@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="auth-page">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <div class="auth-logo">
+                <span>Bridge</span><span>&</span><span>Anchor</span>
+            </div>
+
+            <h1>Welcome Back</h1>
+            <p>Sign in to securely access your account</p>
+        </div>
+
+        <form>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+
+                <input type="email"
+                       id="email"
+                       class="form-control"
+                       placeholder="Enter your email address"
+                       autocomplete="email" />
+            </div>
+
+            <div class="form-group">
+                <div class="password-label">
+                    <label for="password">Password</label>
+
+                    <a href="#" class="forgot-password">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <input type="password"
+                       id="password"
+                       class="form-control"
+                       placeholder="Enter your password"
+                       autocomplete="current-password" />
+            </div>
+
+            <div class="login-options">
+                <label class="remember-me">
+                    <input type="checkbox" />
+                    <span>Remember me</span>
+                </label>
+            </div>
+
+            <button type="submit" class="auth-button">
+                Sign In
+            </button>
+
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account?</p>
+
+            <a asp-controller="Account"
+               asp-action="Register"
+               class="register-link">
+                Create an account
+            </a>
+        </div>
+
+    </div>
+</div>

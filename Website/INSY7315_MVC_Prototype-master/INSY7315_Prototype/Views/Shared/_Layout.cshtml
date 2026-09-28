@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Bridge & Anchor Loans</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/INSY7315_Prototype.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.png" alt="Bridge & Anchor Loans" class="brand-logo" />
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                   <ul class="navbar-nav ms-auto align-items-lg-center">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index"> Home </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Loan" asp-action="Index"> Loans </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="LoanApplication" asp-action="Index"> Applications </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Client" asp-action="Index"> Clients </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Manager" asp-action="Index"> Manager </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Staff" asp-action="Index"> Staff </a>
+                        </li>
+                        <li class="nav-item dropdown ms-lg-3">
+                            <a class="nav-link account-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Account </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Login"> Login </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Register"> Register </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3"> @RenderBody() </main>
+    </div>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="footer-brand">
+                        Bridge & Anchor Loans
+                    </div>
+                    <p class="footer-text"> Simple, reliable lending solutions.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a asp-controller="Home" asp-action="Index"> Home </a>
+                    <span class="footer-divider">|</span>
+                    <a asp-controller="Home" asp-action="Privacy"> Privacy </a>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="footer-bottom">
+                &copy; 2026 Bridge & Anchor Loans. All rights reserved.
+            </div>
+
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

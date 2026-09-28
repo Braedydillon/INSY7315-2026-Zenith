@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F7FB"
+    tools:context=".Policy_Page">
+
+  <ScrollView
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:fillViewport="true"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="1.0"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.0">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="30dp">
+
+      <TextView
+          android:id="@+id/txtPolicyHeader"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="20dp"
+          android:layout_marginTop="30dp"
+          android:layout_marginEnd="20dp"
+          android:text="Our Policies"
+          android:textColor="#172033"
+          android:textSize="28sp"
+          android:textStyle="bold"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
+      <TextView
+          android:id="@+id/txtPolicyIntro"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="20dp"
+          android:layout_marginTop="8dp"
+          android:layout_marginEnd="20dp"
+          android:text="Learn more about our policies, services and the protection provided to our customers."
+          android:textColor="#718096"
+          android:textSize="15sp"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/txtPolicyHeader" />
+
+      <com.google.android.material.card.MaterialCardView
+          android:id="@+id/coverageCard"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="18dp"
+          android:layout_marginTop="22dp"
+          android:layout_marginEnd="18dp"
+          app:cardBackgroundColor="#FFFFFF"
+          app:cardCornerRadius="20dp"
+          app:cardElevation="2dp"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/txtPolicyIntro">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="Insurance &amp; Coverage"
+              android:textColor="#172033"
+              android:textSize="20sp"
+              android:textStyle="bold" />
+
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="10dp"
+              android:lineSpacingExtra="3dp"
+              android:text="Information about the insurance coverage provided by the business, including who is covered, what is included and any applicable conditions."
+              android:textColor="#4A5568"
+              android:textSize="14sp" />
+
+        </LinearLayout>
+
+      </com.google.android.material.card.MaterialCardView>
+
+      <com.google.android.material.card.MaterialCardView
+          android:id="@+id/ficaCard"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="18dp"
+          android:layout_marginTop="16dp"
+          android:layout_marginEnd="18dp"
+          app:cardBackgroundColor="#FFFFFF"
+          app:cardCornerRadius="20dp"
+          app:cardElevation="2dp"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/coverageCard">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="FICA &amp; Compliance"
+              android:textColor="#172033"
+              android:textSize="20sp"
+              android:textStyle="bold" />
+
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="10dp"
+              android:lineSpacingExtra="3dp"
+              android:text="Information relating to customer identification, registration and applicable compliance requirements."
+              android:textColor="#4A5568"
+              android:textSize="14sp" />
+
+        </LinearLayout>
+
+      </com.google.android.material.card.MaterialCardView>
+
+      <com.google.android.material.card.MaterialCardView
+          android:id="@+id/termsCard"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="18dp"
+          android:layout_marginTop="16dp"
+          android:layout_marginEnd="18dp"
+          app:cardBackgroundColor="#FFFFFF"
+          app:cardCornerRadius="20dp"
+          app:cardElevation="2dp"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/ficaCard">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="Terms &amp; Conditions"
+              android:textColor="#172033"
+              android:textSize="20sp"
+              android:textStyle="bold" />
+
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="10dp"
+              android:lineSpacingExtra="3dp"
+              android:text="Terms and conditions relating to the use of our services, customer responsibilities and applicable limitations."
+              android:textColor="#4A5568"
+              android:textSize="14sp" />
+
+        </LinearLayout>
+
+      </com.google.android.material.card.MaterialCardView>
+
+      <com.google.android.material.card.MaterialCardView
+          android:id="@+id/languageCard"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="18dp"
+          android:layout_marginTop="16dp"
+          android:layout_marginEnd="18dp"
+          android:layout_marginBottom="20dp"
+          app:cardBackgroundColor="#FFFFFF"
+          app:cardCornerRadius="20dp"
+          app:cardElevation="2dp"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/termsCard">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+          <TextView
+              android:id="@+id/txtLanguageTitle"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:text="Language Policy"
+              android:textColor="#172033"
+              android:textSize="20sp"
+              android:textStyle="bold"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toTopOf="parent" />
+
+          <TextView
+              android:id="@+id/txtLanguagePolicy"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="12dp"
+              android:justificationMode="inter_word"
+              android:lineSpacingExtra="4dp"
+              android:text="Language Policy 2025
+
+The pre-agreement statement and quotation are available to every client on our Delphin software program, which is provided by an NCR-compliant software provider. The software calculates the contract interest and fees for the client and then prints the required documentation in the format set out in the applicable legislation.
+
+The program does not activate the contract until the client accepts the quotation provided on the system. The client may cancel the contract within 5 days or accept the quotation. If the client declines the quotation, the contract will not be activated and no cancellation fees will be charged.
+
+When the client accepts the quotation, the client signs the pre-agreement and quotation form as well as the credit agreement. Most of our agreements are small agreements, as our current contracts generally fall under six months.
+
+The pre-agreement, quotation and credit agreement are available in English or isiZulu, depending on the official language requested by the client. If the client requests documentation in isiZulu, our staff will explain the contract through translation where necessary.
+
+Regarding the enforcement notice under Section 129 of the Act, we send a notice of default by registered mail after 30 days of missed payment. The notice explains the options available to the client. The date the notice is sent is recorded on our system and a copy is retained for our records. Another 30 days is then allowed before the account is forwarded to the attorneys.
+
+Where possible, we may also restructure a client's debt if they experience difficulties meeting their instalment obligations. This is intended to help avoid unnecessary additional costs for the client.
+
+For marketing and advertising, we currently do not employ agents. Our advertising consists mainly of pamphlets and our website, www.bridgeanchor.co.za. We follow the applicable advertising requirements under the relevant legislation.
+
+Our website provides information about our services, staff and branch contact details. Much of our client base has also been developed through recommendations from existing clients.
+
+Many of our clients have been with the business since before the NCR regulations and know how to contact us. Both offices have operated from the same locations for approximately ten years under Bridge &amp; Anchor Loans. Our branch staff have also been with the business for many years and are trained in pre-agreement quotations, credit agreements and affordability calculations.
+
+Staff have attended relevant training and seminars relating to Delphin, FICA and banking services.
+
+All information stated above is true and correct.
+
+Members of the Closed Corporation"
+              android:textColor="#4A5568"
+              android:textSize="14sp"
+              app:layout_constraintBottom_toBottomOf="parent"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toBottomOf="@id/txtLanguageTitle" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+      </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+  </ScrollView>
+
+  <com.google.android.material.floatingactionbutton.FloatingActionButton
+      android:id="@+id/btnHome"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_margin="20dp"
+      android:contentDescription="Return to Home Page"
+      android:src="@drawable/home"
+      app:backgroundTint="#1769E0"
+      app:tint="@null"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
