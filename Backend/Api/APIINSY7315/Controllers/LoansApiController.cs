@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc;
 using Google.Cloud.Firestore;
 using APIINSY7315.Models;
 
@@ -11,20 +10,22 @@ namespace APIINSY7315.Controllers
     public class LoansApiController : ControllerBase
     {
         private readonly FirestoreDb _firestoreDb;
+        private readonly string _initError;
 
         public LoansApiController()
         {
-            // Ensure your GOOGLE_APPLICATION_CREDENTIALS environment variable is set
-            // or pass the path to your Firebase service account JSON key file here.
-            string projectId = "bridge-anchor-loans"; // Replace with your actual Firebase Project ID
+            string projectId = "insy7315-37442";
             try
             {
+                string credentialPath = Path.Combine(AppContext.BaseDirectory, "cred", "firebase-credentials.json");
+                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credentialPath);
+
                 _firestoreDb = FirestoreDb.Create(projectId);
             }
-            catch
+            catch (Exception ex)
             {
-                // Fallback for initialization during local mocking if needed
                 _firestoreDb = null;
+                _initError = ex.Message;
             }
         }
 
@@ -34,7 +35,7 @@ namespace APIINSY7315.Controllers
         {
             if (_firestoreDb == null)
             {
-                return BadRequest(new { status = "Error", message = "Database connection not initialized." });
+                return BadRequest(new { status = "Error", message = $"Database connection failed: {_initError}" });
             }
 
             Query loanQuery = _firestoreDb.Collection("LoanApplications").WhereEqualTo("Status", "Submitted");
@@ -64,8 +65,7 @@ namespace APIINSY7315.Controllers
 
             if (_firestoreDb == null)
             {
-                // Simulated success if Firestore is not locally configured yet
-                return Ok(new { status = "Success", message = "Loan application received (Mock Mode)" });
+                return BadRequest(new { status = "Error", message = $"Database initialization failed: {_initError}" });
             }
 
             DocumentReference docRef = _firestoreDb.Collection("LoanApplications").Document(loanData.ApplicationId);

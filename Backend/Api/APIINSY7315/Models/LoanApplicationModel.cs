@@ -19,7 +19,7 @@ namespace APIINSY7315.Models
         public Timestamp ApplicationDate { get; set; } = Timestamp.GetCurrentTimestamp();
 
         [FirestoreProperty]
-        public decimal RequestedAmount { get; set; }
+        public double RequestedAmount { get; set; }
 
         [FirestoreProperty]
         public string ReasonForLoan { get; set; }
