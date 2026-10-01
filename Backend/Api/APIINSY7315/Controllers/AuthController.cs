@@ -1,509 +1,680 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Json;
+using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Cloud.Firestore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace APIINSY7315.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [AllowAnonymous]
     public class AuthController : ControllerBase
     {
-        private readonly IHttpClientFactory _httpFactory;
-        private readonly IConfiguration _config;
-        private readonly FirestoreDb _db;
+        private readonly FirestoreDb _firestore;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthController> _logger;
 
         public AuthController(
-            IHttpClientFactory httpFactory,
-            IConfiguration config,
-            FirestoreDb db)
+            FirestoreDb firestore,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration,
+            ILogger<AuthController> logger)
         {
-            _httpFactory = httpFactory;
-            _config = config;
-            _db = db;
+            _firestore = firestore;
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
+            _logger = logger;
         }
-
 
         // ============================================================
         // REGISTER
+        // POST: /api/Auth/register
         // ============================================================
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(
             [FromBody] RegisterRequest request)
         {
-            if (!ModelState.IsValid)
+            if (request == null)
             {
-                return ValidationProblem(ModelState);
+                return BadRequest(new
+                {
+                    error = "INVALID_REQUEST",
+                    message = "Request body is required."
+                });
             }
 
-            var apiKey = WebApiKey();
-
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (string.IsNullOrWhiteSpace(request.Email))
             {
-                return ConfigError();
+                return BadRequest(new
+                {
+                    error = "INVALID_EMAIL",
+                    message = "Email is required."
+                });
             }
 
-            UserRecord user;
+            if (string.IsNullOrWhiteSpace(request.Password) ||
+                request.Password.Length < 6)
+            {
+                return BadRequest(new
+                {
+                    error = "INVALID_PASSWORD",
+                    message = "Password must contain at least 6 characters."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(request.FullName))
+            {
+                return BadRequest(new
+                {
+                    error = "INVALID_NAME",
+                    message = "Full name is required."
+                });
+            }
+
+            var email = request.Email.Trim().ToLowerInvariant();
+            var fullName = request.FullName.Trim();
 
             try
             {
-                user =
-                    await FirebaseAuth
-                        .DefaultInstance
-                        .CreateUserAsync(
-                            new UserRecordArgs
-                            {
-                                Email =
-                                    request.Email.Trim(),
+                FirebaseAuth auth = FirebaseAuth.DefaultInstance;
 
-                                Password =
-                                    request.Password,
+                // ----------------------------------------------------
+                // Check whether the Firebase account already exists
+                // ----------------------------------------------------
 
-                                DisplayName =
-                                    request.FullName.Trim(),
+                try
+                {
+                    var existingUser =
+                        await auth.GetUserByEmailAsync(email);
 
-                                Disabled = false
-                            });
-            }
-            catch (FirebaseAuthException ex)
-                when (ex.AuthErrorCode ==
-                      AuthErrorCode.EmailAlreadyExists)
-            {
-                return Conflict(
-                    new
+                    return Conflict(new
                     {
-                        error =
-                            "ACCOUNT_EXISTS",
-
-                        message =
-                            "An account with that email already exists."
+                        error = "EMAIL_ALREADY_EXISTS",
+                        message = "An account with this email already exists.",
+                        uid = existingUser.Uid
                     });
-            }
-            catch (FirebaseAuthException ex)
-            {
-                return BadRequest(
-                    new
+                }
+                catch (FirebaseAuthException ex)
+                {
+                    if (ex.AuthErrorCode != AuthErrorCode.UserNotFound)
                     {
-                        error =
-                            "FIREBASE_CREATE_USER_FAILED",
+                        throw;
+                    }
+                }
 
-                        message =
-                            ex.Message
-                    });
-            }
+                // ----------------------------------------------------
+                // Create Firebase Authentication account
+                // ----------------------------------------------------
 
+                var firebaseUser =
+                    await auth.CreateUserAsync(
+                        new UserRecordArgs
+                        {
+                            Email = email,
+                            Password = request.Password,
+                            DisplayName = fullName,
+                            EmailVerified = false
+                        });
 
-            // ========================================================
-            // CREATE CLIENT ROLE
-            // ========================================================
+                // ----------------------------------------------------
+                // Default role
+                // ----------------------------------------------------
 
-            await FirebaseAuth
-                .DefaultInstance
-                .SetCustomUserClaimsAsync(
-                    user.Uid,
+                const string role = "client";
+
+                // ----------------------------------------------------
+                // Store role in Firebase custom claims
+                // ----------------------------------------------------
+
+                await auth.SetCustomUserClaimsAsync(
+                    firebaseUser.Uid,
                     new Dictionary<string, object>
                     {
-                        ["role"] =
-                            Roles.Client
+                        ["role"] = role
                     });
 
+                // ----------------------------------------------------
+                // Store user in Firestore
+                // ----------------------------------------------------
 
-            // ========================================================
-            // CREATE USER PROFILE
-            // ========================================================
-
-            await _db
-                .Collection("Users")
-                .Document(user.Uid)
-                .SetAsync(
+                var userData =
                     new Dictionary<string, object>
                     {
-                        ["Uid"] =
-                            user.Uid,
-
-                        ["Email"] =
-                            user.Email ?? request.Email.Trim(),
-
-                        ["FullName"] =
-                            request.FullName.Trim(),
-
-                        ["Role"] =
-                            Roles.Client,
-
-                        ["CreatedAt"] =
+                        ["uid"] = firebaseUser.Uid,
+                        ["email"] = email,
+                        ["fullName"] = fullName,
+                        ["role"] = role,
+                        ["createdAt"] =
                             Timestamp.GetCurrentTimestamp()
+                    };
+
+                await _firestore
+                    .Collection("Users")
+                    .Document(firebaseUser.Uid)
+                    .SetAsync(
+                        userData,
+                        SetOptions.MergeAll);
+
+                // ----------------------------------------------------
+                // Generate Firebase ID token
+                // ----------------------------------------------------
+
+                var idToken =
+                    await FirebaseAuth.DefaultInstance
+                        .CreateCustomTokenAsync(
+                            firebaseUser.Uid,
+                            new Dictionary<string, object>
+                            {
+                                ["role"] = role
+                            });
+
+                var tokenResult =
+                    await ExchangeCustomTokenForIdTokenAsync(
+                        idToken);
+
+                return Ok(
+                    new
+                    {
+                        idToken = tokenResult.IdToken,
+                        refreshToken = tokenResult.RefreshToken,
+                        expiresInSeconds = tokenResult.ExpiresIn,
+                        uid = firebaseUser.Uid,
+                        email = email,
+                        role = role
                     });
+            }
+            catch (FirebaseAuthException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Firebase registration failed for {Email}",
+                    email);
 
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        error = "FIREBASE_REGISTER_ERROR",
+                        message = ex.Message
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Registration failed for {Email}",
+                    email);
 
-            // ========================================================
-            // SIGN IN
-            // ========================================================
-
-            return await SignInAndRespond(
-                apiKey,
-                request.Email.Trim(),
-                request.Password);
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        error = "REGISTER_ERROR",
+                        message = ex.Message
+                    });
+            }
         }
-
 
         // ============================================================
         // LOGIN
+        // POST: /api/Auth/login
         // ============================================================
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(
             [FromBody] LoginRequest request)
         {
-            if (!ModelState.IsValid)
+            if (request == null ||
+                string.IsNullOrWhiteSpace(request.Email) ||
+                string.IsNullOrWhiteSpace(request.Password))
             {
-                return ValidationProblem(ModelState);
+                return BadRequest(new
+                {
+                    error = "INVALID_REQUEST",
+                    message = "Email and password are required."
+                });
             }
 
-            var apiKey = WebApiKey();
-
-            if (string.IsNullOrWhiteSpace(apiKey))
+            try
             {
-                return ConfigError();
-            }
+                var apiKey =
+                    GetFirebaseApiKey();
 
-            return await SignInAndRespond(
-                apiKey,
-                request.Email.Trim(),
-                request.Password);
+                if (string.IsNullOrWhiteSpace(apiKey))
+                {
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        new
+                        {
+                            error = "FIREBASE_API_KEY_MISSING",
+                            message =
+                                "Firebase Web API key is not configured."
+                        });
+                }
+
+                var client =
+                    _httpClientFactory.CreateClient();
+
+                var url =
+                    $"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={apiKey}";
+
+                var payload =
+                    new
+                    {
+                        email = request.Email.Trim(),
+                        password = request.Password,
+                        returnSecureToken = true
+                    };
+
+                var response =
+                    await client.PostAsJsonAsync(
+                        url,
+                        payload);
+
+                var json =
+                    await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Unauthorized(
+                        new
+                        {
+                            error = "LOGIN_FAILED",
+                            message = ExtractFirebaseError(json)
+                        });
+                }
+
+                using var document =
+                    JsonDocument.Parse(json);
+
+                var root =
+                    document.RootElement;
+
+                var idToken =
+                    root.GetProperty("idToken")
+                        .GetString();
+
+                var refreshToken =
+                    root.GetProperty("refreshToken")
+                        .GetString();
+
+                var expiresIn =
+                    root.GetProperty("expiresIn")
+                        .GetString();
+
+                var uid =
+                    root.GetProperty("localId")
+                        .GetString();
+
+                var email =
+                    root.GetProperty("email")
+                        .GetString();
+
+                var role = "client";
+
+                if (!string.IsNullOrWhiteSpace(uid))
+                {
+                    var userSnapshot =
+                        await _firestore
+                            .Collection("Users")
+                            .Document(uid)
+                            .GetSnapshotAsync();
+
+                    if (userSnapshot.Exists &&
+                        userSnapshot.ContainsField("role"))
+                    {
+                        role =
+                            userSnapshot
+                                .GetValue<string>("role");
+                    }
+                }
+
+                return Ok(
+                    new
+                    {
+                        idToken,
+                        refreshToken,
+                        expiresInSeconds =
+                            int.TryParse(
+                                expiresIn,
+                                out var seconds)
+                                ? seconds
+                                : 3600,
+                        uid,
+                        email,
+                        role
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Login failed.");
+
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        error = "LOGIN_ERROR",
+                        message = ex.Message
+                    });
+            }
         }
 
-
         // ============================================================
-        // REFRESH TOKEN
+        // REFRESH
+        // POST: /api/Auth/refresh
         // ============================================================
 
         [HttpPost("refresh")]
+        [AllowAnonymous]
         public async Task<IActionResult> Refresh(
             [FromBody] RefreshRequest request)
         {
-            if (!ModelState.IsValid)
+            if (request == null ||
+                string.IsNullOrWhiteSpace(request.RefreshToken))
             {
-                return ValidationProblem(ModelState);
+                return BadRequest(new
+                {
+                    error = "INVALID_REFRESH_TOKEN",
+                    message = "Refresh token is required."
+                });
             }
 
-            var apiKey = WebApiKey();
+            try
+            {
+                var apiKey =
+                    GetFirebaseApiKey();
+
+                if (string.IsNullOrWhiteSpace(apiKey))
+                {
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        new
+                        {
+                            error = "FIREBASE_API_KEY_MISSING",
+                            message =
+                                "Firebase Web API key is not configured."
+                        });
+                }
+
+                var client =
+                    _httpClientFactory.CreateClient();
+
+                var url =
+                    $"https://securetoken.googleapis.com/v1/token?key={apiKey}";
+
+                var content =
+                    new FormUrlEncodedContent(
+                        new Dictionary<string, string>
+                        {
+                            ["grant_type"] =
+                                "refresh_token",
+
+                            ["refresh_token"] =
+                                request.RefreshToken
+                        });
+
+                var response =
+                    await client.PostAsync(
+                        url,
+                        content);
+
+                var json =
+                    await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Unauthorized(
+                        new
+                        {
+                            error = "REFRESH_FAILED",
+                            message =
+                                ExtractFirebaseError(json)
+                        });
+                }
+
+                using var document =
+                    JsonDocument.Parse(json);
+
+                var root =
+                    document.RootElement;
+
+                var idToken =
+                    root.GetProperty("id_token")
+                        .GetString();
+
+                var refreshToken =
+                    root.GetProperty("refresh_token")
+                        .GetString();
+
+                var expiresIn =
+                    root.GetProperty("expires_in")
+                        .GetString();
+
+                var uid =
+                    root.GetProperty("user_id")
+                        .GetString();
+
+                var role = "client";
+
+                if (!string.IsNullOrWhiteSpace(uid))
+                {
+                    var snapshot =
+                        await _firestore
+                            .Collection("Users")
+                            .Document(uid)
+                            .GetSnapshotAsync();
+
+                    if (snapshot.Exists &&
+                        snapshot.ContainsField("role"))
+                    {
+                        role =
+                            snapshot
+                                .GetValue<string>("role");
+                    }
+                }
+
+                return Ok(
+                    new
+                    {
+                        idToken,
+                        refreshToken,
+                        expiresInSeconds =
+                            int.TryParse(
+                                expiresIn,
+                                out var seconds)
+                                ? seconds
+                                : 3600,
+                        uid,
+                        role
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Refresh token operation failed.");
+
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        error = "REFRESH_ERROR",
+                        message = ex.Message
+                    });
+            }
+        }
+
+        // ============================================================
+        // FIREBASE API KEY
+        // ============================================================
+
+        private string? GetFirebaseApiKey()
+        {
+            return
+                _configuration["Firebase:WebApiKey"]
+                ??
+                Environment.GetEnvironmentVariable(
+                    "FIREBASE_API_KEY");
+        }
+
+        // ============================================================
+        // CUSTOM TOKEN -> ID TOKEN
+        // ============================================================
+
+        private async Task<TokenExchangeResult>
+            ExchangeCustomTokenForIdTokenAsync(
+                string customToken)
+        {
+            var apiKey =
+                GetFirebaseApiKey();
 
             if (string.IsNullOrWhiteSpace(apiKey))
             {
-                return ConfigError();
+                throw new InvalidOperationException(
+                    "Firebase API key is missing.");
             }
 
-            var http =
-                _httpFactory.CreateClient();
+            var client =
+                _httpClientFactory.CreateClient();
 
-            var form =
-                new FormUrlEncodedContent(
-                    new Dictionary<string, string>
-                    {
-                        ["grant_type"] =
-                            "refresh_token",
-
-                        ["refresh_token"] =
-                            request.RefreshToken
-                    });
-
-
-            var response =
-                await http.PostAsync(
-                    "https://securetoken.googleapis.com/v1/token" +
-                    $"?key={apiKey}",
-                    form);
-
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var body =
-                    await response.Content
-                        .ReadAsStringAsync();
-
-                return Unauthorized(
-                    new
-                    {
-                        error =
-                            "REFRESH_FAILED",
-
-                        message =
-                            "The refresh token is invalid or expired.",
-
-                        detail =
-                            body
-                    });
-            }
-
-
-            using var document =
-                JsonDocument.Parse(
-                    await response.Content
-                        .ReadAsStringAsync());
-
-
-            var root =
-                document.RootElement;
-
-
-            var idToken =
-                root.GetProperty("id_token")
-                    .GetString()!;
-
-            var refreshToken =
-                root.GetProperty("refresh_token")
-                    .GetString()!;
-
-            var expiresIn =
-                root.GetProperty("expires_in")
-                    .GetString();
-
-
-            return await BuildTokenResponse(
-                idToken,
-                refreshToken,
-                expiresIn);
-        }
-
-
-        // ============================================================
-        // SIGN IN
-        // ============================================================
-
-        private async Task<IActionResult>
-            SignInAndRespond(
-                string apiKey,
-                string email,
-                string password)
-        {
-            var http =
-                _httpFactory.CreateClient();
-
+            var url =
+                $"https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key={apiKey}";
 
             var payload =
                 new
                 {
-                    email,
-                    password,
+                    token = customToken,
                     returnSecureToken = true
                 };
 
-
-            var content =
-                new StringContent(
-                    JsonSerializer.Serialize(payload),
-                    Encoding.UTF8,
-                    "application/json");
-
-
             var response =
-                await http.PostAsync(
-                    "https://identitytoolkit.googleapis.com/v1/" +
-                    $"accounts:signInWithPassword?key={apiKey}",
-                    content);
+                await client.PostAsJsonAsync(
+                    url,
+                    payload);
 
-
-            var responseBody =
-                await response.Content
-                    .ReadAsStringAsync();
-
+            var json =
+                await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                return Unauthorized(
-                    new
-                    {
-                        error =
-                            "LOGIN_FAILED",
-
-                        message =
-                            "Invalid email or password.",
-
-                        detail =
-                            responseBody
-                    });
+                throw new InvalidOperationException(
+                    ExtractFirebaseError(json));
             }
 
-
             using var document =
-                JsonDocument.Parse(responseBody);
-
+                JsonDocument.Parse(json);
 
             var root =
                 document.RootElement;
 
+            return new TokenExchangeResult
+            {
+                IdToken =
+                    root.GetProperty("idToken")
+                        .GetString() ?? "",
 
-            var idToken =
-                root.GetProperty("idToken")
-                    .GetString()!;
+                RefreshToken =
+                    root.GetProperty("refreshToken")
+                        .GetString() ?? "",
 
-            var refreshToken =
-                root.GetProperty("refreshToken")
-                    .GetString()!;
-
-            var expiresIn =
-                root.GetProperty("expiresIn")
-                    .GetString();
-
-
-            return await BuildTokenResponse(
-                idToken,
-                refreshToken,
-                expiresIn);
+                ExpiresIn =
+                    int.TryParse(
+                        root.GetProperty("expiresIn")
+                            .GetString(),
+                        out var seconds)
+                        ? seconds
+                        : 3600
+            };
         }
 
-
         // ============================================================
-        // BUILD TOKEN RESPONSE
+        // FIREBASE ERROR PARSER
         // ============================================================
 
-        private async Task<IActionResult>
-            BuildTokenResponse(
-                string idToken,
-                string refreshToken,
-                string? expiresIn)
+        private static string ExtractFirebaseError(
+            string json)
         {
-            FirebaseToken decoded;
-
             try
             {
-                decoded =
-                    await FirebaseAuth
-                        .DefaultInstance
-                        .VerifyIdTokenAsync(
-                            idToken);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(
-                    500,
-                    new
+                using var document =
+                    JsonDocument.Parse(json);
+
+                if (document.RootElement
+                    .TryGetProperty(
+                        "error",
+                        out var error))
+                {
+                    if (error.TryGetProperty(
+                        "message",
+                        out var message))
                     {
-                        error =
-                            "TOKEN_VERIFICATION_FAILED",
-
-                        message =
-                            ex.Message
-                    });
+                        return message.GetString()
+                            ?? "Firebase authentication failed.";
+                    }
+                }
             }
-
-
-            string role = "";
-
-            if (decoded.Claims.TryGetValue(
-                    "role",
-                    out var roleClaim))
+            catch
             {
-                role =
-                    Roles.Normalize(
-                        roleClaim?.ToString());
+                // Ignore JSON parsing failure.
             }
 
-
-            string? email = null;
-
-            if (decoded.Claims.TryGetValue(
-                    "email",
-                    out var emailClaim))
-            {
-                email =
-                    emailClaim?.ToString();
-            }
-
-
-            return Ok(
-                new
-                {
-                    idToken,
-
-                    refreshToken,
-
-                    expiresInSeconds =
-                        int.TryParse(
-                            expiresIn,
-                            out var seconds)
-                            ? seconds
-                            : 3600,
-
-                    uid =
-                        decoded.Uid,
-
-                    email,
-
-                    role
-                });
+            return "Firebase authentication failed.";
         }
 
-
         // ============================================================
-        // FIREBASE WEB API KEY
+        // TOKEN RESULT
         // ============================================================
 
-        private string? WebApiKey()
+        private sealed class TokenExchangeResult
         {
-            var key =
-                _config["Firebase:WebApiKey"];
-
-            return string.IsNullOrWhiteSpace(key)
-                ? null
-                : key.Trim();
-        }
-
-
-        private ObjectResult ConfigError()
-        {
-            return StatusCode(
-                500,
-                new
-                {
-                    error =
-                        "FIREBASE_CONFIGURATION_ERROR",
-
-                    message =
-                        "The Firebase Web API key is missing. Configure Firebase__WebApiKey."
-                });
+            public string IdToken { get; set; } = "";
+            public string RefreshToken { get; set; } = "";
+            public int ExpiresIn { get; set; }
         }
     }
 
-
     // ================================================================
-    // REQUEST MODELS
+    // REQUEST CLASSES
     // ================================================================
 
     public class RegisterRequest
     {
-        [Required]
-        [EmailAddress]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.EmailAddress]
         public string Email { get; set; } = "";
 
-        [Required]
-        [MinLength(6)]
-        [MaxLength(100)]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.MinLength(6)]
+        [System.ComponentModel.DataAnnotations.MaxLength(100)]
         public string Password { get; set; } = "";
 
-        [Required]
-        [StringLength(150)]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.StringLength(150)]
         public string FullName { get; set; } = "";
     }
 
-
     public class LoginRequest
     {
-        [Required]
-        [EmailAddress]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.EmailAddress]
         public string Email { get; set; } = "";
 
-        [Required]
+        [System.ComponentModel.DataAnnotations.Required]
         public string Password { get; set; } = "";
     }
 
-
     public class RefreshRequest
     {
-        [Required]
+        [System.ComponentModel.DataAnnotations.Required]
         public string RefreshToken { get; set; } = "";
     }
 }
