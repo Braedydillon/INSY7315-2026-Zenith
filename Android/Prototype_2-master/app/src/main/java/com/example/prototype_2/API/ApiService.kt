@@ -2,6 +2,7 @@ package com.example.prototype_2.API
 
 import okhttp3.ResponseBody
 import retrofit2.Response
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -91,4 +92,11 @@ interface ApiService {
     suspend fun getMe(
         @Header("Authorization") token: String? = null
     ): Response<UserDto>
+
+
+    @POST("api/loans")
+    fun submitLoanApplication(
+        @Body request: SubmitLoanRequest
+    ): Call<Any>
+
 }
