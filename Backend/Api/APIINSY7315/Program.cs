@@ -1,317 +1,57 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
-using Microsoft.OpenApi;
-using System.Text;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ============================================================
-// SERVICES
-// ============================================================
+// 1. Configure Firebase and Firestore Credentials safely for both local and cloud
+GoogleCredential credential;
+string? firebaseJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS_JSON");
 
-builder.Services.AddControllers();
-
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen(options =>
+if (!string.IsNullOrEmpty(firebaseJson))
 {
-    // --------------------------------------------------------
-    // Swagger / Firebase Bearer authentication
-    // --------------------------------------------------------
-
-    options.AddSecurityDefinition(
-        "Bearer",
-        new OpenApiSecurityScheme
-        {
-            Type = SecuritySchemeType.Http,
-            Scheme = "bearer",
-            BearerFormat = "JWT",
-            Description =
-                "Enter your Firebase ID token."
-        });
-
-    options.AddSecurityRequirement(
-        document =>
-            new OpenApiSecurityRequirement
-            {
-                [
-                    new OpenApiSecuritySchemeReference(
-                        "Bearer",
-                        document)
-                ] = []
-            });
-});
-
-builder.Services.AddHttpClient();
-
-
-// ============================================================
-// FIREBASE CONFIGURATION
-// ============================================================
-
-var projectId =
-    builder.Configuration["Firebase:ProjectId"]
-    ?? Environment.GetEnvironmentVariable(
-        "FIREBASE_PROJECT_ID")
-    ?? "insy7315-37442";
-
-
-GoogleCredential? credential = null;
-
-
-// ============================================================
-// RENDER - JSON CREDENTIALS
-// ============================================================
-
-var credentialsJson =
-    Environment.GetEnvironmentVariable(
-        "FIREBASE_CREDENTIALS_JSON");
-
-
-if (!string.IsNullOrWhiteSpace(
-        credentialsJson))
+    // Cloud / Render environment variable approach
+    credential = GoogleCredential.FromJson(firebaseJson);
+}
+else
 {
-    credential =
-        GoogleCredential.FromJson(
-            credentialsJson);
+    // Local development file path approach
+    string pathToKey = Path.Combine(builder.Environment.ContentRootPath, "cred", "firebase-credentials.json");
+    credential = GoogleCredential.FromFile(pathToKey);
 }
 
-
-// ============================================================
-// RENDER - BASE64 CREDENTIALS
-// ============================================================
-
-if (credential == null)
-{
-    var credentialsBase64 =
-        Environment.GetEnvironmentVariable(
-            "FIREBASE_CREDENTIALS_BASE64");
-
-
-    if (!string.IsNullOrWhiteSpace(
-            credentialsBase64))
-    {
-        var json =
-            Encoding.UTF8.GetString(
-                Convert.FromBase64String(
-                    credentialsBase64));
-
-        credential =
-            GoogleCredential.FromJson(
-                json);
-    }
-}
-
-
-// ============================================================
-// LOCAL DEVELOPMENT
-// ============================================================
-
-if (credential == null)
-{
-    var localCredentialsPath =
-        Path.Combine(
-            builder.Environment.ContentRootPath,
-            "cred",
-            "firebase-credentials.json");
-
-
-    if (File.Exists(
-            localCredentialsPath))
-    {
-        credential =
-            GoogleCredential.FromFile(
-                localCredentialsPath);
-    }
-}
-
-
-// ============================================================
-// GOOGLE APPLICATION CREDENTIALS
-// ============================================================
-
-if (credential == null)
-{
-    var environmentPath =
-        Environment.GetEnvironmentVariable(
-            "GOOGLE_APPLICATION_CREDENTIALS");
-
-
-    if (!string.IsNullOrWhiteSpace(
-            environmentPath) &&
-        File.Exists(environmentPath))
-    {
-        credential =
-            GoogleCredential.FromFile(
-                environmentPath);
-    }
-}
-
-
-// ============================================================
-// MAKE SURE FIREBASE CREDENTIALS EXIST
-// ============================================================
-
-if (credential == null)
-{
-    throw new InvalidOperationException(
-        "Firebase credentials are not configured. " +
-        "Set FIREBASE_CREDENTIALS_JSON, " +
-        "FIREBASE_CREDENTIALS_BASE64, " +
-        "or GOOGLE_APPLICATION_CREDENTIALS.");
-}
-
-
-// ============================================================
-// FIREBASE ADMIN SDK
-// ============================================================
-
+// 2. Initialize Firebase App if not already initialized
 if (FirebaseApp.DefaultInstance == null)
 {
-    FirebaseApp.Create(
-        new AppOptions
-        {
-            Credential = credential,
-            ProjectId = projectId
-        });
+    FirebaseApp.Create(new AppOptions()
+    {
+        Credential = credential
+    });
 }
 
-
-// ============================================================
-// FIRESTORE
-// ============================================================
-
-var firestore =
-    new FirestoreDbBuilder
+// 3. Register FirestoreDb using the explicit credential
+builder.Services.AddSingleton(provider =>
+    FirestoreDb.Create("insy7315-37442", new Google.Cloud.Firestore.V1.FirestoreClientBuilder
     {
-        ProjectId = projectId,
         Credential = credential
-    }.Build();
+    }.Build()));
 
+builder.Services.AddHttpClient();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton(
-    firestore);
-
-
-// ============================================================
-// CORS
-// ============================================================
-
-builder.Services.AddCors(
-    options =>
-    {
-        options.AddPolicy(
-            "Frontend",
-            policy =>
-            {
-                policy
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-            });
-    });
-
-
-// ============================================================
-// BUILD APPLICATION
-// ============================================================
-
-var app =
-    builder.Build();
-
-
-// ============================================================
-// SWAGGER
-// ============================================================
+var app = builder.Build();
 
 app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "APIINSY7315 v1");
+    c.RoutePrefix = string.Empty;
+});
 
-app.UseSwaggerUI(
-    options =>
-    {
-        options.SwaggerEndpoint(
-            "/swagger/v1/swagger.json",
-            "APIINSY7315 v1");
-
-        options.RoutePrefix =
-            string.Empty;
-    });
-
-
-// ============================================================
-// CORS
-// ============================================================
-
-app.UseCors("Frontend");
-
-
-// ============================================================
-// HEALTH
-// ============================================================
-
-app.MapGet(
-    "/health",
-    () =>
-    {
-        return Results.Ok(
-            new
-            {
-                status = "ok",
-                service = "APIINSY7315",
-                projectId = projectId
-            });
-    });
-
-
-// ============================================================
-// FIRESTORE HEALTH
-// ============================================================
-
-app.MapGet(
-    "/health/firestore",
-    async (FirestoreDb db) =>
-    {
-        try
-        {
-            await db
-                .Collection("LoanApplications")
-                .Limit(1)
-                .GetSnapshotAsync();
-
-
-            return Results.Ok(
-                new
-                {
-                    status = "ok",
-                    firestore = "connected",
-                    projectId = projectId
-                });
-        }
-        catch (Exception ex)
-        {
-            return Results.Json(
-                new
-                {
-                    status = "error",
-                    firestore = "disconnected",
-                    projectId = projectId,
-                    message = ex.Message
-                },
-                statusCode: 503);
-        }
-    });
-
-
-// ============================================================
-// CONTROLLERS
-// ============================================================
-
+app.UseHttpsRedirection();
+app.UseAuthorization();
 app.MapControllers();
-
-
-// ============================================================
-// START
-// ============================================================
-
 app.Run();
