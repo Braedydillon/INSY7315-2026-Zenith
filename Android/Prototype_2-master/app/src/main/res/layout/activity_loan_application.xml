@@ -111,7 +111,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="FULL NAMES &amp; SURNAME">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etFullName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -121,7 +123,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="ID NUMBER">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etIdNumber"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number" />
@@ -138,7 +142,9 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:hint="HOME TEL. NO">
+
                             <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etHomeTelephone"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="phone" />
@@ -150,7 +156,9 @@
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
                             android:hint="CELL NO">
+
                             <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etCellNumber"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="phone" />
@@ -166,18 +174,31 @@
                         android:textSize="12sp" />
 
                     <RadioGroup
+                        android:id="@+id/rgMaritalStatus"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
-                        <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Married" />
-                        <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Unmarried" />
+
+                        <RadioButton
+                            android:id="@+id/rbMarried"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Married" />
+
+                        <RadioButton
+                            android:id="@+id/rbUnmarried"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Unmarried" />
                     </RadioGroup>
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="IF MARRIED, IN OR OUT OF COMM.">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etMaritalCommunity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -195,15 +216,28 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-                        <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Yes" />
-                        <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="No" />
+
+                        <CheckBox
+                            android:id="@+id/cbDivorcedYes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Yes" />
+
+                        <CheckBox
+                            android:id="@+id/cbDivorcedNo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No" />
+
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
                             android:hint="YEAR">
+
                             <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etDivorceYear"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="number" />
@@ -215,7 +249,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="IF DIVORCED, IN OR OUT OF COMM">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etDivorceCommunity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -250,7 +286,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="CURRENT PHYSICAL ADDRESS">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPhysicalAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textPostalAddress" />
@@ -261,7 +299,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="POSTAL ADDRESS">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPostalAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textPostalAddress" />
@@ -272,7 +312,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="PARENTS ADDRESS">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etParentsAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textPostalAddress" />
@@ -290,23 +332,29 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:hint="Years">
+
                             <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etResidenceYears"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="number" />
                         </com.google.android.material.textfield.TextInputLayout>
+
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
                             android:hint="Months">
+
                             <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etResidenceMonths"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="number" />
@@ -343,7 +391,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="COMPANY NAME">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etCompanyName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -353,7 +403,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="WORK TELEPHONE">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etWorkTelephone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="phone" />
@@ -364,7 +416,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="OCCUPATION">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etOccupation"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -374,7 +428,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="WORK ADDRESS">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etWorkAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -409,7 +465,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="NAME OF BANK">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etBankName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -419,7 +477,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="TYPE OF ACCOUNT">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAccountType"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -429,7 +489,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="ACCOUNT NUMBER">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAccountNumber"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number" />
@@ -440,7 +502,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="BRANCH NAME">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etBranchName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -450,7 +514,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="ACCOUNT NAME">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAccountName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -460,7 +526,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="BRANCH CODE">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etBranchCode"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number" />
@@ -496,7 +564,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="SPOUSE NAME&amp;SURNAME">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSpouseName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -506,7 +576,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="ID NUMBER">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSpouseIdNumber"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number" />
@@ -517,7 +589,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="TEL. NUMBER">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSpouseTelephone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="phone" />
@@ -528,7 +602,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="EMPLOYER NAME">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSpouseEmployerName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -538,7 +614,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="EMPLOYER ADDRESS">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSpouseEmployerAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -548,7 +626,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="EMPLOYER TEL. NUMBER">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSpouseEmployerTelephone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="phone" />
@@ -580,74 +660,112 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="RELATIVE (1)" android:textStyle="bold" android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RELATIVE (1)"
+                        android:textStyle="bold"
+                        android:textSize="12sp" />
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="NAME">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRelative1Name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="RELATIONSHIP">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRelative1Relationship"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="TEL. NUMBER">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRelative1Telephone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="phone" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="ADDRESS">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRelative1Address"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E5E7EB" android:layout_marginVertical="16dp" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="16dp"
+                        android:background="#E5E7EB" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="RELATIVE (2)" android:textStyle="bold" android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RELATIVE (2)"
+                        android:textStyle="bold"
+                        android:textSize="12sp" />
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="NAME">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRelative2Name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="RELATIONSHIP">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRelative2Relationship"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="TEL. NUMBER">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRelative2Telephone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="phone" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="ADDRESS">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRelative2Address"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -682,7 +800,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="LOAN AMOUNT REQUIRED">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etLoanAmount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal" />
@@ -700,12 +820,43 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:columnCount="2">
-                        <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Business" />
-                        <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Education" />
-                        <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Consumption" />
-                        <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Housing" />
-                        <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Furniture" />
-                        <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Other" />
+
+                        <CheckBox
+                            android:id="@+id/cbBusiness"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Business" />
+
+                        <CheckBox
+                            android:id="@+id/cbEducation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Education" />
+
+                        <CheckBox
+                            android:id="@+id/cbConsumption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Consumption" />
+
+                        <CheckBox
+                            android:id="@+id/cbHousing"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Housing" />
+
+                        <CheckBox
+                            android:id="@+id/cbFurniture"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Furniture" />
+
+                        <CheckBox
+                            android:id="@+id/cbOther"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Other" />
+
                     </GridLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -713,7 +864,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="If Other, specify">
+
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etOtherPurpose"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -736,11 +889,32 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="I HEREBY DECLARE THAT:" android:textStyle="bold" android:textSize="14sp" />
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="1) The information furnished herein is true and correct.\n2) I am not insolvent, nor is my estate under administration, nor have I applied for administration.\n3) I authorize Bridge&amp;anchor loans to make all enquires to its discretion to verify information in this application form." android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="I HEREBY DECLARE THAT:"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
 
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="I HEREBY CONSENT TO:" android:textStyle="bold" android:textSize="14sp" />
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="1) My personal and confidential information be collected and used accordingly for my loan application. (credit checks)\n2) The above information be sent to/registered with the applicable credit bureaus on approval of my loan." android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="1) The information furnished herein is true and correct.\n2) I am not insolvent, nor is my estate under administration, nor have I applied for administration.\n3) I authorize Bridge&amp;anchor loans to make all enquires to its discretion to verify information in this application form."
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="I HEREBY CONSENT TO:"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="1) My personal and confidential information be collected and used accordingly for my loan application. (credit checks)\n2) The above information be sent to/registered with the applicable credit bureaus on approval of my loan."
+                        android:textSize="12sp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -749,7 +923,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="APPLICANT SIGNATURE (Type Name)">
+
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etApplicantSignature"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -759,7 +935,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="DATE">
+
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etApplicationDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="date" />
