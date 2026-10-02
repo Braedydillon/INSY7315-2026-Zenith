@@ -1,3 +1,8 @@
+using INSY7315_Prototype.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
+
+
 namespace INSY7315_Prototype
 {
     public class Program
@@ -8,6 +13,18 @@ namespace INSY7315_Prototype
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddHttpClient<AuthApiService>(client =>
+                {
+                    client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+                });
+
+            //Handle Accesss for user roles
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+            });
 
             var app = builder.Build();
 
@@ -24,6 +41,8 @@ namespace INSY7315_Prototype
 
             app.UseRouting();
 
+            //Check who user is
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

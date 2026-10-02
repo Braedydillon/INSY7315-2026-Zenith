@@ -1,4 +1,5 @@
-﻿@{
+﻿@model INSY7315_Prototype.ViewModels.LoginViewModel
+@{
     ViewData["Title"] = "Login";
 }
 
@@ -14,16 +15,21 @@
             <p>Sign in to securely access your account</p>
         </div>
 
-        <form>
+        <form asp-controller="Account" asp-action="Login" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">
                 <label for="email">Email Address</label>
 
-                <input type="email"
-                       id="email"
+                
+                <input asp-for="Email"
                        class="form-control"
                        placeholder="Enter your email address"
                        autocomplete="email" />
+
+                <span asp-validation-for="Email" class="text-danger"></span>
+
             </div>
 
             <div class="form-group">
@@ -35,11 +41,13 @@
                     </a>
                 </div>
 
-                <input type="password"
-                       id="password"
+                <input asp-for="Password"
                        class="form-control"
                        placeholder="Enter your password"
                        autocomplete="current-password" />
+
+                <span asp-validation-for="Password" class="text-danger"></span>
+
             </div>
 
             <div class="login-options">
@@ -67,3 +75,7 @@
 
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

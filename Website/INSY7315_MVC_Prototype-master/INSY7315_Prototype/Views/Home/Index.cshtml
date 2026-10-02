@@ -564,3 +564,12 @@
         </div>
     </div>
 </section>
+
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div>
+        <p>Logged in as: @ViewBag.UserEmail</p>
+        <p>Role: @ViewBag.UserRole</p>
+    </div>
+}
