@@ -22,7 +22,7 @@ class LoanApplicationAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LoanViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_loan_application, parent, false)
+            .inflate(R.layout.activity_item_loan_application, parent, false)
 
         return LoanViewHolder(view)
     }

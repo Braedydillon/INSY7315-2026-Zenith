@@ -525,7 +525,7 @@ class Chatbot_Page : AppCompatActivity() {
             val view = LayoutInflater
                 .from(parent.context)
                 .inflate(
-                    R.layout.item_chat_message,
+                    R.layout.activity_item_chat_message,
                     parent,
                     false
                 )
