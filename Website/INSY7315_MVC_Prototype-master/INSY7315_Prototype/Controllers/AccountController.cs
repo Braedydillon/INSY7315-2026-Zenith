@@ -4,6 +4,7 @@ using INSY7315_Prototype.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace INSY7315_Prototype.Controllers
 {
@@ -82,10 +83,23 @@ namespace INSY7315_Prototype.Controllers
             }
         }
 
-
+        [HttpGet]
         public IActionResult Register()
         {
             return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            return View(model);
         }
 
 
