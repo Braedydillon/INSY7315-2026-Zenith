@@ -2983,3 +2983,57 @@ main {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         transform: translateY(1px);
 }
+
+.card {
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.grid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+    .grid.two {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid.three {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid input, .grid select, .grid textarea, .card > form > input {
+        width: 100%;
+    }
+
+.validation {
+    color: #c0392b;
+}
+
+.check {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.reason-box {
+    margin: 1rem 0;
+    padding: 1rem;
+}
+
+.button {
+    padding: .6rem 1.2rem;
+    background: #0d6efd;
+    color: #fff;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+@media (max-width: 700px) {
+    .grid.two, .grid.three {
+        grid-template-columns: 1fr;
+    }
+}
