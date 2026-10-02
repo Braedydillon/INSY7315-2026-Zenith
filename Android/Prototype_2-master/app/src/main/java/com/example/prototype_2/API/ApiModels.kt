@@ -80,7 +80,9 @@ data class RegisterRequest(
     @SerializedName("fullName") val fullName: String? = null,
     @SerializedName("email") val email: String? = null,
     @SerializedName("password") val password: String? = null,
-    @SerializedName("role") val role: String? = null
+    @SerializedName("role") val role: String? = null,
+    @SerializedName("idNumber") val idNumber: String? = null,
+    @SerializedName("cellNo") val cellNo: String? = null
 )
 
 data class RoleAssignmentRequest(
