@@ -6,7 +6,7 @@ namespace INSY7315_Prototype.Services
     public class AuthApiService
     {
 
-        //Converts the Json returned by the API for the LoginResponseViewModel
+        //Converts the info entered into JSON for the API to read
 
         private readonly HttpClient _httpClient;
 
@@ -18,6 +18,25 @@ namespace INSY7315_Prototype.Services
         public async Task<LoginResponseViewModel?> LoginAsync(LoginViewModel model)
         {
             var response = await _httpClient.PostAsJsonAsync("api/Auth/login", model);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<LoginResponseViewModel>();
+        }
+
+        public async Task<LoginResponseViewModel?> RegisterAsync(RegisterViewModel model)
+        {
+            var request = new RegisterRequestViewModel
+            {
+                Email = model.Email,
+                Password = model.Password,
+                FullName = model.FullName
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("api/Auth/register", request);
 
             if (!response.IsSuccessStatusCode)
             {

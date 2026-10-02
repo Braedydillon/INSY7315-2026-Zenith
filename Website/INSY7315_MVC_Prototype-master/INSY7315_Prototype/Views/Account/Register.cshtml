@@ -29,11 +29,11 @@
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
+            @* <div class="form-group">
                 <label asp-for="Phone">Phone Number</label>
                 <input asp-for="Phone" class="form-control" placeholder="Enter your phone number" autocomplete="tel" />
                 <span asp-validation-for="Phone" class="text-danger"></span>
-            </div>
+            </div> *@
 
             <div class="form-group">
                 <label asp-for="Password">Password</label>
@@ -68,6 +68,6 @@
 </div>
 
 
-@section Scripts{
-    <partial nanme="_ValidationScriptsPartial" />
-}   
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

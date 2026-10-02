@@ -83,6 +83,7 @@ namespace INSY7315_Prototype.Controllers
             }
         }
 
+
         [HttpGet]
         public IActionResult Register()
         {
@@ -92,14 +93,40 @@ namespace INSY7315_Prototype.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            return View(model);
+            var registerResult = await _authApiService.RegisterAsync(model);
+
+            if (registerResult == null)
+            {
+                ModelState.AddModelError(string.Empty, "Registration failed. The email may already be registered");
+
+                return View(model);
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, registerResult.Uid),
+                new Claim(ClaimTypes.Email, registerResult.Email),
+                new Claim(ClaimTypes.Name, registerResult.Email),
+                new Claim(ClaimTypes.Role, registerResult.Role)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = false
+            };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+            return RedirectToAction("Index", "Client");
         }
 
 
