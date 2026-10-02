@@ -80,18 +80,34 @@ class Login_Page : AppCompatActivity() {
 
                 if (response.isSuccessful && response.body() != null) {
                     val authResponse = response.body()
-                    val token = authResponse?.token ?: authResponse?.accessToken
+                    
+                    // Note: Your backend returns 'idToken' in JSON instead of 'token' in the Login endpoint
+                    // so we make sure we grab the token properly. If the backend actually maps to 'idToken',
+                    // we'll rely on the manual API models.
+                    
+                    val role = authResponse?.role?.lowercase() ?: authResponse?.user?.role?.lowercase()
+                    
+                    if(role == "admin") {
+                        val intent = Intent(this@Login_Page, Staff_Page::class.java)
+                        startActivity(intent)
+                        finish()
+                        return@launch
+                    } else {
+                        // Treat everything else as a client for now
+                        val token = authResponse?.token ?: authResponse?.accessToken ?: authResponse?.idToken
 
-                    RetrofitClient.authToken = token
+                        if (token != null) {
+                            RetrofitClient.authToken = token
+                            val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                            prefs.edit().putString("AUTH_TOKEN", token).apply()
+                        }
 
-                    val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-                    prefs.edit().putString("AUTH_TOKEN", token).apply()
+                        Toast.makeText(this@Login_Page, "Login successful!", Toast.LENGTH_SHORT).show()
 
-                    Toast.makeText(this@Login_Page, "Login successful!", Toast.LENGTH_SHORT).show()
-
-                    val intent = Intent(this@Login_Page, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                        val intent = Intent(this@Login_Page, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
                 } else {
                     val code = response.code()
                     val errorMsg = withContext(Dispatchers.IO) {

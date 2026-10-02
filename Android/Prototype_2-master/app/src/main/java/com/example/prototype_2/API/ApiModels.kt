@@ -100,9 +100,11 @@ data class UpdateStatusRequest(
 
 data class AuthResponse(
     @SerializedName("token") val token: String? = null,
+    @SerializedName("idToken") val idToken: String? = null,
     @SerializedName("accessToken") val accessToken: String? = null,
     @SerializedName("refreshToken") val refreshToken: String? = null,
     @SerializedName("expiration") val expiration: String? = null,
+    @SerializedName("role") val role: String? = null,
     @SerializedName("user") val user: UserDto? = null
 )
 
