@@ -121,6 +121,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/trackHeaderBg"
-        tools:listitem="@layout/item_loan_application" />
+        tools:listitem="@layout/activity_item_loan_application" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
