@@ -1,0 +1,49 @@
+﻿@model INSY7315_Prototype.Models.ApplicationForm
+@{
+    ViewData["Title"] = "Loan Application";
+}
+
+<h1>Loan Application</h1>
+
+<form asp-controller="ApplicationForm" asp-action="Index" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="RequestedAmount" class="form-label"></label>
+        <input asp-for="RequestedAmount" class="form-control" />
+        <span asp-validation-for="RequestedAmount" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="FullNameAndSurname" class="form-label"></label>
+        <input asp-for="FullNameAndSurname" class="form-control" />
+        <span asp-validation-for="FullNameAndSurname" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="IdNumber" class="form-label"></label>
+        <input asp-for="IdNumber" class="form-control" />
+        <span asp-validation-for="IdNumber" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="CellNo" class="form-label"></label>
+        <input asp-for="CellNo" class="form-control" />
+        <span asp-validation-for="CellNo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="CurrentPhysicalAddress" class="form-label"></label>
+        <input asp-for="CurrentPhysicalAddress" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="CompanyName" class="form-label"></label>
+        <input asp-for="CompanyName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Occupation" class="form-label"></label>
+        <input asp-for="Occupation" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit application</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
