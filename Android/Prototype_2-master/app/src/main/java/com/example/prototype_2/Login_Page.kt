@@ -1,4 +1,3 @@
-
 package com.example.prototype_2
 
 import android.content.Intent
@@ -15,7 +14,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.prototype_2.API.LoginRequest
 import com.example.prototype_2.API.RetrofitClient
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,8 +41,6 @@ class Login_Page : AppCompatActivity() {
             val intent = Intent(this, Register_Page::class.java)
             startActivity(intent)
         }
-
-
 
         ViewCompat.setOnApplyWindowInsetsListener(
             findViewById(R.id.main)
@@ -122,8 +118,6 @@ class Login_Page : AppCompatActivity() {
                     "Login response: $authResponse"
                 )
 
-                // Get the authentication token.
-                // The backend may return it as idToken, token or accessToken.
                 val token = authResponse.idToken
                     ?: authResponse.token
                     ?: authResponse.accessToken
@@ -139,10 +133,8 @@ class Login_Page : AppCompatActivity() {
                     return@launch
                 }
 
-                // Store token for API requests
                 RetrofitClient.authToken = token
 
-                // Get the user's role
                 val role = (
                         authResponse.role
                             ?: authResponse.user?.role
@@ -154,7 +146,6 @@ class Login_Page : AppCompatActivity() {
                     "User role: $role"
                 )
 
-                // Save login information
                 val prefs = getSharedPreferences(
                     "AppPrefs",
                     MODE_PRIVATE
@@ -186,9 +177,24 @@ class Login_Page : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
 
-                // Staff and admin users go to the staff dashboard.
-                // Clients go to the normal client home page.
-                if (role == "staff" || role == "admin") {
+                /*
+                 * Redirect user based on role:
+                 *
+                 * admin -> Manager Page
+                 * staff -> Staff Page
+                 * client -> Main Page
+                 */
+
+                if (role == "admin") {
+
+                    val intent = Intent(
+                        this@Login_Page,
+                        Manager_Page::class.java
+                    )
+
+                    startActivity(intent)
+
+                } else if (role == "staff") {
 
                     val intent = Intent(
                         this@Login_Page,
@@ -230,4 +236,3 @@ class Login_Page : AppCompatActivity() {
         }
     }
 }
-
