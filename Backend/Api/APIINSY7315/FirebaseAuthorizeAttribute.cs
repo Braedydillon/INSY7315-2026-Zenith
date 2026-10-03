@@ -10,17 +10,21 @@ namespace APIINSY7315
         public const string Admin = "admin";
         public const string Management = "management";
 
+        public const string Staff = "staff";
+
         public static readonly string[] All =
         {
             Client,
             Admin,
-            Management
+            Management,
+            Staff
         };
 
-        public static readonly string[] Staff =
+        public static readonly string[] StaffType =
         {
             Admin,
-            Management
+            Management,
+            Staff
         };
 
         public static bool IsValid(string? role)
@@ -49,7 +53,7 @@ namespace APIINSY7315
         {
             var normalized = Normalize(role);
 
-            return Staff.Contains(normalized);
+            return StaffType.Contains(normalized);
         }
     }
 
