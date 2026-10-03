@@ -175,7 +175,7 @@ class LoanApplicationActivity : AppCompatActivity() {
         btnSubmitApplication = findViewById(R.id.btnSubmitApplication)
     }
 
-
+    // date for loan application
     private fun getCurrentDateTime(): String {
         val formatter = java.text.SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss",
