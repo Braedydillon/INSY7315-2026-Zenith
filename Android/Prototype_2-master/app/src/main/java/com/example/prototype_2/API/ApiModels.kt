@@ -243,7 +243,7 @@ data class UpdateStatusRequest(
 // ==========================================
 
 data class AuthResponse(
-<<<<<<< HEAD
+
     @SerializedName("token") val token: String? = null,
     @SerializedName("idToken") val idToken: String? = null,
     @SerializedName("accessToken") val accessToken: String? = null,
@@ -251,29 +251,9 @@ data class AuthResponse(
     @SerializedName("expiration") val expiration: String? = null,
     @SerializedName("role") val role: String? = null,
     @SerializedName("user") val user: UserDto? = null
-=======
-    @SerializedName("idToken")
-    val idToken: String? = null,
-
-    @SerializedName("refreshToken")
-    val refreshToken: String? = null,
-
-    @SerializedName("accessToken")
-    val accessToken: String? = null,
 
 
-    @SerializedName("expiresInSeconds")
-    val expiresInSeconds: Int? = null,
 
-    @SerializedName("uid")
-    val uid: String? = null,
-
-    @SerializedName("email")
-    val email: String? = null,
-
-    @SerializedName("role")
-    val role: String? = null
->>>>>>> fea7102 (Fixed the application page)
 )
 
 data class UserDto(

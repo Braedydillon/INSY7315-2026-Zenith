@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -16,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/txtStaffTitle"
+        android:id="@+id/StaffTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -29,28 +30,27 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/txtStaffWelcome"
+        android:id="@+id/StaffWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome back, Administrator"
+        android:text="Welcome back, Staff Member"
         android:textColor="#94A3B8"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="@+id/txtStaffTitle"
-        app:layout_constraintTop_toBottomOf="@+id/txtStaffTitle" />
+        app:layout_constraintStart_toStartOf="@id/StaffTitle"
+        app:layout_constraintTop_toBottomOf="@id/StaffTitle" />
 
     <Button
         android:id="@+id/btnLogoutStaff"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:text="Logout"
-        style="@style/Widget.Material3.Button.TextButton"
         android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="@+id/txtStaffWelcome"
+        app:layout_constraintBottom_toBottomOf="@id/StaffWelcome"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/txtStaffTitle" />
+        app:layout_constraintTop_toTopOf="@id/StaffTitle" />
 
-    <!-- Stats Section -->
     <LinearLayout
         android:id="@+id/statsLayout"
         android:layout_width="match_parent"
@@ -58,7 +58,7 @@
         android:layout_marginTop="24dp"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/txtStaffWelcome">
+        app:layout_constraintTop_toBottomOf="@id/StaffWelcome">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="0dp"
@@ -67,14 +67,31 @@
             android:layout_weight="1"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12" android:textSize="20sp" android:textStyle="bold" android:textColor="#1769E0" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="New" android:textSize="12sp" android:textColor="#718096" />
+
+                <TextView
+                    android:id="@+id/TotalApplications"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#1769E0"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Applications"
+                    android:textColor="#718096"
+                    android:textSize="12sp" />
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
@@ -84,14 +101,31 @@
             android:layout_weight="1"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="45" android:textSize="20sp" android:textStyle="bold" android:textColor="#25D366" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Processed" android:textSize="12sp" android:textColor="#718096" />
+
+                <TextView
+                    android:id="@+id/PendingApplications"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#F59E0B"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pending Review"
+                    android:textColor="#718096"
+                    android:textSize="12sp" />
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
@@ -101,106 +135,62 @@
             android:layout_weight="1"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R250k" android:textSize="18sp" android:textStyle="bold" android:textColor="#172033" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Volume" android:textSize="12sp" android:textColor="#718096" />
+
+                <TextView
+                    android:id="@+id/ApprovedApplications"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#25D366"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Verified"
+                    android:textColor="#718096"
+                    android:textSize="12sp" />
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
     <TextView
-        android:id="@+id/txtSubmissionsTitle"
+        android:id="@+id/SubmissionsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
-        android:text="Recent Submissions"
+        android:text="Loan Applications"
         android:textColor="#172033"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/statsLayout" />
+        app:layout_constraintTop_toBottomOf="@id/statsLayout" />
 
-    <ScrollView
-        android:layout_width="match_parent"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvStaffLoans"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="12dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
+        android:clipToPadding="false"
+        android:visibility="visible"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtSubmissionsTitle">
-
-        <LinearLayout
-            android:id="@+id/submissionsContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingBottom="24dp">
-            <!-- Items will be added here or statically for mock -->
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/mockSubmission1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp">
-                    <TextView android:id="@+id/applicantName1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="John Doe" android:textStyle="bold" android:textColor="#172033" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loan ID: BA-2026-001" android:textSize="12sp" android:textColor="#718096" app:layout_constraintTop_toBottomOf="@id/applicantName1" app:layout_constraintStart_toStartOf="parent" />
-                    <Button android:id="@+id/btnViewPdf1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="View PDF" style="@style/Widget.Material3.Button.TextButton" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/mockSubmission2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp">
-                    <TextView android:id="@+id/applicantName2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sarah Smith" android:textStyle="bold" android:textColor="#172033" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loan ID: BA-2026-002" android:textSize="12sp" android:textColor="#718096" app:layout_constraintTop_toBottomOf="@id/applicantName2" app:layout_constraintStart_toStartOf="parent" />
-                    <Button android:id="@+id/btnViewPdf2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="View PDF" style="@style/Widget.Material3.Button.TextButton" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/mockSubmission3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp">
-                    <TextView android:id="@+id/applicantName3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Michael Brown" android:textStyle="bold" android:textColor="#172033" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loan ID: BA-2026-003" android:textSize="12sp" android:textColor="#718096" app:layout_constraintTop_toBottomOf="@id/applicantName3" app:layout_constraintStart_toStartOf="parent" />
-                    <Button android:id="@+id/btnViewPdf3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="View PDF" style="@style/Widget.Material3.Button.TextButton" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
-    </ScrollView>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/SubmissionsTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
