@@ -2,17 +2,13 @@ using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
+using Microsoft.OpenApi;
 using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
-
-
 GoogleCredential credential;
 string? firebaseJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS_JSON");
-
 if (!string.IsNullOrEmpty(firebaseJson))
 {
     credential = GoogleCredential.FromJson(firebaseJson);
@@ -40,19 +36,32 @@ builder.Services.AddSingleton(provider =>
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "APIINSY7315", Version = "v1" });
 
+    // Define the Bearer token scheme for OpenAPI v3
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
+    });
 
-
-
-
-
-
-
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document),
+            new List<string>()
+        }
+    });
+});
 
 var app = builder.Build();
-
 
 using (var scope = app.Services.CreateScope())
 {
@@ -75,7 +84,6 @@ async Task SeedDefaultAdminAsync(FirestoreDb db)
         }
         catch (FirebaseAuthException)
         {
-        
         }
 
         if (user == null)
@@ -89,7 +97,6 @@ async Task SeedDefaultAdminAsync(FirestoreDb db)
             });
         }
 
-      
         await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(
             user.Uid,
             new Dictionary<string, object> { { "role", "admin" } });
