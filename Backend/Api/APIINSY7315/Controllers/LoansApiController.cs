@@ -963,9 +963,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // INT
-        // ============================================================
 
         private static int GetInt(
             Dictionary<string, object> data,
@@ -990,10 +987,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // DATETIME
-        // ============================================================
-
+    
         private static DateTime GetDateTime(
             Dictionary<string, object> data,
             string key)
