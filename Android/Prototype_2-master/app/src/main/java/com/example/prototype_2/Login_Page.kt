@@ -44,17 +44,7 @@ class Login_Page : AppCompatActivity() {
             startActivity(intent)
         }
 
-        findViewById<Button>(R.id.btnStaffProto).setOnClickListener {
-            val intent = Intent(this, Staff_Page::class.java)
-            startActivity(intent)
-        }
 
-        val btnHome = findViewById<FloatingActionButton>(R.id.btnHome)
-
-        btnHome.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
 
         ViewCompat.setOnApplyWindowInsetsListener(
             findViewById(R.id.main)
