@@ -23,9 +23,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // POST /api/LoansApi
-        // ============================================================
+        
 
         [HttpPost]
         [FirebaseAuthorize(Roles.Client)]
@@ -56,10 +54,6 @@ namespace APIINSY7315.Controllers
 
             try
             {
-                // ----------------------------------------------------
-                // Automatically fetch user profile details from Firestore
-                // to link ID number, Cell number, and Full Name.
-                // ----------------------------------------------------
                 string idNumber = request.ClientDetails?.IdNumber ?? "";
                 string cellNo = request.ClientDetails?.CellNo ?? "";
                 string fullName = request.ClientDetails?.FullNameAndSurname ?? "";
@@ -80,11 +74,6 @@ namespace APIINSY7315.Controllers
                         fullName = userDoc.GetValue<string>("fullName");
                     }
                 }
-
-                // ----------------------------------------------------
-                // Convert client supplied DateTime to Firestore
-                // Timestamp safely.
-                // ----------------------------------------------------
 
                 Timestamp? applicantFormTimestamp = null;
 
@@ -111,9 +100,7 @@ namespace APIINSY7315.Controllers
                 }
 
 
-                // ----------------------------------------------------
-                // Build strongly typed Firestore object.
-                // ----------------------------------------------------
+            
 
                 var application =
                     new LoanApplicationModel
@@ -276,9 +263,6 @@ namespace APIINSY7315.Controllers
                     };
 
 
-                // ----------------------------------------------------
-                // Firestore document
-                // ----------------------------------------------------
 
                 var document =
                     _db
@@ -286,8 +270,6 @@ namespace APIINSY7315.Controllers
                         .Document(applicationId);
 
 
-                // IMPORTANT:
-                // Save the strongly typed Firestore model.
                 await document.CreateAsync(application);
 
 
@@ -337,9 +319,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // GET /api/LoansApi/mine
-        // ============================================================
+     
 
         [HttpGet("mine")]
         [FirebaseAuthorize(Roles.Client)]
@@ -392,9 +372,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // GET /api/LoansApi
-        // ============================================================
 
         [HttpGet]
         [FirebaseAuthorize(
@@ -467,9 +444,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // GET /api/LoansApi/pending
-        // ============================================================
 
         [HttpGet("pending")]
         [FirebaseAuthorize(
@@ -520,9 +494,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // GET /api/LoansApi/{id}
-        // ============================================================
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(
@@ -582,9 +553,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // PUT /api/LoansApi/{id}/status
-        // ============================================================
 
         [HttpPut("{id}/status")]
         [FirebaseAuthorize(
@@ -692,9 +660,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // FIRESTORE DOCUMENT -> DTO
-        // ============================================================
 
         private static LoanApplicationDto MapDocument(
             DocumentSnapshot document)
@@ -955,9 +920,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // STRING
-        // ============================================================
+        
 
         private static string GetString(
             Dictionary<string, object> data,
@@ -975,9 +938,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // DOUBLE
-        // ============================================================
+     
 
         private static double GetDouble(
             Dictionary<string, object> data,
@@ -1066,9 +1027,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // NULLABLE DATETIME
-        // ============================================================
 
         private static DateTime? GetNullableDateTime(
             Dictionary<string, object> data,
@@ -1103,9 +1061,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // NULLABLE TIMESTAMP
-        // ============================================================
 
         private static Timestamp? GetNullableTimestamp(
             Dictionary<string, object> data,
@@ -1128,9 +1083,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // STRING LIST
-        // ============================================================
 
         private static List<string> GetStringList(
             Dictionary<string, object> data,
@@ -1166,10 +1118,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // CLIENT DETAILS
-        // ============================================================
-
+      
         private static ClientDetailsDto GetClientDetails(
             Dictionary<string, object> data)
         {

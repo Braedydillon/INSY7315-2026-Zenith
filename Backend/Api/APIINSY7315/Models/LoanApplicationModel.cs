@@ -3,10 +3,7 @@ using Google.Cloud.Firestore;
 
 namespace APIINSY7315.Models
 {
-    // ============================================================
-    // FIRESTORE MODEL
-    // ============================================================
-
+   
     [FirestoreData]
     public class LoanApplicationModel
     {
@@ -148,8 +145,7 @@ namespace APIINSY7315.Models
         [FirestoreProperty]
         public string ApplicantSignature { get; set; } = "";
 
-        // IMPORTANT:
-        // Firestore stores this as Timestamp, not DateTime.
+        
         [FirestoreProperty]
         public Timestamp? ApplicantFormDate { get; set; }
 
@@ -164,10 +160,6 @@ namespace APIINSY7315.Models
     }
 
 
-    // ============================================================
-    // CLIENT DETAILS
-    // ============================================================
-
     [FirestoreData]
     public class ClientDetailsModel
     {
@@ -181,10 +173,6 @@ namespace APIINSY7315.Models
         public string CellNo { get; set; } = "";
     }
 
-
-    // ============================================================
-    // LOAN STATUS
-    // ============================================================
 
     public static class LoanStatus
     {
@@ -203,9 +191,6 @@ namespace APIINSY7315.Models
     }
 
 
-    // ============================================================
-    // SUBMIT REQUEST
-    // ============================================================
 
     public class SubmitLoanRequest
     {
@@ -299,10 +284,6 @@ namespace APIINSY7315.Models
     }
 
 
-    // ============================================================
-    // CLIENT DETAILS REQUEST
-    // ============================================================
-
     public class ClientDetailsRequest
     {
         [Required]
@@ -323,10 +304,7 @@ namespace APIINSY7315.Models
     }
 
 
-    // ============================================================
-    // UPDATE STATUS REQUEST
-    // ============================================================
-
+  
     public class UpdateStatusRequest
     {
         [Required]
@@ -337,10 +315,7 @@ namespace APIINSY7315.Models
     }
 
 
-    // ============================================================
-    // API RESPONSE DTO
-    // ============================================================
-
+   
     public class LoanApplicationDto
     {
         public string ApplicationId { get; set; } = "";
@@ -445,9 +420,6 @@ namespace APIINSY7315.Models
     }
 
 
-    // ============================================================
-    // CLIENT DETAILS DTO
-    // ============================================================
 
     public class ClientDetailsDto
     {

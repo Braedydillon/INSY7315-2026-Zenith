@@ -31,10 +31,7 @@ namespace APIINSY7315.Controllers
             _logger = logger;
         }
 
-        // ============================================================
-        // REGISTER
-        // POST: /api/Auth/register
-        // ============================================================
+     
 
         [HttpPost("register")]
         [AllowAnonymous]
@@ -103,9 +100,7 @@ namespace APIINSY7315.Controllers
             {
                 FirebaseAuth auth = FirebaseAuth.DefaultInstance;
 
-                // ----------------------------------------------------
-                // Check whether the Firebase account already exists
-                // ----------------------------------------------------
+            
 
                 try
                 {
@@ -127,9 +122,7 @@ namespace APIINSY7315.Controllers
                     }
                 }
 
-                // ----------------------------------------------------
-                // Create Firebase Authentication account
-                // ----------------------------------------------------
+              
 
                 var firebaseUser =
                     await auth.CreateUserAsync(
@@ -141,15 +134,11 @@ namespace APIINSY7315.Controllers
                             EmailVerified = false
                         });
 
-                // ----------------------------------------------------
-                // Default role
-                // ----------------------------------------------------
+          
 
                 const string role = "client";
 
-                // ----------------------------------------------------
-                // Store role in Firebase custom claims
-                // ----------------------------------------------------
+              
 
                 await auth.SetCustomUserClaimsAsync(
                     firebaseUser.Uid,
@@ -158,9 +147,7 @@ namespace APIINSY7315.Controllers
                         ["role"] = role
                     });
 
-                // ----------------------------------------------------
-                // Store user and linked details in Firestore
-                // ----------------------------------------------------
+               
 
                 var userData =
                     new Dictionary<string, object>
@@ -182,9 +169,7 @@ namespace APIINSY7315.Controllers
                         userData,
                         SetOptions.MergeAll);
 
-                // ----------------------------------------------------
-                // Generate Firebase ID token
-                // ----------------------------------------------------
+              
 
                 var idToken =
                     await FirebaseAuth.DefaultInstance
@@ -242,10 +227,7 @@ namespace APIINSY7315.Controllers
             }
         }
 
-        // ============================================================
-        // LOGIN
-        // POST: /api/Auth/login
-        // ============================================================
+    
 
         [HttpPost("login")]
         [AllowAnonymous]
@@ -388,12 +370,6 @@ namespace APIINSY7315.Controllers
                     });
             }
         }
-
-        // ============================================================
-        // REFRESH
-        // POST: /api/Auth/refresh
-        // ============================================================
-
         [HttpPost("refresh")]
         [AllowAnonymous]
         public async Task<IActionResult> Refresh(
@@ -534,9 +510,7 @@ namespace APIINSY7315.Controllers
             }
         }
 
-        // ============================================================
-        // FIREBASE API KEY
-        // ============================================================
+      
 
         private string? GetFirebaseApiKey()
         {
@@ -547,9 +521,7 @@ namespace APIINSY7315.Controllers
                     "FIREBASE_API_KEY");
         }
 
-        // ============================================================
-        // CUSTOM TOKEN -> ID TOKEN
-        // ============================================================
+        
 
         private async Task<TokenExchangeResult>
             ExchangeCustomTokenForIdTokenAsync(
@@ -617,9 +589,7 @@ namespace APIINSY7315.Controllers
             };
         }
 
-        // ============================================================
-        // FIREBASE ERROR PARSER
-        // ============================================================
+      
 
         private static string ExtractFirebaseError(
             string json)
@@ -651,9 +621,7 @@ namespace APIINSY7315.Controllers
             return "Firebase authentication failed.";
         }
 
-        // ============================================================
-        // TOKEN RESULT
-        // ============================================================
+      
 
         private sealed class TokenExchangeResult
         {
@@ -663,9 +631,6 @@ namespace APIINSY7315.Controllers
         }
     }
 
-    // ================================================================
-    // REQUEST CLASSES
-    // ================================================================
 
     public class RegisterRequest
     {

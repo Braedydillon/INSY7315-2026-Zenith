@@ -223,10 +223,6 @@ namespace APIINSY7315
             role =
                 Roles.Normalize(role);
 
-
-            // IMPORTANT:
-            // Never automatically turn a missing/invalid
-            // role into "client".
             if (string.IsNullOrWhiteSpace(role))
             {
                 context.Result =
@@ -263,8 +259,7 @@ namespace APIINSY7315
                 email;
 
 
-            // No role requirement.
-            // [FirebaseAuthorize]
+          
             if (_allowedRoles.Length == 0)
             {
                 return;
