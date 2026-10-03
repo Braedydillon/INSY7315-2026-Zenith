@@ -1,217 +1,57 @@
 ﻿@{
-    ViewData["Title"] = "Clients";
+    ViewData["Title"] = "My Account";
 }
 
-<div class="staff-client-page">
+<div class="client-dashboard">
 
-    <div class="client-header">
-
-        <span class="client-label">BRIDGE&ANCHOR</span>
-
-        <h1>Clients</h1>
-
-        <p>
-            View and manage client information and loan activity.
-        </p>
-
-    </div>
-   
-
-    <!-- Search -->
-
-    <div class="client-search-card">
-
-        <input type="text"
-               class="client-search"
-               placeholder="Search by name, email or ID number..." />
-
-        <button class="client-search-button btn-shadow">
-            Search
-        </button>
-
+    <div class="dashboard-header">
+        <div>
+            <h1>My Account</h1>
+            <p>Manage your account and loan applications.</p>
+        </div>
     </div>
 
-
-    <!-- Client Table -->
-
-    <div class="client-table-card">
-
-        <div class="client-table-header">
-            <h2>Client List</h2>
-
-            <span>3 Clients</span>
+    <div class="account-card">
+        <div class="account-icon">
+            <i class="bi bi-person-circle"></i>
         </div>
 
-        <div class="table-responsive">
-
-            <table class="client-table">
-
-                <thead>
-                    <tr>
-                        <th>Client</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Applications</th>
-                        <th>Loans</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-
-                        <td>
-                            <strong>John Smith</strong>
-                            <small>Client #1001</small>
-                        </td>
-
-                        <td>
-                            john@email.com
-                        </td>
-
-                        <td>
-                            072 123 4567
-                        </td>
-
-                        <td>
-                            2
-                        </td>
-
-                        <td>
-                            1
-                        </td>
-
-                        <td>
-                            <span class="client-status active">
-                                Active
-                            </span>
-                        </td>
-
-                        <td>
-                            <a href="#" class="view-client-link">
-                                View →
-                            </a>
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>Sarah Naidoo</strong>
-                            <small>Client #1002</small>
-                        </td>
-
-                        <td>
-                            sarah@email.com
-                        </td>
-
-                        <td>
-                            083 456 7890
-                        </td>
-
-                        <td>
-                            1
-                        </td>
-
-                        <td>
-                            1
-                        </td>
-
-                        <td>
-                            <span class="client-status active">
-                                Active
-                            </span>
-                        </td>
-
-                        <td>
-                            <a href="#" class="view-client-link">
-                                View →
-                            </a>
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>David Jones</strong>
-                            <small>Client #1003</small>
-                        </td>
-
-                        <td>
-                            david@email.com
-                        </td>
-
-                        <td>
-                            071 555 1234
-                        </td>
-
-                        <td>
-                            1
-                        </td>
-
-                        <td>
-                            0
-                        </td>
-
-                        <td>
-                            <span class="client-status pending">
-                                Pending
-                            </span>
-                        </td>
-
-                        <td>
-                            <a href="#" class="view-client-link">
-                                View →
-                            </a>
-                        </td>
-
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Michael Dlamini</strong>
-                            <small>Client #1004</small>
-                        </td>
-
-                        <td>
-                            michael@email.com
-                        </td>
-
-                        <td>
-                            076 234 8910
-                        </td>
-
-                        <td>
-                            2
-                        </td>
-
-                        <td>
-                            1
-                        </td>
-
-                        <td>
-                            <span class="client-status active">
-                                Active
-                            </span>
-                        </td>
-
-                        <td>
-                            <a href="#" class="view-client-link">
-                                View →
-                            </a>
-                        </td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
+        <div class="account-info">
+            <span class="account-label">Signed in as</span>
+            <h3>@ViewBag.Email</h3>
+            <span class="account-badge">Client</span>
         </div>
+    </div>
+
+    <div class="dashboard-actions">
+
+        <a asp-controller="Loan"
+           asp-action="Index"
+           class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                <i class="bi bi-cash-coin"></i>
+            </div>
+
+            <div>
+                <h3>View Loans</h3>
+                <p>Browse available loan options.</p>
+            </div>
+        </a>
+
+        <a asp-controller="LoanApplication"
+           asp-action="Index"
+           class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                <i class="bi bi-file-earmark-text"></i>
+            </div>
+
+            <div>
+                <h3>My Applications</h3>
+                <p>View and track your loan applications.</p>
+            </div>
+        </a>
 
     </div>
 

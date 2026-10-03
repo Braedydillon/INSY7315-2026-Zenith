@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace INSY7315_Prototype.Controllers
 {
@@ -8,6 +9,9 @@ namespace INSY7315_Prototype.Controllers
     {
         public IActionResult Index()
         {
+            ViewBag.Email = User.FindFirst(ClaimTypes.Email)?.Value;
+            ViewBag.Role = User.FindFirst(ClaimTypes.Role)?.Value;
+
             return View();
         }
     }
