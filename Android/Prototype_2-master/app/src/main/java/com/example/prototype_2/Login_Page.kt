@@ -1,4 +1,3 @@
-
 package com.example.prototype_2
 
 import android.content.Intent
@@ -42,8 +41,6 @@ class Login_Page : AppCompatActivity() {
             val intent = Intent(this, Register_Page::class.java)
             startActivity(intent)
         }
-
-
 
         ViewCompat.setOnApplyWindowInsetsListener(
             findViewById(R.id.main)
@@ -121,8 +118,6 @@ class Login_Page : AppCompatActivity() {
                     "Login response: $authResponse"
                 )
 
-                // Get the authentication token.
-                // The backend may return it as idToken, token or accessToken.
                 val token = authResponse.idToken
                     ?: authResponse.token
                     ?: authResponse.accessToken
@@ -140,10 +135,6 @@ class Login_Page : AppCompatActivity() {
 
                 RetrofitClient.authToken = token
 
-                // Store token for API requests
-                RetrofitClient.authToken = token
-
-                // Get the user's role
                 val role = (
                         authResponse.role
                             ?: authResponse.user?.role
@@ -204,9 +195,6 @@ class Login_Page : AppCompatActivity() {
                     startActivity(intent)
 
                 } else if (role == "staff") {
-                // Staff and admin users go to the staff dashboard.
-                // Clients go to the normal client home page.
-                if (role == "staff" || role == "admin") {
 
                     val intent = Intent(
                         this@Login_Page,
@@ -248,4 +236,3 @@ class Login_Page : AppCompatActivity() {
         }
     }
 }
-
