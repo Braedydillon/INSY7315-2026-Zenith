@@ -75,7 +75,7 @@ async Task SeedDefaultAdminAsync(FirestoreDb db)
         }
         catch (FirebaseAuthException)
         {
-            // User does not exist, create them
+        
         }
 
         if (user == null)
@@ -89,7 +89,7 @@ async Task SeedDefaultAdminAsync(FirestoreDb db)
             });
         }
 
-        // Set custom claims and Firestore role
+      
         await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(
             user.Uid,
             new Dictionary<string, object> { { "role", "admin" } });
