@@ -293,7 +293,7 @@ data class LoanDto(
     val reasonForLoan: String? = null,
 
     @SerializedName("status")
-    val status: String? = null,
+    var status: String? = null,
 
     @SerializedName("submissionDate")
     val submissionDate: String? = null,

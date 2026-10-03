@@ -15,7 +15,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.prototype_2.API.LoginRequest
 import com.example.prototype_2.API.RetrofitClient
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -139,6 +138,8 @@ class Login_Page : AppCompatActivity() {
                     return@launch
                 }
 
+                RetrofitClient.authToken = token
+
                 // Store token for API requests
                 RetrofitClient.authToken = token
 
@@ -154,7 +155,6 @@ class Login_Page : AppCompatActivity() {
                     "User role: $role"
                 )
 
-                // Save login information
                 val prefs = getSharedPreferences(
                     "AppPrefs",
                     MODE_PRIVATE
@@ -186,6 +186,24 @@ class Login_Page : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
 
+                /*
+                 * Redirect user based on role:
+                 *
+                 * admin -> Manager Page
+                 * staff -> Staff Page
+                 * client -> Main Page
+                 */
+
+                if (role == "admin") {
+
+                    val intent = Intent(
+                        this@Login_Page,
+                        Manager_Page::class.java
+                    )
+
+                    startActivity(intent)
+
+                } else if (role == "staff") {
                 // Staff and admin users go to the staff dashboard.
                 // Clients go to the normal client home page.
                 if (role == "staff" || role == "admin") {
