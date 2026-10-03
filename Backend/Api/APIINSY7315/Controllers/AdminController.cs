@@ -13,7 +13,7 @@ namespace APIINSY7315.Controllers
         private readonly FirestoreDb _db;
         public AdminController(FirestoreDb db) => _db = db;
 
-        // POST api/Admin/set-role
+     
         [HttpPost("set-role")]
         public async Task<IActionResult> SetUserRole([FromBody] RoleAssignmentRequest request)
         {
@@ -31,17 +31,16 @@ namespace APIINSY7315.Controllers
             await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(user.Uid,
                 new Dictionary<string, object> { { "role", role } });
 
-            // Keep the readable profile in Firestore in sync (the token claim remains the source of truth).
+        
             await _db.Collection("Users").Document(user.Uid)
                 .SetAsync(new Dictionary<string, object> { { "Role", role } }, SetOptions.MergeAll);
-
-            // Forces the user's apps to re-authenticate so the new role takes effect straight away.
+.
             await FirebaseAuth.DefaultInstance.RevokeRefreshTokensAsync(user.Uid);
 
             return Ok(new { message = $"'{request.Email}' is now '{role}'." });
         }
 
-        // GET api/Admin/users - list accounts and their roles (for an admin screen)
+       
         [HttpGet("users")]
         public async Task<IActionResult> ListUsers()
         {
@@ -62,6 +61,6 @@ namespace APIINSY7315.Controllers
     public class RoleAssignmentRequest
     {
         [Required, EmailAddress] public string Email { get; set; } = "";
-        [Required] public string Role { get; set; } = ""; // admin | management | client
+        [Required] public string Role { get; set; } = ""; 
     }
 }
