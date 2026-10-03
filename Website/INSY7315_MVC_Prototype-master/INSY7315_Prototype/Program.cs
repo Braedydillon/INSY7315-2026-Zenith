@@ -1,8 +1,6 @@
 using INSY7315_Prototype.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
-
-
 namespace INSY7315_Prototype
 {
     public class Program
@@ -11,18 +9,31 @@ namespace INSY7315_Prototype
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews(options =>
             {
                 options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
             });
 
             builder.Services.AddHttpClient<AuthApiService>(client =>
-                {
-                    client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
-                });
+            {
+                client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+            });
 
-            //Handle Accesss for user roles
+            // Named client used by LoanController
+            builder.Services.AddHttpClient("LoanApi", client =>
+            {
+                client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+            });
+
+            // Session support (fixes the InvalidOperationException)
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
                 options.LoginPath = "/Account/Login";
@@ -31,11 +42,9 @@ namespace INSY7315_Prototype
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -44,7 +53,7 @@ namespace INSY7315_Prototype
 
             app.UseRouting();
 
-            //Check who user is
+            app.UseSession();          // after UseRouting, before auth
             app.UseAuthentication();
             app.UseAuthorization();
 
