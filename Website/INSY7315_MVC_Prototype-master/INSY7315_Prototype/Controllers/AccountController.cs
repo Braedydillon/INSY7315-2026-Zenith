@@ -52,7 +52,8 @@ namespace INSY7315_Prototype.Controllers
                 new Claim(ClaimTypes.NameIdentifier, loginResult.Uid),
                 new Claim(ClaimTypes.Email, loginResult.Email),
                 new Claim(ClaimTypes.Name, loginResult.Email),
-                new Claim(ClaimTypes.Role, loginResult.Role)
+                new Claim(ClaimTypes.Role, loginResult.Role),
+                new Claim("IdToken", loginResult.IdToken)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -114,7 +115,8 @@ namespace INSY7315_Prototype.Controllers
                 new Claim(ClaimTypes.NameIdentifier, registerResult.Uid),
                 new Claim(ClaimTypes.Email, registerResult.Email),
                 new Claim(ClaimTypes.Name, registerResult.Email),
-                new Claim(ClaimTypes.Role, registerResult.Role)
+                new Claim(ClaimTypes.Role, registerResult.Role),
+                new Claim("IdToken", registerResult.IdToken)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
