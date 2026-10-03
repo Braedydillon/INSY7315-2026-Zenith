@@ -276,9 +276,12 @@ data class UserDto(
 data class LoanDto(
     @SerializedName("id")
     val id: String? = null,
+    @SerializedName("applicationId")
+    val applicationId: String? = null,
 
     @SerializedName("applicantName")
     val applicantName: String? = null,
+
 
     @SerializedName("requestedAmount")
     val requestedAmount: Double? = null,

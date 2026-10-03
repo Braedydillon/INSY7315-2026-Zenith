@@ -83,15 +83,23 @@ class StaffLoanAdapter(
 
             val context = holder.itemView.context
 
+            val id = application.applicationId
+
+            if (id.isNullOrEmpty()) {
+                android.widget.Toast.makeText(
+                    context,
+                    "Application ID is missing",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+
             val intent = Intent(
                 context,
                 StaffLoanDetailsActivity::class.java
             )
 
-            intent.putExtra(
-                "LOAN_ID",
-                application.id
-            )
+            intent.putExtra("LOAN_ID", id)
 
             context.startActivity(intent)
         }
