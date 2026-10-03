@@ -48,9 +48,6 @@ class Staff_Page : AppCompatActivity() {
         rvStaffLoans.adapter = adapter
 
         btnLogoutStaff.setOnClickListener {
-            val prefs = getSharedPreferences("Auth", MODE_PRIVATE)
-            prefs.edit().clear().apply()
-
             val prefsApp = getSharedPreferences("AppPrefs", MODE_PRIVATE)
             prefsApp.edit().clear().apply()
             RetrofitClient.authToken = null
@@ -72,12 +69,10 @@ class Staff_Page : AppCompatActivity() {
     private fun loadLoans() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val token = getSharedPreferences("Auth", MODE_PRIVATE)
-                    .getString("token", null)
 
-                val response = RetrofitClient.apiService.getAllLoans(
-                    token = if (token != null) "Bearer $token" else null
-                )
+                RetrofitClient.loadToken(this@Staff_Page)
+                
+                val response = RetrofitClient.apiService.getAllLoans()
 
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
