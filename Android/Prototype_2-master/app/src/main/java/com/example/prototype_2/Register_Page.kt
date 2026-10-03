@@ -46,12 +46,15 @@ class Register_Page : AppCompatActivity() {
         edtPassword = findViewById(R.id.edtPassword)
         edtConfirmPassword = findViewById(R.id.edtConfirmPassword)
 
+
         btnSubmitRegistration.setOnClickListener {
             if (checkTerms.isChecked) {
                 val fullName = edtFullName.text?.toString()?.trim().orEmpty()
                 val email = edtEmail.text?.toString()?.trim().orEmpty()
                 val password = edtPassword.text?.toString()?.trim().orEmpty()
                 val confirmPassword = edtConfirmPassword.text?.toString()?.trim().orEmpty()
+                val idnumber = edtIdNumber.text?.toString()?.trim().orEmpty()
+                val phone = edtPhone.text?.toString()?.trim().orEmpty()
 
                 if (fullName.isEmpty() || email.isEmpty() || password.isEmpty()) {
                     Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
@@ -71,15 +74,36 @@ class Register_Page : AppCompatActivity() {
                     ).show()
                     return@setOnClickListener
                 }
+                if (idnumber.isEmpty()) {
+                    Toast.makeText(this, "Please enter your ID number", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if (idnumber.length != 13) {
+                    Toast.makeText(this, "Please enter a valid ID number", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if (phone.isEmpty()) {
+                    Toast.makeText(this, "Please enter your phone number", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if (phone.length != 10) {
+                    Toast.makeText(this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+
 
                 btnSubmitRegistration.isEnabled = false
 
                 lifecycleScope.launch {
                     try {
                         val request = RegisterRequest(
-                            email = email,
                             fullName = fullName,
-                            password = password
+                            email = email,
+                            password = password,
+                            idNumber = edtIdNumber.text?.toString()?.trim().orEmpty(),
+                            cellNo = edtPhone.text?.toString()?.trim().orEmpty(),
+                            role = "Client"
                         )
 
                         val response = withContext(Dispatchers.IO) {
@@ -88,7 +112,7 @@ class Register_Page : AppCompatActivity() {
 
                         if (response.isSuccessful) {
                             val authResponse = response.body()
-                            val token = authResponse?.token ?: authResponse?.accessToken
+                            val token = authResponse?.idToken ?: authResponse?.accessToken
 
                             if (token != null) {
                                 RetrofitClient.authToken = token

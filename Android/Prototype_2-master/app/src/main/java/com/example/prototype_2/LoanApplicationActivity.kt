@@ -1,6 +1,7 @@
 package com.example.prototype_2
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -91,6 +92,8 @@ class LoanApplicationActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_loan_application)
 
+        RetrofitClient.loadToken(this)
+
         initialiseViews()
 
         btnSubmitApplication.setOnClickListener {
@@ -172,6 +175,17 @@ class LoanApplicationActivity : AppCompatActivity() {
         btnSubmitApplication = findViewById(R.id.btnSubmitApplication)
     }
 
+    // date for loan application
+    private fun getCurrentDateTime(): String {
+        val formatter = java.text.SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss",
+            java.util.Locale.getDefault()
+        )
+
+        return formatter.format(java.util.Date())
+    }
+
+
     private fun submitApplication() {
 
         if (!validateForm()) {
@@ -202,34 +216,24 @@ class LoanApplicationActivity : AppCompatActivity() {
             etResidenceMonths.text.toString().toIntOrNull()
 
         val clientDetails = ClientDetailsRequest(
-            firstName = getFirstName(),
-            lastName = getLastName(),
-            email = null,
+            fullNameAndSurname = etFullName.text.toString().trim(),
             idNumber = etIdNumber.text.toString().trim(),
-            homeTelephone = etHomeTelephone.text.toString().trim(),
-            cellNumber = etCellNumber.text.toString().trim(),
-            maritalStatus = getMaritalStatus(),
-            maritalCommunity = etMaritalCommunity.text.toString().trim(),
-            previouslyDivorced = divorced,
-            divorceYear = divorceYear,
+            cellNo = etCellNumber.text.toString().trim(),
+            homeTelNo = etHomeTelephone.text.toString().trim(),
+            marriedOrUnmarried = "",
+            marriageCommunity = etMaritalCommunity.text.toString().trim(),
+            previouslyDivorced = if (divorced) "Yes" else "No",
+            divorceYear = divorceYear?.toString() ?: "",
             divorceCommunity = etDivorceCommunity.text.toString().trim(),
-            physicalAddress = etPhysicalAddress.text.toString().trim(),
+            currentPhysicalAddress = etPhysicalAddress.text.toString().trim(),
             postalAddress = etPostalAddress.text.toString().trim(),
             parentsAddress = etParentsAddress.text.toString().trim(),
             residenceYears = residenceYears,
             residenceMonths = residenceMonths,
             companyName = etCompanyName.text.toString().trim(),
-            workTelephone = etWorkTelephone.text.toString().trim(),
             occupation = etOccupation.text.toString().trim(),
-            workAddress = etWorkAddress.text.toString().trim(),
-            employmentStatus = null,
-            monthlyIncome = null,
-            bankName = etBankName.text.toString().trim(),
-            accountType = etAccountType.text.toString().trim(),
-            accountNumber = etAccountNumber.text.toString().trim(),
-            branchName = etBranchName.text.toString().trim(),
-            accountName = etAccountName.text.toString().trim(),
-            branchCode = etBranchCode.text.toString().trim()
+            workTelephone = etWorkTelephone.text.toString().trim(),
+            workAddress = etWorkAddress.text.toString().trim()
         )
 
         val spouseDetails = SpouseDetailsRequest(
@@ -256,16 +260,39 @@ class LoanApplicationActivity : AppCompatActivity() {
         )
 
         val request = SubmitLoanRequest(
-            amount = loanAmount,
-            termMonths = null,
-            purpose = purpose,
-            otherPurpose = etOtherPurpose.text.toString().trim(),
+            requestedAmount = loanAmount,
+            reasonForLoan = purpose,
+            otherReason = etOtherPurpose.text.toString().trim(),
+
             clientDetails = clientDetails,
-            spouseDetails = spouseDetails,
-            relative1 = relative1,
-            relative2 = relative2,
+
+            bankName = etBankName.text.toString().trim(),
+            accountType = etAccountType.text.toString().trim(),
+            accountNumber = etAccountNumber.text.toString().trim(),
+            branchName = etBranchName.text.toString().trim(),
+            accountName = etAccountName.text.toString().trim(),
+            branchCode = etBranchCode.text.toString().trim(),
+
+            spouseNameAndSurname = etSpouseName.text.toString().trim(),
+            spouseIdNumber = etSpouseIdNumber.text.toString().trim(),
+            spouseTelNumber = etSpouseTelephone.text.toString().trim(),
+            spouseEmployerName = etSpouseEmployerName.text.toString().trim(),
+            spouseEmployerAddress = etSpouseEmployerAddress.text.toString().trim(),
+            spouseEmployerTelNumber = etSpouseEmployerTelephone.text.toString().trim(),
+
+            relative1Name = etRelative1Name.text.toString().trim(),
+            relative1Relationship = etRelative1Relationship.text.toString().trim(),
+            relative1TelNumber = etRelative1Telephone.text.toString().trim(),
+            relative1Address = etRelative1Address.text.toString().trim(),
+
+            relative2Name = etRelative2Name.text.toString().trim(),
+            relative2Relationship = etRelative2Relationship.text.toString().trim(),
+            relative2TelNumber = etRelative2Telephone.text.toString().trim(),
+            relative2Address = etRelative2Address.text.toString().trim(),
+
             applicantSignature = etApplicantSignature.text.toString().trim(),
-            applicationDate = etApplicationDate.text.toString().trim()
+            applicationDate = etApplicationDate.text.toString().trim(),
+            applicantFormDate = getCurrentDateTime()
         )
 
         sendApplicationToApi(request)
@@ -280,11 +307,33 @@ class LoanApplicationActivity : AppCompatActivity() {
 
             try {
 
-                val token = getSharedPreferences("Auth", MODE_PRIVATE)
-                    .getString("token", null)
+                val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+
+                var token = RetrofitClient.authToken
+
+                if (token.isNullOrEmpty()) {
+                    token = prefs.getString("AUTH_TOKEN", null)
+                }
+
+                if (token.isNullOrEmpty()) {
+
+                    Toast.makeText(
+                        this@LoanApplicationActivity,
+                        "Please log in again before submitting.",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    return@launch
+                }
+
+                RetrofitClient.authToken = token
+
+                Log.d(
+                    "LOAN_AUTH",
+                    "Token found: ${token.take(20)}..."
+                )
 
                 val response = RetrofitClient.apiService.submitLoan(
-                    token = if (token != null) "Bearer $token" else null,
                     request = request
                 )
 
@@ -300,18 +349,27 @@ class LoanApplicationActivity : AppCompatActivity() {
 
                 } else {
 
+                    val errorBody = response.errorBody()?.string()
+
+                    Log.e(
+                        "LOAN_API",
+                        "Code: ${response.code()}, Error: $errorBody"
+                    )
+
                     Toast.makeText(
                         this@LoanApplicationActivity,
-                        "Application submission failed: ${response.code()}",
+                        "Submission failed: ${response.code()}",
                         Toast.LENGTH_LONG
                     ).show()
                 }
 
             } catch (e: Exception) {
 
+                Log.e("LOAN_API", "Exception", e)
+
                 Toast.makeText(
                     this@LoanApplicationActivity,
-                    "Network error: ${e.message}",
+                    "Network error: ${e.localizedMessage}",
                     Toast.LENGTH_LONG
                 ).show()
 

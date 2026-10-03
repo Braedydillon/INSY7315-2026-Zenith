@@ -1,5 +1,6 @@
 package com.example.prototype_2.API
 
+import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -43,5 +44,20 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
+    }
+
+    fun loadToken(context: Context) {
+
+        val prefs =
+            context.getSharedPreferences(
+                "AppPrefs",
+                Context.MODE_PRIVATE
+            )
+
+        authToken =
+            prefs.getString(
+                "AUTH_TOKEN",
+                null
+            )
     }
 }
