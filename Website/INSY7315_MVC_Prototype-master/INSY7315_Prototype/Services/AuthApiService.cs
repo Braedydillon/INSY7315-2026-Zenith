@@ -33,7 +33,9 @@ namespace INSY7315_Prototype.Services
             {
                 Email = model.Email,
                 Password = model.Password,
-                FullName = model.FullName
+                FullName = model.FullName,
+                IdNumber = model.IdNumber,
+                CellNo = model.Phone
             };
 
             var response = await _httpClient.PostAsJsonAsync("api/Auth/register", request);
