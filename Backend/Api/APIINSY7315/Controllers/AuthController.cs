@@ -3,6 +3,7 @@ using FirebaseAdmin.Auth;
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -77,6 +78,24 @@ namespace APIINSY7315.Controllers
                 });
             }
 
+            if (string.IsNullOrWhiteSpace(request.IdNumber) || request.IdNumber.Length != 13)
+            {
+                return BadRequest(new
+                {
+                    error = "INVALID_ID_NUMBER",
+                    message = "A valid 13-digit ID number is required."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(request.CellNo))
+            {
+                return BadRequest(new
+                {
+                    error = "INVALID_CELL_NO",
+                    message = "Cell number is required."
+                });
+            }
+
             var email = request.Email.Trim().ToLowerInvariant();
             var fullName = request.FullName.Trim();
 
@@ -140,7 +159,7 @@ namespace APIINSY7315.Controllers
                     });
 
                 // ----------------------------------------------------
-                // Store user in Firestore
+                // Store user and linked details in Firestore
                 // ----------------------------------------------------
 
                 var userData =
@@ -149,6 +168,8 @@ namespace APIINSY7315.Controllers
                         ["uid"] = firebaseUser.Uid,
                         ["email"] = email,
                         ["fullName"] = fullName,
+                        ["idNumber"] = request.IdNumber.Trim(),
+                        ["cellNo"] = request.CellNo.Trim(),
                         ["role"] = role,
                         ["createdAt"] =
                             Timestamp.GetCurrentTimestamp()
@@ -648,33 +669,41 @@ namespace APIINSY7315.Controllers
 
     public class RegisterRequest
     {
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.EmailAddress]
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = "";
 
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.MinLength(6)]
-        [System.ComponentModel.DataAnnotations.MaxLength(100)]
+        [Required]
+        [MinLength(6)]
+        [MaxLength(100)]
         public string Password { get; set; } = "";
 
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(150)]
+        [Required]
+        [StringLength(150)]
         public string FullName { get; set; } = "";
+
+        [Required]
+        [RegularExpression(@"^\d{13}$", ErrorMessage = "ID number must be 13 digits.")]
+        public string IdNumber { get; set; } = "";
+
+        [Required]
+        [RegularExpression(@"^\+?\d{9,15}$", ErrorMessage = "Invalid cell number.")]
+        public string CellNo { get; set; } = "";
     }
 
     public class LoginRequest
     {
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.EmailAddress]
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = "";
 
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string Password { get; set; } = "";
     }
 
     public class RefreshRequest
     {
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string RefreshToken { get; set; } = "";
     }
 }
