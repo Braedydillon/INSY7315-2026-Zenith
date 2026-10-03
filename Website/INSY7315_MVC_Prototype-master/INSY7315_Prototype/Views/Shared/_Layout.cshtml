@@ -38,7 +38,7 @@
                                 <a class="nav-link" asp-controller="Client" asp-action="Index">My Account</a>
                             </li>
                         }
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("management"))
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("staff"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="LoanApplication" asp-action="Index"> Applications</a>

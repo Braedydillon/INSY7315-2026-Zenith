@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace INSY7315_Prototype.Controllers
 {
-    [Authorize(Roles = "management")]
+    [Authorize(Roles = "staff")]
     public class StaffController : Controller
     {
         public IActionResult Index()
