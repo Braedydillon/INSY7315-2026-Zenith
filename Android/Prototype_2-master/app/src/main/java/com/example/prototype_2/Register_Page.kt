@@ -112,7 +112,7 @@ class Register_Page : AppCompatActivity() {
 
                         if (response.isSuccessful) {
                             val authResponse = response.body()
-                            val token = authResponse?.token ?: authResponse?.accessToken
+                            val token = authResponse?.idToken ?: authResponse?.accessToken
 
                             if (token != null) {
                                 RetrofitClient.authToken = token
