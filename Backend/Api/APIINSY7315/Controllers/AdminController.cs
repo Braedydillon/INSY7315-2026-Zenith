@@ -33,14 +33,14 @@ namespace APIINSY7315.Controllers
 
         
             await _db.Collection("Users").Document(user.Uid)
-                .SetAsync(new Dictionary<string, object> { { "Role", role } }, SetOptions.MergeAll);
-.
+                .SetAsync(new Dictionary<string, object> { { "role", role } }, SetOptions.MergeAll);
+
             await FirebaseAuth.DefaultInstance.RevokeRefreshTokensAsync(user.Uid);
 
             return Ok(new { message = $"'{request.Email}' is now '{role}'." });
         }
 
-       
+      
         [HttpGet("users")]
         public async Task<IActionResult> ListUsers()
         {
