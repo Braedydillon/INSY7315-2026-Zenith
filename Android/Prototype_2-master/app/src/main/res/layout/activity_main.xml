@@ -436,17 +436,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <Button
-                android:id="@+id/btnMap"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginTop="18dp"
-                android:layout_marginEnd="18dp"
-                android:text="📍  Find Our Location"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/contactCard" />
+
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/policyCard"
@@ -462,7 +452,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnMap">
+                app:layout_constraintTop_toBottomOf="@id/contactCard">
+
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
