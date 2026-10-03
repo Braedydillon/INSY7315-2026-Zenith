@@ -57,10 +57,11 @@ namespace INSY7315_Prototype.Models
         public string? SpouseEmployerAddress { get; set; }
         public string? SpouseEmployerTelNumber { get; set; }
 
+        [Required(ErrorMessage = "Please add at least one relative.")]
         public string? Relative1Name { get; set; }
-        public string? Relative1Relationship { get; set; }
-        public string? Relative1TelNumber { get; set; }
-        public string? Relative1Address { get; set; }
+        [Required] public string? Relative1Relationship { get; set; }
+        [Required] public string? Relative1TelNumber { get; set; }
+        [Required] public string? Relative1Address { get; set; }
         public string? Relative2Name { get; set; }
         public string? Relative2Relationship { get; set; }
         public string? Relative2TelNumber { get; set; }

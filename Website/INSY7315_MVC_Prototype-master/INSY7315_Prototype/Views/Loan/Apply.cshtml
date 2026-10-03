@@ -33,13 +33,33 @@
         <div class="col-md-6"><label asp-for="HomeTelNo" class="form-label">Home tel no.</label><input asp-for="HomeTelNo" class="form-control" /></div>
         <div class="col-md-6">
             <label asp-for="MarriedOrUnmarried" class="form-label">Marital status</label>
-            <select asp-for="MarriedOrUnmarried" class="form-select"><option value="">Select…</option><option>Married</option><option>Unmarried</option></select>
+            <select asp-for="MarriedOrUnmarried" id="maritalStatus" class="form-select">
+                <option value="">Select…</option>
+                <option>Married</option>
+                <option>Unmarried</option>
+            </select>
         </div>
-        <div class="col-md-6"><label asp-for="MarriageCommunity" class="form-label">Marriage community (in/out of)</label><input asp-for="MarriageCommunity" class="form-control" /></div>
-        <div class="col-md-4"><label asp-for="PreviouslyDivorced" class="form-label"></label><select asp-for="PreviouslyDivorced" class="form-select"><option value="">Select…</option><option>Yes</option><option>No</option></select></div>
-        <div class="col-md-4"><label asp-for="DivorceYear" class="form-label"></label><input asp-for="DivorceYear" class="form-control" /></div>
-        <div class="col-md-4"><label asp-for="DivorceCommunity" class="form-label"></label><input asp-for="DivorceCommunity" class="form-control" /></div>
-    </div>
+        <div class="col-md-6" id="marriageCommunityBox">
+            <label asp-for="MarriageCommunity" class="form-label">Marriage community (in/out of)</label>
+            <input asp-for="MarriageCommunity" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="PreviouslyDivorced" class="form-label"></label>
+            <select asp-for="PreviouslyDivorced" id="prevDivorced" class="form-select">
+                <option value="">Select…</option>
+                <option>No</option>
+                <option>Yes</option>
+            </select>
+        </div>
+        <div class="col-md-4" id="divorceYearBox">
+            <label asp-for="DivorceYear" class="form-label"></label>
+            <input asp-for="DivorceYear" class="form-control" />
+            <span asp-validation-for="DivorceYear" class="text-danger"></span>
+        </div>
+        <div class="col-md-4" id="divorceCommunityBox">
+            <label asp-for="DivorceCommunity" class="form-label"></label>
+            <input asp-for="DivorceCommunity" class="form-control" />
+        </div>
 
     <h5>Address</h5>
     <div class="row g-3 mb-4">
@@ -68,27 +88,48 @@
         <div class="col-md-6"><label asp-for="BranchCode" class="form-label"></label><input asp-for="BranchCode" class="form-control" /></div>
     </div>
 
-    <h5>Spouse (if married)</h5>
-    <div class="row g-3 mb-4">
-        <div class="col-md-6"><label asp-for="SpouseNameAndSurname" class="form-label"></label><input asp-for="SpouseNameAndSurname" class="form-control" /></div>
-        <div class="col-md-6"><label asp-for="SpouseIdNumber" class="form-label"></label><input asp-for="SpouseIdNumber" class="form-control" /></div>
-        <div class="col-md-6"><label asp-for="SpouseTelNumber" class="form-label"></label><input asp-for="SpouseTelNumber" class="form-control" /></div>
-        <div class="col-md-6"><label asp-for="SpouseEmployerName" class="form-label"></label><input asp-for="SpouseEmployerName" class="form-control" /></div>
-        <div class="col-md-6"><label asp-for="SpouseEmployerAddress" class="form-label"></label><input asp-for="SpouseEmployerAddress" class="form-control" /></div>
-        <div class="col-md-6"><label asp-for="SpouseEmployerTelNumber" class="form-label"></label><input asp-for="SpouseEmployerTelNumber" class="form-control" /></div>
-    </div>
+        <div id="spouseSection">
+            <h5>Spouse</h5>
+            <div class="row g-3 mb-4">
+                <!-- the six existing spouse fields stay exactly as they are,
+             and add the validation spans for the first three -->
+                <div class="col-md-6"><label asp-for="SpouseNameAndSurname" class="form-label"></label><input asp-for="SpouseNameAndSurname" class="form-control" /><span asp-validation-for="SpouseNameAndSurname" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="SpouseIdNumber" class="form-label"></label><input asp-for="SpouseIdNumber" class="form-control" /><span asp-validation-for="SpouseIdNumber" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="SpouseTelNumber" class="form-label"></label><input asp-for="SpouseTelNumber" class="form-control" /><span asp-validation-for="SpouseTelNumber" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="SpouseEmployerName" class="form-label"></label><input asp-for="SpouseEmployerName" class="form-control" /></div>
+                <div class="col-md-6"><label asp-for="SpouseEmployerAddress" class="form-label"></label><input asp-for="SpouseEmployerAddress" class="form-control" /></div>
+                <div class="col-md-6"><label asp-for="SpouseEmployerTelNumber" class="form-label"></label><input asp-for="SpouseEmployerTelNumber" class="form-control" /></div>
+            </div>
+        </div>
 
-    <h5>Relatives</h5>
-    <div class="row g-3 mb-4">
-        <div class="col-md-3"><label asp-for="Relative1Name" class="form-label"></label><input asp-for="Relative1Name" class="form-control" /></div>
-        <div class="col-md-3"><label asp-for="Relative1Relationship" class="form-label"></label><input asp-for="Relative1Relationship" class="form-control" /></div>
-        <div class="col-md-3"><label asp-for="Relative1TelNumber" class="form-label"></label><input asp-for="Relative1TelNumber" class="form-control" /></div>
-        <div class="col-md-3"><label asp-for="Relative1Address" class="form-label"></label><input asp-for="Relative1Address" class="form-control" /></div>
-        <div class="col-md-3"><label asp-for="Relative2Name" class="form-label"></label><input asp-for="Relative2Name" class="form-control" /></div>
-        <div class="col-md-3"><label asp-for="Relative2Relationship" class="form-label"></label><input asp-for="Relative2Relationship" class="form-control" /></div>
-        <div class="col-md-3"><label asp-for="Relative2TelNumber" class="form-label"></label><input asp-for="Relative2TelNumber" class="form-control" /></div>
-        <div class="col-md-3"><label asp-for="Relative2Address" class="form-label"></label><input asp-for="Relative2Address" class="form-control" /></div>
-    </div>
+        <h5>Relatives <small class="text-muted fs-6">(Relative 1 is required, Relative 2 is optional)</small></h5>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <label asp-for="Relative1Name" class="form-label"></label>
+                <input asp-for="Relative1Name" class="form-control" />
+                <span asp-validation-for="Relative1Name" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Relative1Relationship" class="form-label"></label>
+                <input asp-for="Relative1Relationship" class="form-control" />
+                <span asp-validation-for="Relative1Relationship" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Relative1TelNumber" class="form-label"></label>
+                <input asp-for="Relative1TelNumber" class="form-control" />
+                <span asp-validation-for="Relative1TelNumber" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Relative1Address" class="form-label"></label>
+                <input asp-for="Relative1Address" class="form-control" />
+                <span asp-validation-for="Relative1Address" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3"><label asp-for="Relative2Name" class="form-label"></label><input asp-for="Relative2Name" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Relative2Relationship" class="form-label"></label><input asp-for="Relative2Relationship" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Relative2TelNumber" class="form-label"></label><input asp-for="Relative2TelNumber" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Relative2Address" class="form-label"></label><input asp-for="Relative2Address" class="form-control" /></div>
+        </div>
 
     <h5>Declaration</h5>
     <div class="row g-3 mb-4">
@@ -101,6 +142,22 @@
     </div>
 </form>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            function show(id, visible) {
+                document.getElementById(id).style.display = visible ? '' : 'none';
+            }
+            function updateForm() {
+                const married = document.getElementById('maritalStatus').value === 'Married';
+                const divorced = document.getElementById('prevDivorced').value === 'Yes';
+                show('spouseSection', married);
+                show('marriageCommunityBox', married);
+                show('divorceYearBox', divorced);
+                show('divorceCommunityBox', divorced);
+            }
+            document.getElementById('maritalStatus').addEventListener('change', updateForm);
+            document.getElementById('prevDivorced').addEventListener('change', updateForm);
+            updateForm();
+        </script>
+    }
