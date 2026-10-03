@@ -60,6 +60,9 @@
             android:exported="false"
             android:label="Track Application" />
         <activity
+            android:name=".StaffLoanDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".Manager_Page"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
