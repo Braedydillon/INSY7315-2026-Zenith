@@ -57,6 +57,31 @@ namespace APIINSY7315.Controllers
             try
             {
                 // ----------------------------------------------------
+                // Automatically fetch user profile details from Firestore
+                // to link ID number, Cell number, and Full Name.
+                // ----------------------------------------------------
+                string idNumber = request.ClientDetails?.IdNumber ?? "";
+                string cellNo = request.ClientDetails?.CellNo ?? "";
+                string fullName = request.ClientDetails?.FullNameAndSurname ?? "";
+
+                var userDoc = await _db.Collection("Users").Document(userId).GetSnapshotAsync();
+                if (userDoc.Exists)
+                {
+                    if (string.IsNullOrWhiteSpace(idNumber) && userDoc.ContainsField("idNumber"))
+                    {
+                        idNumber = userDoc.GetValue<string>("idNumber");
+                    }
+                    if (string.IsNullOrWhiteSpace(cellNo) && userDoc.ContainsField("cellNo"))
+                    {
+                        cellNo = userDoc.GetValue<string>("cellNo");
+                    }
+                    if (string.IsNullOrWhiteSpace(fullName) && userDoc.ContainsField("fullName"))
+                    {
+                        fullName = userDoc.GetValue<string>("fullName");
+                    }
+                }
+
+                // ----------------------------------------------------
                 // Convert client supplied DateTime to Firestore
                 // Timestamp safely.
                 // ----------------------------------------------------
@@ -117,17 +142,9 @@ namespace APIINSY7315.Controllers
                         ClientDetails =
                             new ClientDetailsModel
                             {
-                                FullNameAndSurname =
-                                    request.ClientDetails
-                                        ?.FullNameAndSurname ?? "",
-
-                                IdNumber =
-                                    request.ClientDetails
-                                        ?.IdNumber ?? "",
-
-                                CellNo =
-                                    request.ClientDetails
-                                        ?.CellNo ?? ""
+                                FullNameAndSurname = fullName,
+                                IdNumber = idNumber,
+                                CellNo = cellNo
                             },
 
                         HomeTelNo =
