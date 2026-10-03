@@ -1,0 +1,82 @@
+﻿@model INSY7315_Prototype.ViewModels.StaffVerifyLoanViewModel
+@{ ViewData["Title"] = "Verify Application"; }
+
+<a asp-action="Index" class="text-decoration-none">&larr; Back to queue</a>
+<h1 class="fw-bold mt-2">Verify Application</h1>
+<p class="text-muted">Application #@Model.ApplicationId &middot; Applied @Model.DateApplied.ToString("dd MMM yyyy")</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="card p-4 h-100">
+            <h5 class="mb-3">Loan</h5>
+            <dl class="row mb-4">
+                <dt class="col-sm-4 text-muted fw-normal">Amount</dt><dd class="col-sm-8 fw-semibold">R@Model.RequestedAmount.ToString("N0")</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Reason</dt><dd class="col-sm-8">@Model.ReasonForLoan</dd>
+            </dl>
+
+            <h5 class="mb-3">Client</h5>
+            <dl class="row mb-4">
+                <dt class="col-sm-4 text-muted fw-normal">Full name</dt><dd class="col-sm-8">@Model.Client.FullNameAndSurname</dd>
+                <dt class="col-sm-4 text-muted fw-normal">ID number</dt><dd class="col-sm-8">@Model.Client.IdNumber</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Cell</dt><dd class="col-sm-8">@Model.Client.CellNo</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Home tel</dt><dd class="col-sm-8">@Model.Client.HomeTelNo</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Marital status</dt><dd class="col-sm-8">@Model.Client.MaritalStatus</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Spouse</dt><dd class="col-sm-8">@Model.Client.SpouseNameAndSurname</dd>
+            </dl>
+
+            <h5 class="mb-3">Address</h5>
+            <dl class="row mb-4">
+                <dt class="col-sm-4 text-muted fw-normal">Physical</dt><dd class="col-sm-8">@Model.Client.CurrentPhysicalAddress</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Postal</dt><dd class="col-sm-8">@Model.Client.PostalAddress</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Time at address</dt><dd class="col-sm-8">@Model.Client.ResidenceDuration</dd>
+            </dl>
+
+            <h5 class="mb-3">Employment</h5>
+            <dl class="row mb-4">
+                <dt class="col-sm-4 text-muted fw-normal">Company</dt><dd class="col-sm-8">@Model.Client.CompanyName</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Occupation</dt><dd class="col-sm-8">@Model.Client.Occupation</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Work tel</dt><dd class="col-sm-8">@Model.Client.WorkTelephone</dd>
+            </dl>
+
+            <h5 class="mb-3">Bank</h5>
+            <dl class="row mb-4">
+                <dt class="col-sm-4 text-muted fw-normal">Bank</dt><dd class="col-sm-8">@Model.Client.BankName</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Account type</dt><dd class="col-sm-8">@Model.Client.AccountType</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Account number</dt><dd class="col-sm-8">@Model.Client.AccountNumber</dd>
+            </dl>
+
+            <h5 class="mb-3">Relative</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4 text-muted fw-normal">Name</dt><dd class="col-sm-8">@Model.Client.Relative1Name</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Phone</dt><dd class="col-sm-8">@Model.Client.Relative1TelNumber</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <form asp-action="Verify" method="post" class="card p-4">
+            <input type="hidden" asp-for="ApplicationId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <h5 class="mb-3">Verification checklist</h5>
+            <div class="form-check mb-2"><input asp-for="IdVerified" class="form-check-input" /><label asp-for="IdVerified" class="form-check-label"></label></div>
+            <div class="form-check mb-2"><input asp-for="AddressVerified" class="form-check-input" /><label asp-for="AddressVerified" class="form-check-label"></label></div>
+            <div class="form-check mb-2"><input asp-for="EmploymentVerified" class="form-check-input" /><label asp-for="EmploymentVerified" class="form-check-label"></label></div>
+            <div class="form-check mb-3"><input asp-for="BankVerified" class="form-check-input" /><label asp-for="BankVerified" class="form-check-label"></label></div>
+
+            <div class="mb-4">
+                <label asp-for="StaffNotes" class="form-label"></label>
+                <textarea asp-for="StaffNotes" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="StaffNotes" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" name="Decision" value="Verify" class="btn btn-primary">Verify &amp; send to manager</button>
+                <button type="submit" name="Decision" value="Reject" class="btn btn-outline-danger"
+                        onclick="return confirm('Reject this application?');">Reject application</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

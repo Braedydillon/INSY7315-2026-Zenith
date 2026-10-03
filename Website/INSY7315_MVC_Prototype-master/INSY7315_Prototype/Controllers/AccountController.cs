@@ -73,8 +73,11 @@ namespace INSY7315_Prototype.Controllers
                 case "client":
                     return RedirectToAction("Index", "Client");
 
-                case "management":
+                case "staff":
                     return RedirectToAction("Index", "Staff");
+
+                case "management":
+                    return RedirectToAction("Index", "management");
 
                 case "admin":
                     return RedirectToAction("Index", "Manager");
