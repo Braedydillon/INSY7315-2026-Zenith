@@ -1,3 +1,4 @@
+
 package com.example.prototype_2
 
 import android.content.Intent
@@ -21,15 +22,15 @@ import kotlinx.coroutines.withContext
 
 class Register_Page : AppCompatActivity() {
 
-    private lateinit var btnSubmitRegistration : Button
-    private lateinit var txtLoginBack : TextView
-    private lateinit var checkTerms : CheckBox
-    private lateinit var edtFullName : TextInputEditText
-    private lateinit var edtEmail : TextInputEditText
-    private lateinit var edtPhone : TextInputEditText
-    private lateinit var edtIdNumber : TextInputEditText
-    private lateinit var edtPassword : TextInputEditText
-    private lateinit var edtConfirmPassword : TextInputEditText
+    private lateinit var btnSubmitRegistration: Button
+    private lateinit var txtLoginBack: TextView
+    private lateinit var checkTerms: CheckBox
+    private lateinit var edtFullName: TextInputEditText
+    private lateinit var edtEmail: TextInputEditText
+    private lateinit var edtPhone: TextInputEditText
+    private lateinit var edtIdNumber: TextInputEditText
+    private lateinit var edtPassword: TextInputEditText
+    private lateinit var edtConfirmPassword: TextInputEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,19 +48,39 @@ class Register_Page : AppCompatActivity() {
         edtConfirmPassword = findViewById(R.id.edtConfirmPassword)
 
         btnSubmitRegistration.setOnClickListener {
-            if (checkTerms.isChecked) {
-                val fullName = edtFullName.text?.toString()?.trim().orEmpty()
-                val email = edtEmail.text?.toString()?.trim().orEmpty()
-                val password = edtPassword.text?.toString()?.trim().orEmpty()
-                val confirmPassword = edtConfirmPassword.text?.toString()?.trim().orEmpty()
 
-                if (fullName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+            if (checkTerms.isChecked) {
+
+                val fullName =
+                    edtFullName.text?.toString()?.trim().orEmpty()
+
+                val email =
+                    edtEmail.text?.toString()?.trim().orEmpty()
+
+                val password =
+                    edtPassword.text?.toString()?.trim().orEmpty()
+
+                val confirmPassword =
+                    edtConfirmPassword.text?.toString()?.trim().orEmpty()
+
+                if (fullName.isEmpty() ||
+                    email.isEmpty() ||
+                    password.isEmpty()
+                ) {
+                    Toast.makeText(
+                        this,
+                        "Please fill in all required fields",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return@setOnClickListener
                 }
 
                 if (password != confirmPassword) {
-                    Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Passwords do not match",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return@setOnClickListener
                 }
 
@@ -75,7 +96,9 @@ class Register_Page : AppCompatActivity() {
                 btnSubmitRegistration.isEnabled = false
 
                 lifecycleScope.launch {
+
                     try {
+
                         val request = RegisterRequest(
                             email = email,
                             fullName = fullName,
@@ -87,41 +110,116 @@ class Register_Page : AppCompatActivity() {
                         }
 
                         if (response.isSuccessful) {
-                            val authResponse = response.body()
-                            val token = authResponse?.token ?: authResponse?.accessToken
 
-                            if (token != null) {
+                            val authResponse = response.body()
+
+                            // The API returns the token as "idToken"
+                            val token = authResponse?.idToken
+
+                            if (!token.isNullOrEmpty()) {
+
                                 RetrofitClient.authToken = token
-                                val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-                                prefs.edit().putString("AUTH_TOKEN", token).apply()
+
+                                val prefs = getSharedPreferences(
+                                    "AppPrefs",
+                                    MODE_PRIVATE
+                                )
+
+                                val role = authResponse.role
+                                    ?.lowercase()
+                                    ?.trim()
+                                    ?: "client"
+
+                                prefs.edit()
+                                    .putString("AUTH_TOKEN", token)
+                                    .putString(
+                                        "REFRESH_TOKEN",
+                                        authResponse.refreshToken ?: ""
+                                    )
+                                    .putString(
+                                        "UID",
+                                        authResponse.uid ?: ""
+                                    )
+                                    .putString(
+                                        "EMAIL",
+                                        authResponse.email ?: email
+                                    )
+                                    .putString("ROLE", role)
+                                    .apply()
+
+                                Log.d(
+                                    "Register_API",
+                                    "Registration successful. Role: $role"
+                                )
                             }
 
-                            Toast.makeText(this@Register_Page, "Registration successful!", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(this@Register_Page, MainActivity::class.java))
+                            Toast.makeText(
+                                this@Register_Page,
+                                "Registration successful!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            // New registrations are clients,
+                            // so send them to the client home page.
+                            startActivity(
+                                Intent(
+                                    this@Register_Page,
+                                    MainActivity::class.java
+                                )
+                            )
+
                             finish()
+
                         } else {
+
                             val code = response.code()
+
                             val errorBodyStr = withContext(Dispatchers.IO) {
                                 response.errorBody()?.string()
                             }
-                            Log.e("Register_API", "Code: $code, ErrorBody: $errorBodyStr")
+
+                            Log.e(
+                                "Register_API",
+                                "Code: $code, ErrorBody: $errorBodyStr"
+                            )
 
                             val displayMsg = when {
-                                !errorBodyStr.isNullOrEmpty() -> errorBodyStr
-                                else -> "HTTP $code ${response.message()}"
+                                !errorBodyStr.isNullOrEmpty() ->
+                                    errorBodyStr
+
+                                else ->
+                                    "HTTP $code ${response.message()}"
                             }
 
-                            Toast.makeText(this@Register_Page, "Failed ($code): $displayMsg", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@Register_Page,
+                                "Failed ($code): $displayMsg",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
+
                     } catch (e: Exception) {
-                        Log.e("Register_API", "Exception: ", e)
-                        Toast.makeText(this@Register_Page, "Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+
+                        Log.e(
+                            "Register_API",
+                            "Exception: ",
+                            e
+                        )
+
+                        Toast.makeText(
+                            this@Register_Page,
+                            "Error: ${e.localizedMessage}",
+                            Toast.LENGTH_LONG
+                        ).show()
+
                     } finally {
                         btnSubmitRegistration.isEnabled = true
                     }
                 }
+
             } else {
-                checkTerms.error = "Please accept the terms and conditions"
+                checkTerms.error =
+                    "Please accept the terms and conditions"
             }
         }
 
@@ -131,19 +229,38 @@ class Register_Page : AppCompatActivity() {
             finish()
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+        ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById(R.id.main)
+        ) { v, insets ->
+
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
+            )
+
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
+
             insets
         }
     }
 
     private fun isPasswordValid(password: String): Boolean {
+
         if (password.length < 6) return false
+
         val hasUpper = password.any { it.isUpperCase() }
         val hasLower = password.any { it.isLowerCase() }
         val hasDigit = password.any { it.isDigit() }
         val hasSpecial = password.any { !it.isLetterOrDigit() }
-        return hasUpper && hasLower && hasDigit && hasSpecial
+
+        return hasUpper &&
+                hasLower &&
+                hasDigit &&
+                hasSpecial
     }
 }
+

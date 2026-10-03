@@ -1,3 +1,4 @@
+
 package com.example.prototype_2
 
 import android.content.Intent
@@ -56,7 +57,12 @@ class Login_Page : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
             insets
         }
     }
@@ -66,7 +72,11 @@ class Login_Page : AppCompatActivity() {
         val password = edtPassword.text.toString().trim()
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "Please fill in all fields",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
@@ -75,42 +85,140 @@ class Login_Page : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    RetrofitClient.apiService.login(LoginRequest(email, password))
+                    RetrofitClient.apiService.login(
+                        LoginRequest(email, password)
+                    )
                 }
 
                 if (response.isSuccessful && response.body() != null) {
-                    val authResponse = response.body()
-                    val token = authResponse?.token ?: authResponse?.accessToken
 
+                    val authResponse = response.body()!!
+
+                    // Get the token returned by the API
+                    val token = authResponse.idToken
+
+                    if (token.isNullOrEmpty()) {
+                        Toast.makeText(
+                            this@Login_Page,
+                            "Login successful, but no token was returned.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        return@launch
+                    }
+
+                    // Save the token for API requests
                     RetrofitClient.authToken = token
 
-                    val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-                    prefs.edit().putString("AUTH_TOKEN", token).apply()
+                    // Get the user's role from the API
+                    val role = authResponse.role
+                        ?.lowercase()
+                        ?.trim()
+                        ?: ""
 
-                    Toast.makeText(this@Login_Page, "Login successful!", Toast.LENGTH_SHORT).show()
+                    Log.d("LOGIN_ROLE", "User role: '$role'")
 
-                    val intent = Intent(this@Login_Page, MainActivity::class.java)
-                    startActivity(intent)
+                    // Save login information
+                    val prefs = getSharedPreferences(
+                        "AppPrefs",
+                        MODE_PRIVATE
+                    )
+
+                    prefs.edit()
+                        .putString("AUTH_TOKEN", token)
+                        .putString(
+                            "REFRESH_TOKEN",
+                            authResponse.refreshToken ?: ""
+                        )
+                        .putString(
+                            "UID",
+                            authResponse.uid ?: ""
+                        )
+                        .putString(
+                            "EMAIL",
+                            authResponse.email ?: email
+                        )
+                        .putString("ROLE", role)
+                        .apply()
+
+                    Toast.makeText(
+                        this@Login_Page,
+                        "Login successful!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    // Send the user to the correct page based on their role
+                    if (role == "staff" || role == "admin") {
+
+                        Log.d(
+                            "LOGIN_ROLE",
+                            "Opening Staff Dashboard"
+                        )
+
+                        val intent = Intent(
+                            this@Login_Page,
+                            Staff_Page::class.java
+                        )
+                        startActivity(intent)
+
+                    } else {
+
+                        Log.d(
+                            "LOGIN_ROLE",
+                            "Opening Client Home Page"
+                        )
+
+                        val intent = Intent(
+                            this@Login_Page,
+                            MainActivity::class.java
+                        )
+                        startActivity(intent)
+                    }
+
                     finish()
+
                 } else {
+
                     val code = response.code()
+
                     val errorMsg = withContext(Dispatchers.IO) {
                         response.errorBody()?.string()
                     }
-                    Log.e("Login_API", "Code: $code, ErrorBody: $errorMsg")
-                    
+
+                    Log.e(
+                        "Login_API",
+                        "Code: $code, ErrorBody: $errorMsg"
+                    )
+
                     val displayMsg = when {
                         !errorMsg.isNullOrEmpty() -> errorMsg
                         else -> "HTTP $code ${response.message()}"
                     }
-                    Toast.makeText(this@Login_Page, "Login failed: $displayMsg", Toast.LENGTH_LONG).show()
+
+                    Toast.makeText(
+                        this@Login_Page,
+                        "Login failed: $displayMsg",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
+
             } catch (e: Exception) {
-                Log.e("Login_API", "Exception: ", e)
-                Toast.makeText(this@Login_Page, "Network error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+
+                Log.e(
+                    "Login_API",
+                    "Exception: ",
+                    e
+                )
+
+                Toast.makeText(
+                    this@Login_Page,
+                    "Network error: ${e.localizedMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+
             } finally {
                 btnLogin.isEnabled = true
             }
         }
     }
 }
+
