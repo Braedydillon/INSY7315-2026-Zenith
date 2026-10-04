@@ -106,8 +106,55 @@ data class SubmitLoanRequest(
     @SerializedName("OtherReason")
     val otherReason: String? = null,
 
+    // Client Details
     @SerializedName("ClientDetails")
     val clientDetails: ClientDetailsRequest? = null,
+
+    // Client information expected at top level
+    @SerializedName("HomeTelNo")
+    val homeTelNo: String? = null,
+
+    @SerializedName("MarriedOrUnmarried")
+    val marriedOrUnmarried: String? = null,
+
+    @SerializedName("MarriageCommunity")
+    val marriageCommunity: String? = null,
+
+    @SerializedName("PreviouslyDivorced")
+    val previouslyDivorced: String? = null,
+
+    @SerializedName("DivorceYear")
+    val divorceYear: String? = null,
+
+    @SerializedName("DivorceCommunity")
+    val divorceCommunity: String? = null,
+
+    @SerializedName("CurrentPhysicalAddress")
+    val currentPhysicalAddress: String? = null,
+
+    @SerializedName("PostalAddress")
+    val postalAddress: String? = null,
+
+    @SerializedName("ParentsAddress")
+    val parentsAddress: String? = null,
+
+    @SerializedName("ResidenceYears")
+    val residenceYears: Int? = null,
+
+    @SerializedName("ResidenceMonths")
+    val residenceMonths: Int? = null,
+
+    @SerializedName("CompanyName")
+    val companyName: String? = null,
+
+    @SerializedName("Occupation")
+    val occupation: String? = null,
+
+    @SerializedName("WorkTelephone")
+    val workTelephone: String? = null,
+
+    @SerializedName("WorkAddress")
+    val workAddress: String? = null,
 
     // Bank Details
     @SerializedName("BankName")
