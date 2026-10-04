@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Net.Http.Headers;
 
 namespace INSY7315_Prototype.Controllers
 {
@@ -59,6 +60,47 @@ namespace INSY7315_Prototype.Controllers
             };
 
             return View(model);
+        }
+
+        public async Task<IActionResult> Review(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest();
+            }
+
+            var token = User.FindFirst("IdToken")?.Value;
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var client = _httpClientFactory.CreateClient();
+
+            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.GetAsync($"api/LoansApi/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                ViewBag.ErrorMessage = $"Unable to load application. {response.StatusCode}: {error}";
+
+                return View(new ManagerLoanApplicationViewModel());
+            }
+
+            var application = await response.Content.ReadFromJsonAsync<ManagerLoanApplicationViewModel>();
+
+            if (application == null)
+            {
+                return NotFound();
+            }
+
+            return View(application);
         }
     }
 }

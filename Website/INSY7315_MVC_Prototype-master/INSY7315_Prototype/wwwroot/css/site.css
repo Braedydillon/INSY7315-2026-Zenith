@@ -3231,3 +3231,40 @@ main {
         padding: 20px;
     }
 }
+
+.application-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+    .application-details-grid div {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .application-details-grid span,
+    .application-reason span {
+        font-size: 0.8rem;
+        color: #6c7a89;
+    }
+
+    .application-details-grid strong {
+        color: #0f2f4a;
+    }
+
+.application-reason {
+    padding: 0 20px 20px;
+}
+
+    .application-reason p {
+        margin-top: 5px;
+    }
+
+@media (max-width: 768px) {
+    .application-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
