@@ -14,42 +14,82 @@ class LoanApplicationAdapter(
 ) : RecyclerView.Adapter<LoanApplicationAdapter.LoanViewHolder>() {
 
     class LoanViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val txtAppId: TextView = itemView.findViewById(R.id.txtAppId)
-        val txtDate: TextView = itemView.findViewById(R.id.txtDate)
-        val txtAmount: TextView = itemView.findViewById(R.id.txtAmount)
-        val txtStatus: TextView = itemView.findViewById(R.id.txtStatus)
+
+        val applicantName: TextView =
+            itemView.findViewById(R.id.ApplicantName)
+
+        val appId: TextView =
+            itemView.findViewById(R.id.AppId)
+
+        val date: TextView =
+            itemView.findViewById(R.id.Date)
+
+        val amount: TextView =
+            itemView.findViewById(R.id.Amount)
+
+        val status: TextView =
+            itemView.findViewById(R.id.Status)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LoanViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): LoanViewHolder {
+
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.activity_item_loan_application, parent, false)
+            .inflate(
+                R.layout.activity_item_loan_application,
+                parent,
+                false
+            )
 
         return LoanViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: LoanViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: LoanViewHolder,
+        position: Int
+    ) {
+
         val application = applications[position]
 
-        holder.txtAppId.text = "Application: ${application.applicationId?: "--"}"
-        holder.txtDate.text = "Submitted: ${application.applicationDate ?: "--"}"
+        // Applicant name
+        holder.applicantName.text =
+            "Applicant Name: ${application.clientDetails?.fullNameAndSurname ?: "--"}"
 
-        val loanAmount = application.requestedAmount ?: application.requestedAmount
+        // Application ID
+        holder.appId.text =
+            "Application ID: ${application.applicationId ?: "--"}"
 
-        holder.txtAmount.text = if (loanAmount != null) {
-            val formatter = NumberFormat.getCurrencyInstance(Locale("en", "ZA"))
-            "Amount: ${formatter.format(loanAmount)}"
-        } else {
-            "Amount: R --"
-        }
+        // Submitted date
+        holder.date.text =
+            "Submitted Date: ${application.applicationDate ?: "--"}"
 
-        holder.txtStatus.text = application.status ?: "Pending"
+        // Loan amount
+        val loanAmount = application.requestedAmount
+
+        holder.amount.text =
+            if (loanAmount != null) {
+                val formatter =
+                    NumberFormat.getCurrencyInstance(Locale("en", "ZA"))
+
+                "Amount: ${formatter.format(loanAmount)}"
+            } else {
+                "Amount: R --"
+            }
+
+        // Status
+        holder.status.text =
+            application.status ?: "Pending"
     }
 
     override fun getItemCount(): Int {
         return applications.size
     }
 
-    fun updateApplications(newApplications: List<LoanDto>) {
+    fun updateApplications(
+        newApplications: List<LoanDto>
+    ) {
         applications = newApplications
         notifyDataSetChanged()
     }
