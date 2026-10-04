@@ -1,6 +1,8 @@
 package com.example.prototype_2
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -35,8 +37,9 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
     private var loanId: String? = null
 
-    // Stores the current loan amount
+    // Stores current loan details
     private var currentLoanAmount: Double? = null
+    private var currentStatus: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,6 +133,36 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
         loadLoanDetails()
     }
 
+    private fun getAuthToken(): String? {
+
+        var token = RetrofitClient.authToken
+
+        if (token.isNullOrEmpty()) {
+
+            val prefsApp =
+                getSharedPreferences("AppPrefs", MODE_PRIVATE)
+
+            token =
+                prefsApp.getString("AUTH_TOKEN", null)
+        }
+
+        if (token.isNullOrEmpty()) {
+
+            val prefsAuth =
+                getSharedPreferences("Auth", MODE_PRIVATE)
+
+            token =
+                prefsAuth.getString("AUTH_TOKEN", null)
+                    ?: prefsAuth.getString("token", null)
+        }
+
+        if (!token.isNullOrEmpty()) {
+            RetrofitClient.authToken = token
+        }
+
+        return token
+    }
+
     @SuppressLint("SetTextI18n")
     private fun loadLoanDetails() {
 
@@ -137,10 +170,10 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
             try {
 
-                val token =
-                    RetrofitClient.authToken
+                val rawToken =
+                    getAuthToken()
 
-                if (token.isNullOrEmpty()) {
+                if (rawToken.isNullOrEmpty()) {
 
                     withContext(Dispatchers.Main) {
 
@@ -154,8 +187,16 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                     return@launch
                 }
 
+                val bearerToken =
+                    if (rawToken.startsWith("Bearer ", ignoreCase = true)) {
+                        rawToken
+                    } else {
+                        "Bearer $rawToken"
+                    }
+
                 val response =
                     RetrofitClient.apiService.getLoanById(
+                        token = bearerToken,
                         id = loanId!!
                     )
 
@@ -169,11 +210,20 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                         if (loan != null) {
 
                             // -------------------------
-                            // SAVE LOAN AMOUNT
+                            // SAVE LOAN DETAILS
                             // -------------------------
 
                             currentLoanAmount =
                                 loan.requestedAmount
+
+                            currentStatus =
+                                loan.status ?: "Pending"
+
+                            val amount =
+                                currentLoanAmount ?: 0.0
+
+                            val status =
+                                currentStatus ?: "Pending"
 
                             // -------------------------
                             // APPLICATION INFORMATION
@@ -185,9 +235,7 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                                 }"
 
                             applicationStatus.text =
-                                "Status: ${
-                                    loan.status ?: "Pending"
-                                }"
+                                "Status: $status"
 
                             submissionDate.text =
                                 "Submission Date: ${
@@ -329,45 +377,13 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                                 }
 
                             // -------------------------
-                            // APPROVAL RULE
+                            // BUTTON STATE & ACTIONS
                             // -------------------------
 
-                            if (
-                                loan.status.equals(
-                                    "Approved",
-                                    ignoreCase = true
-                                )
-                            ) {
-
-                                // Already approved
-                                verifyButton.isEnabled = false
-                                verifyButton.text = "Loan Approved"
-
-                            } else if (
-                                loan.requestedAmount != null &&
-                                loan.requestedAmount >= 7000
-                            ) {
-
-                                // R7,000 or more
-                                // Staff cannot approve
-                                verifyButton.isEnabled = false
-                                verifyButton.text = "Cannot Approve"
-
-                            } else {
-
-                                // Below R7,000
-                                // Staff can approve
-                                verifyButton.isEnabled = true
-                                verifyButton.text = "Approve Loan"
-                            }
-
-                            // -------------------------
-                            // APPROVE BUTTON
-                            // -------------------------
-
-                            verifyButton.setOnClickListener {
-                                verifyLoanDetails()
-                            }
+                            updateButtonForState(
+                                amount = amount,
+                                status = status
+                            )
 
                         } else {
 
@@ -417,10 +433,105 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
     }
 
     // -------------------------
-    // APPROVE LOAN
+    // UPDATE BUTTON STATE
+    // -------------------------
+
+    private fun updateButtonForState(
+        amount: Double,
+        status: String
+    ) {
+
+        if (status.equals("Approved", ignoreCase = true)) {
+
+            verifyButton.text =
+                "Loan Approved"
+
+            verifyButton.isEnabled =
+                false
+
+            verifyButton.backgroundTintList =
+                ColorStateList.valueOf(Color.parseColor("#059669"))
+
+        } else if (status.equals("Verified", ignoreCase = true)) {
+
+            if (amount < 7000) {
+
+                // Step 2 for < R7,000: Already verified, now ready to Approve
+                verifyButton.text =
+                    "Approve Loan"
+
+                verifyButton.isEnabled =
+                    true
+
+                verifyButton.backgroundTintList =
+                    ColorStateList.valueOf(Color.parseColor("#059669"))
+
+                verifyButton.setOnClickListener {
+                    approveLoan()
+                }
+
+            } else {
+
+                // Step 2 for >= R7,000: Already verified for Manager
+                verifyButton.text =
+                    "Loan Verified (Awaiting Manager Approval)"
+
+                verifyButton.isEnabled =
+                    false
+
+                verifyButton.backgroundTintList =
+                    ColorStateList.valueOf(Color.parseColor("#6B7280"))
+            }
+
+        } else {
+
+            // Step 1: Pending / Submitted - Verify details
+            verifyButton.text =
+                "Verify Details"
+
+            verifyButton.isEnabled =
+                true
+
+            verifyButton.backgroundTintList =
+                ColorStateList.valueOf(Color.parseColor("#2563EB"))
+
+            verifyButton.setOnClickListener {
+                verifyLoanDetails()
+            }
+        }
+    }
+
+    // -------------------------
+    // STEP 1: VERIFY LOAN
     // -------------------------
 
     private fun verifyLoanDetails() {
+
+        val amount =
+            currentLoanAmount ?: 0.0
+
+        currentStatus = "Verified"
+
+        applicationStatus.text =
+            "Status: Verified"
+
+        Toast.makeText(
+            this@StaffLoanDetailsActivity,
+            "Loan details verified successfully",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        updateButtonForState(
+            amount = amount,
+            status = "Verified"
+        )
+    }
+
+    // -------------------------
+    // STEP 2: APPROVE LOAN
+    // -------------------------
+
+    private fun approveLoan() {
 
         val id =
             loanId ?: return
@@ -428,20 +539,38 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
         val amount =
             currentLoanAmount ?: 0.0
 
-        // -------------------------
-        // CHECK R7,000 LIMIT
-        // -------------------------
-
+        // Security check: Staff can only approve loans < R7,000
         if (amount >= 7000) {
 
             Toast.makeText(
                 this,
-                "Staff can only approve loans below R7,000",
-                Toast.LENGTH_LONG
+                "Action not permitted for this loan amount.",
+                Toast.LENGTH_SHORT
             ).show()
 
             return
         }
+
+        val rawToken =
+            getAuthToken()
+
+        if (rawToken.isNullOrEmpty()) {
+
+            Toast.makeText(
+                this,
+                "Please log in again",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return
+        }
+
+        val bearerToken =
+            if (rawToken.startsWith("Bearer ", ignoreCase = true)) {
+                rawToken
+            } else {
+                "Bearer $rawToken"
+            }
 
         verifyButton.isEnabled = false
 
@@ -452,11 +581,12 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                 val request =
                     UpdateStatusRequest(
                         status = "Approved",
-                        comments = "Staff approved the loan application."
+                        comments = "Loan approved (< R7,000)."
                     )
 
                 val response =
                     RetrofitClient.apiService.updateLoanStatus(
+                        token = bearerToken,
                         id = id,
                         request = request
                     )
@@ -465,14 +595,10 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
                     if (response.isSuccessful) {
 
+                        currentStatus = "Approved"
+
                         applicationStatus.text =
                             "Status: Approved"
-
-                        verifyButton.text =
-                            "Loan Approved"
-
-                        verifyButton.isEnabled =
-                            false
 
                         Toast.makeText(
                             this@StaffLoanDetailsActivity,
@@ -480,26 +606,37 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
 
+                        updateButtonForState(
+                            amount = amount,
+                            status = "Approved"
+                        )
+
                     } else {
 
                         verifyButton.isEnabled =
                             true
 
-                        verifyButton.text =
-                            "Approve Loan"
-
                         val error =
                             response.errorBody()?.string()
 
                         android.util.Log.e(
-                            "STAFF_VERIFY",
+                            "STAFF_APPROVE",
                             "Code: ${response.code()}, Error: $error"
                         )
 
+                        val errorMsg =
+                            if (response.code() == 401 || response.code() == 403) {
+                                "Session expired. Please log in again."
+                            } else if (!error.isNullOrEmpty()) {
+                                "Could not approve loan (${response.code()}): $error"
+                            } else {
+                                "Could not approve loan (${response.code()})"
+                            }
+
                         Toast.makeText(
                             this@StaffLoanDetailsActivity,
-                            "Could not verify the loan details",
-                            Toast.LENGTH_SHORT
+                            errorMsg,
+                            Toast.LENGTH_LONG
                         ).show()
                     }
                 }
@@ -507,8 +644,8 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
             } catch (e: Exception) {
 
                 android.util.Log.e(
-                    "STAFF_VERIFY",
-                    "Error verifying loan",
+                    "STAFF_APPROVE",
+                    "Error approving loan",
                     e
                 )
 
@@ -517,12 +654,9 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                     verifyButton.isEnabled =
                         true
 
-                    verifyButton.text =
-                        "Approve Loan"
-
                     Toast.makeText(
                         this@StaffLoanDetailsActivity,
-                        "Error approving the loan",
+                        "Error approving the loan: ${e.localizedMessage}",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
