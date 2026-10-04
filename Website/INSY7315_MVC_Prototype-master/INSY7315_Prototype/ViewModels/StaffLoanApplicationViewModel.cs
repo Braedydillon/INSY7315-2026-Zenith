@@ -2,6 +2,7 @@
 
 namespace INSY7315_Prototype.ViewModels
 {
+    // One row in a queue (staff and manager both use it)
     public class StaffLoanApplicationViewModel
     {
         public string ApplicationId { get; set; } = string.Empty;
@@ -9,6 +10,8 @@ namespace INSY7315_Prototype.ViewModels
         public decimal RequestedAmount { get; set; }
         public DateTime? DateApplied { get; set; }
         public string Status { get; set; } = string.Empty;
+        public bool RequiresManager { get; set; }
+        public bool IsPending { get; set; }
     }
 
     public class StaffVerifyLoanViewModel
@@ -18,6 +21,7 @@ namespace INSY7315_Prototype.ViewModels
         public string ReasonForLoan { get; set; } = string.Empty;
         public DateTime? DateApplied { get; set; }
         public string Status { get; set; } = string.Empty;
+        public bool RequiresManager { get; set; }
 
         public StaffDetailsViewModel Client { get; set; } = new();
 
@@ -33,6 +37,7 @@ namespace INSY7315_Prototype.ViewModels
         [StringLength(500), Display(Name = "Staff notes")]
         public string? StaffNotes { get; set; }
 
+        // "Approve" / "Decline" (under R7,000)  or  "Verify" / "Reject" (R7,000+)
         public string Decision { get; set; } = string.Empty;
     }
 

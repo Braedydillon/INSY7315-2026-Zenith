@@ -1,17 +1,19 @@
 ﻿@model INSY7315_Prototype.ViewModels.StaffDashboardViewModel
-
+@using INSY7315_Prototype.Models
 @{
     ViewData["Title"] = "Staff - Loan Applications";
 }
 
 <h1 class="fw-bold">Loan Applications</h1>
-<p class="text-muted mb-4">Review each client's details, then send the application to the manager or reject it.</p>
+<p class="text-muted mb-4">
+    Loans under R@(LoanRules.ManagerThreshold.ToString("N0")) can be approved or declined by staff.
+    Loans of R@(LoanRules.ManagerThreshold.ToString("N0")) and above are verified and sent to the manager.
+</p>
 
 @if (TempData["Success"] != null)
 {
     <div class="alert alert-success">@TempData["Success"]</div>
 }
-
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
@@ -20,11 +22,11 @@
 <div class="row g-3 mb-4">
     @foreach (var (label, value) in new[] {
         ("Pending", Model.PendingCount),
-        ("Sent to manager", Model.VerifiedCount),
-        ("Rejected", Model.RejectedCount)
-    })
+        ("Sent to manager", Model.SentToManagerCount),
+        ("Approved", Model.ApprovedCount),
+        ("Declined / Rejected", Model.DeclinedCount) })
     {
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card p-4 h-100">
                 <div class="text-muted">@label</div>
                 <div class="fs-3 fw-bold">@value</div>
@@ -34,53 +36,44 @@
 </div>
 
 <div class="card">
-    <div class="card-header bg-light fs-5 p-4">
-        All Loan Applications
-    </div>
+    <div class="card-header bg-light fs-5 p-4">All Loan Applications</div>
 
     @foreach (var a in Model.Applications)
     {
         <div class="row align-items-center p-4 border-bottom mx-0">
-
             <div class="col-md-3">
                 <div class="fw-semibold">@a.ClientName</div>
-                <small class="text-muted">
-                    Application #@a.ApplicationId
-                </small>
+                <small class="text-muted">Application #@a.ApplicationId</small>
             </div>
-
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <small class="text-muted d-block">Amount</small>
                 <strong>R@(a.RequestedAmount.ToString("N0"))</strong>
             </div>
-
             <div class="col-md-3">
                 <small class="text-muted d-block">Date Applied</small>
-                <strong>
-                    @(a.DateApplied?.ToString("dd MMM yyyy") ?? "—")
-                </strong>
+                <strong>@(a.DateApplied?.ToString("dd MMM yyyy") ?? "—")</strong>
             </div>
-
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <small class="text-muted d-block">Status</small>
                 <strong>@a.Status</strong>
-
-                <div class="mt-2">
-                    <a asp-action="Verify"
-                       asp-route-id="@a.ApplicationId"
-                       class="btn btn-primary btn-sm">
-                        Review
-                    </a>
-                </div>
             </div>
-
+            <div class="col-md-2 text-end">
+                @if (a.IsPending)
+                {
+                    <a asp-action="Verify" asp-route-id="@a.ApplicationId" class="btn btn-primary btn-sm">
+                        @(a.RequiresManager ? "Verify" : "Review")
+                    </a>
+                    @if (a.RequiresManager)
+                    {
+                        <div><small class="text-muted">Needs manager</small></div>
+                    }
+                }
+            </div>
         </div>
     }
 
     @if (!Model.Applications.Any())
     {
-        <div class="p-4 text-muted">
-            No loan applications found.
-        </div>
+        <div class="p-4 text-muted">No loan applications found.</div>
     }
 </div>

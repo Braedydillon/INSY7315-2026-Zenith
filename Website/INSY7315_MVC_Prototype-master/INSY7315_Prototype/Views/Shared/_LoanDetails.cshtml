@@ -1,0 +1,55 @@
+﻿@model INSY7315_Prototype.ViewModels.StaffDetailsViewModel
+
+<h5 class="mb-3">Client</h5>
+<dl class="row mb-4">
+    <dt class="col-sm-4 text-muted fw-normal">Full name</dt>
+    <dd class="col-sm-8">@Model.FullNameAndSurname</dd>
+    <dt class="col-sm-4 text-muted fw-normal">ID number</dt>
+    <dd class="col-sm-8">@Model.IdNumber</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Cell</dt>
+    <dd class="col-sm-8">@Model.CellNo</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Home tel</dt>
+    <dd class="col-sm-8">@Model.HomeTelNo</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Marital status</dt>
+    <dd class="col-sm-8">@Model.MaritalStatus</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Spouse</dt>
+    <dd class="col-sm-8">@Model.SpouseNameAndSurname</dd>
+</dl>
+
+<h5 class="mb-3">Address</h5>
+<dl class="row mb-4">
+    <dt class="col-sm-4 text-muted fw-normal">Physical</dt>
+    <dd class="col-sm-8">@Model.CurrentPhysicalAddress</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Postal</dt>
+    <dd class="col-sm-8">@Model.PostalAddress</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Time at address</dt>
+    <dd class="col-sm-8">@Model.ResidenceDuration</dd>
+</dl>
+
+<h5 class="mb-3">Employment</h5>
+<dl class="row mb-4">
+    <dt class="col-sm-4 text-muted fw-normal">Company</dt>
+    <dd class="col-sm-8">@Model.CompanyName</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Occupation</dt>
+    <dd class="col-sm-8">@Model.Occupation</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Work tel</dt>
+    <dd class="col-sm-8">@Model.WorkTelephone</dd>
+</dl>
+
+<h5 class="mb-3">Bank</h5>
+<dl class="row mb-4">
+    <dt class="col-sm-4 text-muted fw-normal">Bank</dt>
+    <dd class="col-sm-8">@Model.BankName</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Account type</dt>
+    <dd class="col-sm-8">@Model.AccountType</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Account number</dt>
+    <dd class="col-sm-8">@Model.AccountNumber</dd>
+</dl>
+
+<h5 class="mb-3">Relative</h5>
+<dl class="row mb-0">
+    <dt class="col-sm-4 text-muted fw-normal">Name</dt>
+    <dd class="col-sm-8">@Model.Relative1Name</dd>
+    <dt class="col-sm-4 text-muted fw-normal">Phone</dt>
+    <dd class="col-sm-8">@Model.Relative1TelNumber</dd>
+</dl>
