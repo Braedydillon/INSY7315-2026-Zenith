@@ -7,13 +7,9 @@
         public string  UserEmail {  get; set; } = string.Empty;
         public decimal RequestedAmount { get; set; }
         public string ReasonForLoan { get; set; } = string.Empty;
+        public DateTime DateApplied { get; set; }
         public string Status {  get; set; } = string.Empty;
-    }
+        public ClientDetailsViewModel ClientDetails { get; set; } = new();
 
-    public class ClientDetailsViewModel
-    {
-        public string FullNameAndSurname { get; set; } = string.Empty;
-        public string IdNumber { get; set; } = string.Empty;
-        public string CellNo { get; set; } = string.Empty;
     }
 }

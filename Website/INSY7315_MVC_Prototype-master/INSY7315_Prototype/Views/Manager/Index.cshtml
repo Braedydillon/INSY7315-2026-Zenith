@@ -6,8 +6,7 @@
 
 <div class="manager-page">
 
-   
-
+    <!-- Header -->
     <div class="manager-header">
 
         <div>
@@ -23,37 +22,14 @@
     </div>
 
 
-    
-
+    <!-- Dashboard Statistics -->
     <div class="manager-stats">
 
-        <!-- Total Clients -->
-
+        <!-- Total Applications -->
         <div class="manager-stat-card">
 
             <div class="stat-top">
-
-                <div class="stat-icon"> C </div>
-
-                <span class="stat-change"> +8% </span>
-
-            </div>
-
-            <span>Total Clients</span>
-
-            <strong>124</strong>
-
-        </div>
-
-
-        <!-- Applications -->
-
-        <div class="manager-stat-card">
-
-            <div class="stat-top">
-
-                <div class="stat-icon"> A </div>
-
+                <div class="stat-icon">A</div>
             </div>
 
             <span>Total Applications</span>
@@ -63,14 +39,11 @@
         </div>
 
 
-        <!-- Pending -->
-
+        <!-- Needs Review -->
         <div class="manager-stat-card pending">
 
             <div class="stat-top">
-
-                <div class="stat-icon"> ! </div>
-
+                <div class="stat-icon">!</div>
             </div>
 
             <span>Needs Review</span>
@@ -80,34 +53,28 @@
         </div>
 
 
-        <!-- Active Loans -->
-
+        <!-- Approved -->
         <div class="manager-stat-card">
 
             <div class="stat-top">
-
-                <div class="stat-icon"> L </div>
-
+                <div class="stat-icon">✓</div>
             </div>
 
-            <span>Active Loans</span>
+            <span>Approved</span>
 
             <strong>@Model.ApprovedApplications</strong>
 
         </div>
 
 
-        <!-- Rejected Loans -->
-
+        <!-- Rejected -->
         <div class="manager-stat-card">
 
             <div class="stat-top">
-
-                <div class="stat-icon"> R </div>
-
+                <div class="stat-icon">R</div>
             </div>
 
-            <span>Rejected Loans</span>
+            <span>Rejected</span>
 
             <strong>@Model.RejectedApplications</strong>
 
@@ -115,13 +82,12 @@
 
     </div>
 
-   
 
+    <!-- Dashboard Content -->
     <div class="manager-dashboard-grid">
 
 
         <!-- Recent Applications -->
-
         <div class="manager-panel">
 
             <div class="manager-panel-header">
@@ -130,9 +96,7 @@
 
                     <h2>Recent Applications</h2>
 
-                    <p>
-                        Applications requiring your attention
-                    </p>
+                    <p> Applications requiring your attention </p>
 
                 </div>
 
@@ -143,196 +107,81 @@
 
             <div class="application-list">
 
+                @if (Model.RecentApplications != null && Model.RecentApplications.Any())
+                {
+                    foreach (var application in Model.RecentApplications)
+                    {
+                        <div class="application-row">
 
-                <!-- Application 1 -->
+                            @* Applicant Initial *@
+                            <div class="applicant-icon">
 
-                <div class="application-row">
+                                @if (!string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname))
+                                {
+                                    @application.ClientDetails.FullNameAndSurname.Substring(0, 1).ToUpper()
+                                }
+                                else
+                                {
+                                    <span>?</span>
+                                }
 
-                    <div class="applicant-icon"> JS </div>
-
-                    <div class="applicant-details">
-
-                        <strong> John Smith </strong>
-
-                        <span>
-                            Application #APP001
-                        </span>
-
-                    </div>
-
-                    <div class="application-amount">
-                        R50,000
-                    </div>
-
-                    <span class="application-status pending">
-                        Pending
-                    </span>
-
-                    <div class="application-actions">
-
-                        <a href="#" class="action-view">
-                            View
-                        </a>
-
-                        <a href="#" class="action-approve">
-                            Approve
-                        </a>
-
-                        <a href="#" class="action-decline">
-                            Decline
-                        </a>
-
-                    </div>
-
-                </div>
+                            </div>
 
 
-                <!-- Application 2 -->
+                            @* Applicant Information *@
+                            <div class="applicant-details">
 
-                <div class="application-row">
+                                <strong>
+                                    @(string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname)? "Unknown Applicant" : application.ClientDetails.FullNameAndSurname)
+                                </strong>
 
-                    <div class="applicant-icon">
-                        SN
-                    </div>
+                                <span> Application #@application.ApplicationId </span>
 
-                    <div class="applicant-details">
+                            </div>
 
-                        <strong>
-                            Sarah Naidoo
-                        </strong>
 
-                        <span>
-                            Application #APP002
-                        </span>
+                            <!-- Requested Amount -->
+                            <div class="application-amount">
 
-                    </div>
+                                R @application.RequestedAmount.ToString("N2")
 
-                    <div class="application-amount">
-                        R25,000
-                    </div>
+                            </div>
 
-                    <span class="application-status pending">
-                        Pending
-                    </span>
 
-                    <div class="application-actions">
+                            @* Status *@
+                            <span class="application-status @application.Status.ToLower()"> @application.Status </span>
 
-                        <a href="#" class="action-view">
-                            View
-                        </a>
 
-                        <a href="#" class="action-approve">
-                            Approve
-                        </a>
+                            @* Actions *@
+                            <div class="application-actions">
 
-                        <a href="#" class="action-decline">
-                            Decline
-                        </a>
+                                <a href="#" class="action-view"> View </a>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-applications">
+
+                        <p> No loan applications found.</p>
 
                     </div>
-
-                </div>
-
-
-                <!-- Application 3 -->
-
-                <div class="application-row">
-
-                    <div class="applicant-icon">
-                        DJ
-                    </div>
-
-                    <div class="applicant-details">
-
-                        <strong>
-                            David Jones
-                        </strong>
-
-                        <span>
-                            Application #APP003
-                        </span>
-
-                    </div>
-
-                    <div class="application-amount">
-                        R75,000
-                    </div>
-
-                    <span class="application-status approved">
-                        Approved
-                    </span>
-
-                    <div class="application-actions">
-
-                        <a href="#" class="action-view">
-                            View
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Application 4 -->
-
-                <div class="application-row">
-
-                    <div class="applicant-icon">
-                        MD
-                    </div>
-
-                    <div class="applicant-details">
-
-                        <strong>
-                            Michael Dlamini
-                        </strong>
-
-                        <span>
-                            Application #APP004
-                        </span>
-
-                    </div>
-
-                    <div class="application-amount">
-                        R40,000
-                    </div>
-
-                    <span class="application-status pending">
-                        Pending
-                    </span>
-
-                    <div class="application-actions">
-
-                        <a href="#" class="action-view">
-                            View
-                        </a>
-
-                        <a href="#" class="action-approve">
-                            Approve
-                        </a>
-
-                        <a href="#" class="action-decline">
-                            Decline
-                        </a>
-
-                    </div>
-
-                </div>
+                }
 
             </div>
 
         </div>
 
 
-        <!-- Needs Attention -->
-
+        @* Needs Attention *@
         <div class="attention-panel">
 
             <span class="attention-label"> MANAGER ACTION </span>
 
-            <h2>
-                Applications Need Review
-            </h2>
+            <h2> Applications Need Review </h2>
 
             <p>
                 There are currently applications waiting for
@@ -340,36 +189,31 @@
                 before making a decision.
             </p>
 
+
             <div class="pending-number">
 
-                <strong>@Model.PendingApplications</strong>
+                <strong> @Model.PendingApplications </strong>
 
                 <span> applications needing review </span>
 
             </div>
 
-            <a href="#" class="review-button btn-shadow">
-                Review Applications
-            </a>
+
+            <a href="#" class="review-button btn-shadow"> Review Applications </a>
 
         </div>
 
     </div>
 
 
-   
-
+    @* Quick Actions *@
     <div class="manager-section">
 
         <div class="manager-section-heading">
 
-            <h2>
-                Quick Actions
-            </h2>
+            <h2>Quick Actions</h2>
 
-            <p>
-                Access commonly used management functions.
-            </p>
+            <p>Access commonly used management functions.</p>
 
         </div>
 
@@ -377,59 +221,38 @@
         <div class="manager-actions">
 
 
-            <!-- Applications -->
-
+           @* Applications *@
             <a href="#" class="manager-action-card">
 
-                <div class="manager-action-icon">
-                    A
-                </div>
+                <div class="manager-action-icon"> A </div>
 
-                <strong>
-                    Loan Applications
-                </strong>
+                <strong> Loan Applications </strong>
 
-                <span>
-                    Review and manage client applications.
-                </span>
+                <span> Review and manage client applications. </span>
 
             </a>
 
 
             <!-- Clients -->
-
             <a href="#" class="manager-action-card">
 
-                <div class="manager-action-icon">
-                    C
-                </div>
+                <div class="manager-action-icon">C</div>
 
-                <strong>
-                    Clients
-                </strong>
+                <strong> Clients </strong>
 
-                <span>
-                    View client information and activity.
-                </span>
+                <span> View client information and activity. </span>
 
             </a>
 
 
-            <!-- Reports -->
-
+            @* Reports *@
             <a href="#" class="manager-action-card">
 
-                <div class="manager-action-icon">
-                    R
-                </div>
+                <div class="manager-action-icon"> R </div>
 
-                <strong>
-                    Reports
-                </strong>
+                <strong> Reports </strong>
 
-                <span>
-                    View loan and business reports.
-                </span>
+                <span> View loan and business reports.</span>
 
             </a>
 

@@ -133,7 +133,7 @@ public class StaffController : Controller
             ReasonForLoan = l.ReasonForLoan,
             DateApplied = l.ApplicantFormDate,
             Status = l.Status,
-            Client = new StaffDetailsViewModel
+            ClientDetails = new ClientDetailsViewModel
             {
                 FullNameAndSurname = l.ClientDetails?.FullNameAndSurname ?? "",
                 IdNumber = l.ClientDetails?.IdNumber ?? "",

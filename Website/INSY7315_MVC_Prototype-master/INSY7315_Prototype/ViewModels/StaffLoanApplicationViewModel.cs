@@ -19,7 +19,7 @@ namespace INSY7315_Prototype.ViewModels
         public DateTime DateApplied { get; set; }
         public string Status { get; set; } = string.Empty;
 
-        public StaffDetailsViewModel Client { get; set; } = new();
+        public ClientDetailsViewModel ClientDetails { get; set; } = new();
 
         [Display(Name = "ID number verified")]
         public bool IdVerified { get; set; }
@@ -36,7 +36,7 @@ namespace INSY7315_Prototype.ViewModels
         public string Decision { get; set; } = string.Empty;   
     }
 
-    public class StaffDetailsViewModel
+    public class ClientDetailsViewModel
     {
         public string FullNameAndSurname { get; set; } = string.Empty;
         public string IdNumber { get; set; } = string.Empty;
