@@ -109,17 +109,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <TextView
-                        android:id="@+id/txtForgotPassword"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="12dp"
-                        android:text="Forgot Password?"
-                        android:textColor="#1769E0"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
                     <Button
                         android:id="@+id/btnLogin"
                         android:layout_width="match_parent"
@@ -139,16 +128,6 @@
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
-                    <Button
-                        android:id="@+id/btnStaffProto"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginTop="24dp"
-                        android:text="Staff Portal (Proto)"
-                        android:backgroundTint="#172033"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold" />
-
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
@@ -156,17 +135,5 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnHome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:contentDescription="Return to Home Page"
-        android:src="@drawable/home"
-        app:backgroundTint="#1769E0"
-        app:tint="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
