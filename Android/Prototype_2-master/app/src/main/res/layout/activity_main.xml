@@ -30,7 +30,7 @@
                 android:layout_height="154dp"
                 android:contentDescription="Business banner"
                 android:scaleType="centerCrop"
-                android:src="@drawable/logo"
+                android:src="@drawable/logo2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
