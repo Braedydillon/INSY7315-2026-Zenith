@@ -1,7 +1,7 @@
 ﻿@model INSY7315_Prototype.ViewModels.ManagerLoanApplicationViewModel
 
 @{
-    ViewData["Title"] = "Review Application";
+    ViewData["Title"] = "Verify Application";
 }
 
 <div class="manager-page">
@@ -11,10 +11,11 @@
         <div>
             <span class="manager-label">BRIDGE&ANCHOR</span>
 
-            <h1>Application Details</h1>
+            <h1>Verify Application</h1>
 
             <p>
-                Review the information submitted by the client.
+                Verify the information submitted by the client
+                before sending the loan for approval.
             </p>
         </div>
 
@@ -29,76 +30,6 @@
             @ViewBag.ErrorMessage
         </div>
     }
-
-
-    <!-- Application Summary -->
-    <div class="manager-panel">
-
-        <div class="manager-panel-header">
-
-            <div class="manager-panel-title">
-
-                <h2>Application Summary</h2>
-
-                <p>
-                    Application #@Model.ApplicationId
-                </p>
-
-            </div>
-
-            <span class="application-status @Model.Status.ToLower()"> @Model.Status </span>
-
-        </div>
-
-
-        <div class="application-details-grid">
-
-            <div>
-                <span>Applicant</span>
-
-                <strong> @Model.ClientDetails.FullNameAndSurname </strong>
-            </div>
-
-
-            <div>
-                <span>Email</span>
-
-                <strong> @Model.UserEmail  </strong>
-            </div>
-
-
-            <div>
-                <span>ID Number</span>
-
-                <strong> @Model.ClientDetails.IdNumber  </strong>
-            </div>
-
-
-            <div>
-                <span>Cell Number</span>
-
-                <strong> @Model.ClientDetails.CellNo </strong>
-            </div>
-
-
-            <div>
-                <span>Requested Amount</span>
-
-                <strong> R @Model.RequestedAmount.ToString("N2") </strong>
-            </div>
-
-
-            <div>
-                <span>Date Applied</span>
-
-                <strong>
-                    @(Model.ApplicantFormDate.HasValue ? Model.ApplicantFormDate.Value.ToString("dd MMMM yyyy") : "Not available")
-                </strong>
-            </div>
-
-        </div>
-
-    </div>
 
 
     <!-- Loan Details -->
@@ -301,44 +232,46 @@
 
     </div>
 
-    <!-- Manager Review -->
+    <!-- Application Summary -->
     <div class="manager-panel">
 
         <div class="manager-panel-header">
             <div class="manager-panel-title">
-                <h2>Manager Review</h2>
+                <h2>Verify Application</h2>
                 <p>
-                    Review the application before making a final decision.
+                    Verify the applicant's information and supporting
+                    documentation before the loan proceeds for approval.
                 </p>
             </div>
         </div>
 
-        <form asp-controller="Manager" asp-action="Review" method="post" class="manager-review">
+        <form asp-controller="Manager" asp-action="CompleteReview" method="post" class="manager-review">
 
             @Html.AntiForgeryToken()
 
             <input type="hidden" name="ApplicationId" value="@Model.ApplicationId" />
 
             <div class="review-field">
+                <label for="reviewNote">Review Notes</label>
 
-                <label for="reviewNote"> Review Note </label>
+                <textarea id="reviewNote" name="Note" rows="5" maxlength="500" placeholder="Add any notes about the application or documents..."></textarea>
 
-                <textarea id="reviewNote"  name="Note" rows="5" maxlength="500" placeholder="Enter a note about this application..."></textarea>
-
-                <small> Add any comments or reasons relating to your decision. </small>
-
+                <small>
+                    Record anything relevant that was identified during the review.
+                </small>
             </div>
 
             <div class="review-actions">
 
-                <button type="submit" name="Decision" value="decline" class="btn-decline"> Decline Application </button>
+                <a asp-controller="Manager" asp-action="Applications" class="btn-decline"> Back </a>
 
-                <button type="submit" name="Decision" value="approve" class="btn-approve"> Application </button>
+                <button type="submit" class="btn-approve"> Confirm Verification </button>
 
             </div>
 
         </form>
 
     </div>
+
 
 </div>

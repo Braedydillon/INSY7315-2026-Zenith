@@ -3333,3 +3333,185 @@ main {
     .btn-decline:hover {
         opacity: 0.9;
     }
+
+/* =========================
+   ALL APPLICATIONS
+   ========================= */
+
+.applications-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+    .applications-summary > div {
+        background: #ffffff;
+        border: 1px solid #e4e9ee;
+        border-radius: 10px;
+        padding: 18px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .applications-summary span {
+        color: #718096;
+        font-size: 0.82rem;
+        font-weight: 500;
+    }
+
+    .applications-summary strong {
+        color: #0f2f4a;
+        font-size: 1.7rem;
+    }
+
+
+/* Table */
+
+.applications-table-wrapper {
+    overflow-x: auto;
+}
+
+.applications-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .applications-table th {
+        padding: 13px 18px;
+        text-align: left;
+        color: #718096;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid #e7ebef;
+    }
+
+    .applications-table td {
+        padding: 16px 18px;
+        border-bottom: 1px solid #edf0f2;
+        vertical-align: middle;
+    }
+
+    .applications-table tbody tr {
+        transition: background 0.15s ease;
+    }
+
+        .applications-table tbody tr:hover {
+            background: #f8fafb;
+        }
+
+        .applications-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+
+/* Applicant */
+
+.applicant-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+    .applicant-cell > div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .applicant-cell strong {
+        color: #173b57;
+    }
+
+    .applicant-cell small {
+        color: #84919d;
+    }
+
+
+/* Application ID */
+
+.application-number {
+    color: #61717f;
+    font-size: 0.88rem;
+}
+
+
+/* Review button */
+
+.application-action {
+    text-align: right;
+}
+
+.view-application-btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid #d8e0e6;
+    border-radius: 6px;
+    color: #173b57;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.15s ease;
+}
+
+    .view-application-btn:hover {
+        background: #173b57;
+        border-color: #173b57;
+        color: #ffffff;
+    }
+
+
+/* Empty */
+
+.empty-state {
+    padding: 50px 20px;
+    text-align: center;
+}
+
+    .empty-state h3 {
+        color: #173b57;
+        margin-bottom: 6px;
+    }
+
+    .empty-state p {
+        color: #7a8995;
+    }
+
+
+/* Responsive */
+
+@media (max-width: 900px) {
+
+    .applications-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+
+    .applications-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+.all-applications-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .all-applications-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        margin-top: 12px;
+    }
+
+        .all-applications-actions a {
+            text-align: center;
+        }
+}

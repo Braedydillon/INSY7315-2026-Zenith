@@ -114,7 +114,7 @@
 
                 </div>
 
-                <a href="#" class="view-all-link"> View All → </a>
+                <a asp-controller="Manager" asp-action="Applications" class="action-view"> View All Applications </a>
 
             </div>
 
@@ -193,14 +193,13 @@
         @* Needs Attention *@
         <div class="attention-panel">
 
-            <span class="attention-label"> MANAGER ACTION </span>
+            <span class="attention-label">MANAGER ACTION</span>
 
-            <h2> Applications Need Review </h2>
+            <h2>Applications Need Verification</h2>
 
             <p>
-                There are currently applications waiting for
-                your review. Check the applicant information
-                before making a decision.
+                Verify applicant information and supporting documentation
+                before applications proceed for loan approval.
             </p>
 
 
@@ -212,65 +211,51 @@
 
             </div>
 
-
-            <a href="#" class="review-button btn-shadow"> Review Applications </a>
+            <a asp-controller="Manager" asp-action="Applications" class="review-button btn-shadow"> Verify Applications </a>
 
         </div>
 
     </div>
 
+    <div class="manager-actions">
 
-    @* Quick Actions *@
-    <div class="manager-section">
+        <a asp-controller="Manager" asp-action="Applications" class="manager-action-card">
 
-        <div class="manager-section-heading">
+            <div class="manager-action-icon">V</div>
 
-            <h2>Quick Actions</h2>
+            <strong>Verify Applications</strong>
 
-            <p>Access commonly used management functions.</p>
+            <span>
+                Check client details and submitted documentation.
+            </span>
 
-        </div>
-
-
-        <div class="manager-actions">
-
-
-           @* Applications *@
-            <a href="#" class="manager-action-card">
-
-                <div class="manager-action-icon"> A </div>
-
-                <strong> Loan Applications </strong>
-
-                <span> Review and manage client applications. </span>
-
-            </a>
+        </a>
 
 
-            <!-- Clients -->
-            <a href="#" class="manager-action-card">
+        <a asp-controller="Manager" asp-action="Approvals" class="manager-action-card">
 
-                <div class="manager-action-icon">C</div>
+            <div class="manager-action-icon">A</div>
 
-                <strong> Clients </strong>
+            <strong>Approve Loans</strong>
 
-                <span> View client information and activity. </span>
+            <span>
+                Make decisions on verified loan applications.
+            </span>
 
-            </a>
+        </a>
 
 
-            @* Reports *@
-            <a href="#" class="manager-action-card">
+        <a href="#" class="manager-action-card">
 
-                <div class="manager-action-icon"> R </div>
+            <div class="manager-action-icon">R</div>
 
-                <strong> Reports </strong>
+            <strong>Reports</strong>
 
-                <span> View loan and business reports.</span>
+            <span>
+                View loan and business reports.
+            </span>
 
-            </a>
-
-        </div>
+        </a>
 
     </div>
 

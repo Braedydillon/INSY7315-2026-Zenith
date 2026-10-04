@@ -1,0 +1,194 @@
+﻿@model INSY7315_Prototype.ViewModels.ManagerLoanApplicationViewModel
+
+@{
+    ViewData["Title"] = "Loan Approval";
+}
+
+<div class="manager-page">
+
+    <div class="manager-header">
+
+        <div>
+            <span class="manager-label">BRIDGE&ANCHOR</span>
+
+            <h1>Loan Approval</h1>
+
+            <p>
+                Make the final decision on this verified loan application.
+            </p>
+        </div>
+
+        <a asp-controller="Manager"
+           asp-action="Approvals"
+           class="action-view">
+            ← Back to Approvals
+        </a>
+
+    </div>
+
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+
+    <!-- Applicant -->
+
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+            <div class="manager-panel-title">
+
+                <h2>Applicant</h2>
+
+                <p>
+                    Verified applicant information.
+                </p>
+
+            </div>
+        </div>
+
+
+        <div class="application-details-grid">
+
+            <div>
+                <span>Applicant</span>
+
+                <strong>
+                    @(string.IsNullOrWhiteSpace(Model.ClientDetails?.FullNameAndSurname)? "Unknown Applicant" : Model.ClientDetails.FullNameAndSurname)
+                </strong>
+            </div>
+
+
+            <div>
+                <span>ID Number</span>
+
+                <strong>
+                    @Model.ClientDetails?.IdNumber
+                </strong>
+            </div>
+
+
+            <div>
+                <span>Application</span>
+
+                <strong>
+                    #@Model.ApplicationId
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Loan -->
+
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+            <div class="manager-panel-title">
+
+                <h2>Loan Details</h2>
+
+                <p>
+                    Review the requested loan before making a decision.
+                </p>
+
+            </div>
+        </div>
+
+
+        <div class="application-details-grid">
+
+            <div>
+                <span>Amount Requested</span>
+
+                <strong>
+                    R @Model.RequestedAmount.ToString("N2")
+                </strong>
+            </div>
+
+
+            <div>
+                <span>Status</span>
+
+                <strong>
+                    Ready for Approval
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="application-reason">
+
+            <span>Reason for Loan</span>
+
+            <p>
+                @(string.IsNullOrWhiteSpace(Model.ReasonForLoan) ? "No reason provided." : Model.ReasonForLoan)
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Final Decision -->
+
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+
+            <div class="manager-panel-title">
+
+                <h2>Loan Decision</h2>
+
+                <p>
+                    Approve or decline this verified loan application.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <form asp-controller="Manager" asp-action="LoanDecision" method="post" class="manager-review">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="ApplicationId" value="@Model.ApplicationId" />
+
+
+            <div class="review-field">
+
+                <label for="decisionNote"> Decision Note </label>
+
+                <textarea id="decisionNote"
+                          name="Note"
+                          rows="5"
+                          maxlength="500"
+                          placeholder="Enter comments relating to the loan decision..."></textarea>
+
+                <small>
+                    Record any relevant information relating to the final decision.
+                </small>
+
+            </div>
+
+            <div class="review-actions">
+
+                <button type="submit" name="Decision" value="decline" class="btn-decline"> Decline Loan </button>
+
+                <button type="submit" name="Decision" value="approve" class="btn-approve"> Approve Loan </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
