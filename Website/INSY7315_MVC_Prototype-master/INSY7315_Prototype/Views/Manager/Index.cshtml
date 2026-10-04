@@ -1,4 +1,6 @@
-﻿@{
+﻿@model INSY7315_Prototype.ViewModels.ManagerDashboardViewModel
+
+@{
     ViewData["Title"] = "Manager Dashboard";
 }
 
@@ -31,13 +33,9 @@
 
             <div class="stat-top">
 
-                <div class="stat-icon">
-                    C
-                </div>
+                <div class="stat-icon"> C </div>
 
-                <span class="stat-change">
-                    +8%
-                </span>
+                <span class="stat-change"> +8% </span>
 
             </div>
 
@@ -54,19 +52,13 @@
 
             <div class="stat-top">
 
-                <div class="stat-icon">
-                    A
-                </div>
-
-                <span class="stat-change">
-                    +5%
-                </span>
+                <div class="stat-icon"> A </div>
 
             </div>
 
             <span>Total Applications</span>
 
-            <strong>48</strong>
+            <strong>@Model.TotalApplications</strong>
 
         </div>
 
@@ -77,19 +69,13 @@
 
             <div class="stat-top">
 
-                <div class="stat-icon">
-                    !
-                </div>
-
-                <span class="stat-change">
-                    12
-                </span>
+                <div class="stat-icon"> ! </div>
 
             </div>
 
             <span>Needs Review</span>
 
-            <strong>12</strong>
+            <strong>@Model.PendingApplications</strong>
 
         </div>
 
@@ -100,24 +86,34 @@
 
             <div class="stat-top">
 
-                <div class="stat-icon">
-                    L
-                </div>
-
-                <span class="stat-change">
-                    +3%
-                </span>
+                <div class="stat-icon"> L </div>
 
             </div>
 
             <span>Active Loans</span>
 
-            <strong>36</strong>
+            <strong>@Model.ApprovedApplications</strong>
+
+        </div>
+
+
+        <!-- Rejected Loans -->
+
+        <div class="manager-stat-card">
+
+            <div class="stat-top">
+
+                <div class="stat-icon"> R </div>
+
+            </div>
+
+            <span>Rejected Loans</span>
+
+            <strong>@Model.RejectedApplications</strong>
 
         </div>
 
     </div>
-
 
    
 
@@ -140,9 +136,7 @@
 
                 </div>
 
-                <a href="#" class="view-all-link">
-                    View All →
-                </a>
+                <a href="#" class="view-all-link"> View All → </a>
 
             </div>
 
@@ -154,15 +148,11 @@
 
                 <div class="application-row">
 
-                    <div class="applicant-icon">
-                        JS
-                    </div>
+                    <div class="applicant-icon"> JS </div>
 
                     <div class="applicant-details">
 
-                        <strong>
-                            John Smith
-                        </strong>
+                        <strong> John Smith </strong>
 
                         <span>
                             Application #APP001
@@ -338,9 +328,7 @@
 
         <div class="attention-panel">
 
-            <span class="attention-label">
-                MANAGER ACTION
-            </span>
+            <span class="attention-label"> MANAGER ACTION </span>
 
             <h2>
                 Applications Need Review
@@ -354,11 +342,9 @@
 
             <div class="pending-number">
 
-                <strong>12</strong>
+                <strong>@Model.PendingApplications</strong>
 
-                <span>
-                    pending applications
-                </span>
+                <span> applications needing review </span>
 
             </div>
 
