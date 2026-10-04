@@ -393,7 +393,7 @@ class Chatbot_Page : AppCompatActivity() {
                     "161 Boshoff Street, Pietermaritzburg, 3201\n" +
                     "📞 Tel: 033 345 8021\n" +
                     "📱 Cell: 062 769 2868\n" +
-                    "✉️ Email: Bridgeanchor3@gmail.com",
+                    "✉️ Email: Bridgeanchor@gmail.com",
 
             listOf(
                 ChatOption("📞 Call Church Street") {
