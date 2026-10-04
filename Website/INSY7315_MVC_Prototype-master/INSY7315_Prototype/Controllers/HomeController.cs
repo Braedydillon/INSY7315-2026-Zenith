@@ -1,6 +1,7 @@
-using System.Diagnostics;
 using INSY7315_Prototype.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace INSY7315_Prototype.Controllers
 {
@@ -15,6 +16,12 @@ namespace INSY7315_Prototype.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                ViewBag.UserEmail = User.Identity.Name;
+                ViewBag.UserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            }
+
             return View();
         }
 

@@ -1,140 +1,85 @@
-﻿@{
+﻿@model INSY7315_Prototype.ViewModels.MyLoansViewModel
+@{
     ViewData["Title"] = "My Loans";
 }
 
-<div class="loans-page">
-
-    <div class="loans-header">
-        <div>
-            <h1>My Loans</h1>
-            <p>View and track your loan applications.</p>
-        </div>
-
-        <a href="#" class="apply-button">
-            Apply for a Loan
-        </a>
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1 class="fw-bold">My Loans</h1>
+        <p class="text-muted">View and track your loan applications.</p>
     </div>
+    <a asp-action="Apply" class="btn btn-primary">Apply for a Loan</a>
+</div>
 
-    <div class="loan-summary">
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-        <div class="summary-card">
-            <span>Total Applications</span>
-            <strong>3</strong>
-        </div>
-
-        <div class="summary-card">
-            <span>Pending</span>
-            <strong>1</strong>
-        </div>
-
-        <div class="summary-card">
-            <span>Approved</span>
-            <strong>1</strong>
-        </div>
-
-        <div class="summary-card">
-            <span>Total Requested</span>
-            <strong>R85,000</strong>
-        </div>
-
-    </div>
-
-    <div class="loans-card">
-
-        <div class="card-header">
-            <h2>Loan Applications</h2>
-        </div>
-
-        <div class="loan-list">
-
-            <div class="loan-item">
-
-                <div class="loan-info">
-                    <h3>Personal Loan</h3>
-                    <p>Application #LN-001</p>
-                </div>
-
-                <div class="loan-detail">
-                    <span>Amount</span>
-                    <strong>R25,000</strong>
-                </div>
-
-                <div class="loan-detail">
-                    <span>Date Applied</span>
-                    <strong>12 Aug 2026</strong>
-                </div>
-
-                <div class="loan-detail">
-                    <span>Term</span>
-                    <strong>24 Months</strong>
-                </div>
-
-                <span class="status pending">
-                    Pending
-                </span>
-
+<div class="row g-3 mb-4">
+    @foreach (var (label, value) in new[] {
+    ("Total Applications", Model.Total.ToString()),
+    ("Pending", Model.Pending.ToString()),
+    ("Approved", Model.Approved.ToString()),
+    ("Rejected", Model.Rejected.ToString()) })
+    {
+        <div class="col-md-3">
+            <div class="card p-4 h-100">
+                <div class="text-muted">@label</div>
+                <div class="fs-3 fw-bold">@value</div>
             </div>
-
-
-            <div class="loan-item">
-
-                <div class="loan-info">
-                    <h3>Home Improvement Loan</h3>
-                    <p>Application #LN-002</p>
-                </div>
-
-                <div class="loan-detail">
-                    <span>Amount</span>
-                    <strong>R50,000</strong>
-                </div>
-
-                <div class="loan-detail">
-                    <span>Date Applied</span>
-                    <strong>03 Aug 2026</strong>
-                </div>
-
-                <div class="loan-detail">
-                    <span>Term</span>
-                    <strong>36 Months</strong>
-                </div>
-
-                <span class="status approved">
-                    Approved
-                </span>
-
-            </div>
-
-
-            <div class="loan-item">
-
-                <div class="loan-info">
-                    <h3>Emergency Loan</h3>
-                    <p>Application #LN-003</p>
-                </div>
-
-                <div class="loan-detail">
-                    <span>Amount</span>
-                    <strong>R10,000</strong>
-                </div>
-
-                <div class="loan-detail">
-                    <span>Date Applied</span>
-                    <strong>20 Jul 2026</strong>
-                </div>
-
-                <div class="loan-detail">
-                    <span>Term</span>
-                    <strong>12 Months</strong>
-                </div>
-
-                <span class="status declined">
-                    Declined
-                </span>
-
-            </div>
-
         </div>
+    }
+</div>
 
-    </div>
+<div class="card">
+    <div class="card-header bg-light fs-5 p-4">Loan Applications</div>
 
+    @foreach (var l in Model.Loans.OrderByDescending(x => x.ApplicantFormDate))
+    {
+        var statusText = l.Status?.ToLower() switch
+        {
+            "submitted" => "Pending",
+            "underreview" => "Under Review",
+            "approved" => "Approved",
+            "rejected" => "Rejected",
+            _ => l.Status ?? "Unknown"
+        };
+
+        var badge = l.Status?.ToLower() switch
+        {
+            "submitted" => "bg-warning text-dark",
+            "underreview" => "bg-info text-dark",
+            "approved" => "bg-success text-white",
+            "rejected" => "bg-danger text-white",
+            _ => "bg-secondary text-white"
+        };
+
+        <div class="row align-items-center p-4 border-bottom mx-0">
+            <div class="col-md-3">
+                <div class="fw-semibold">@(l.ReasonForLoan ?? "Loan")</div>
+                <small class="text-muted">Application #@l.Id</small>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted d-block">Amount</small>
+                <strong>@l.RequestedAmount.ToString("N0")</strong>
+            </div>
+            <div class="col-md-4">
+                <small class="text-muted d-block">Date Applied</small>
+                <strong>@l.ApplicantFormDate.ToString("dd MMM yyyy")</strong>
+            </div>
+            <div class="col-md-2 text-end">
+                <span class="badge rounded-pill px-3 py-2 @badge"> @statusText </span>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Loans.Any())
+    {
+        <div class="p-4 text-muted">You haven't applied for any loans yet.</div>
+    }
 </div>

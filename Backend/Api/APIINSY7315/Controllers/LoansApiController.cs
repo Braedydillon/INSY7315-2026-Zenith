@@ -23,9 +23,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // POST /api/LoansApi
-        // ============================================================
+        
 
         [HttpPost]
         [FirebaseAuthorize(Roles.Client)]
@@ -56,10 +54,26 @@ namespace APIINSY7315.Controllers
 
             try
             {
-                // ----------------------------------------------------
-                // Convert client supplied DateTime to Firestore
-                // Timestamp safely.
-                // ----------------------------------------------------
+                string idNumber = request.ClientDetails?.IdNumber ?? "";
+                string cellNo = request.ClientDetails?.CellNo ?? "";
+                string fullName = request.ClientDetails?.FullNameAndSurname ?? "";
+
+                var userDoc = await _db.Collection("Users").Document(userId).GetSnapshotAsync();
+                if (userDoc.Exists)
+                {
+                    if (string.IsNullOrWhiteSpace(idNumber) && userDoc.ContainsField("idNumber"))
+                    {
+                        idNumber = userDoc.GetValue<string>("idNumber");
+                    }
+                    if (string.IsNullOrWhiteSpace(cellNo) && userDoc.ContainsField("cellNo"))
+                    {
+                        cellNo = userDoc.GetValue<string>("cellNo");
+                    }
+                    if (string.IsNullOrWhiteSpace(fullName) && userDoc.ContainsField("fullName"))
+                    {
+                        fullName = userDoc.GetValue<string>("fullName");
+                    }
+                }
 
                 Timestamp? applicantFormTimestamp = null;
 
@@ -86,9 +100,7 @@ namespace APIINSY7315.Controllers
                 }
 
 
-                // ----------------------------------------------------
-                // Build strongly typed Firestore object.
-                // ----------------------------------------------------
+            
 
                 var application =
                     new LoanApplicationModel
@@ -117,17 +129,9 @@ namespace APIINSY7315.Controllers
                         ClientDetails =
                             new ClientDetailsModel
                             {
-                                FullNameAndSurname =
-                                    request.ClientDetails
-                                        ?.FullNameAndSurname ?? "",
-
-                                IdNumber =
-                                    request.ClientDetails
-                                        ?.IdNumber ?? "",
-
-                                CellNo =
-                                    request.ClientDetails
-                                        ?.CellNo ?? ""
+                                FullNameAndSurname = fullName,
+                                IdNumber = idNumber,
+                                CellNo = cellNo
                             },
 
                         HomeTelNo =
@@ -259,9 +263,6 @@ namespace APIINSY7315.Controllers
                     };
 
 
-                // ----------------------------------------------------
-                // Firestore document
-                // ----------------------------------------------------
 
                 var document =
                     _db
@@ -269,8 +270,6 @@ namespace APIINSY7315.Controllers
                         .Document(applicationId);
 
 
-                // IMPORTANT:
-                // Save the strongly typed Firestore model.
                 await document.CreateAsync(application);
 
 
@@ -320,9 +319,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // GET /api/LoansApi/mine
-        // ============================================================
+     
 
         [HttpGet("mine")]
         [FirebaseAuthorize(Roles.Client)]
@@ -375,14 +372,11 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // GET /api/LoansApi
-        // ============================================================
 
         [HttpGet]
         [FirebaseAuthorize(
             Roles.Admin,
-            Roles.Management)]
+            Roles.Staff)]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? status)
         {
@@ -450,14 +444,11 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // GET /api/LoansApi/pending
-        // ============================================================
 
         [HttpGet("pending")]
         [FirebaseAuthorize(
             Roles.Admin,
-            Roles.Management)]
+            Roles.Staff)]
         public async Task<IActionResult> GetPending()
         {
             try
@@ -503,9 +494,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // GET /api/LoansApi/{id}
-        // ============================================================
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(
@@ -565,25 +553,18 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // PUT /api/LoansApi/{id}/status
-        // ============================================================
 
         [HttpPut("{id}/status")]
         [FirebaseAuthorize(
-            Roles.Admin,
-            Roles.Management)]
+      Roles.Admin,
+      Roles.Staff)]
         public async Task<IActionResult> UpdateStatus(
-            string id,
-            [FromBody] UpdateStatusRequest request)
+      string id,
+      [FromBody] UpdateStatusRequest request)
         {
             if (request == null)
             {
-                return BadRequest(new
-                {
-                    error =
-                        "Request body is required."
-                });
+                return BadRequest(new { error = "Request body is required." });
             }
 
             if (!ModelState.IsValid)
@@ -599,43 +580,47 @@ namespace APIINSY7315.Controllers
 
             if (validStatus == null)
             {
-                return BadRequest(new
-                {
-                    error =
-                        "Invalid loan status."
-                });
+                return BadRequest(new { error = "Invalid loan status." });
             }
 
             try
             {
-                var document =
-                    _db
-                        .Collection(CollectionName)
-                        .Document(id);
-
-                var snapshot =
-                    await document.GetSnapshotAsync();
+                var document = _db.Collection(CollectionName).Document(id);
+                var snapshot = await document.GetSnapshotAsync();
 
                 if (!snapshot.Exists)
                 {
                     return NotFound();
                 }
 
-                var updates =
-                    new Dictionary<string, object>
+                // 1. Get the loan amount from the Firestore document
+                var requestedAmount = snapshot.ContainsField("RequestedAmount")
+                    ? snapshot.GetValue<double>("RequestedAmount")
+                    : 0;
+
+                var currentUserRole = HttpContext.GetRole();
+
+                // 2. Check if the status is being set to "Approved" and amount exceeds 7000
+                if (validStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase) && requestedAmount > 7000)
+                {
+                    // 3. If it's over 7000, strictly require an Admin role
+                    if (!string.Equals(currentUserRole, Roles.Admin, StringComparison.OrdinalIgnoreCase))
                     {
-                        ["Status"] =
-                            validStatus,
+                        return StatusCode(403, new
+                        {
+                            error = "FORBIDDEN",
+                            message = "Loans exceeding 7,000 require Administrator approval."
+                        });
+                    }
+                }
 
-                        ["ReviewedBy"] =
-                            HttpContext.GetUserId(),
-
-                        ["ReviewedAt"] =
-                            Timestamp.GetCurrentTimestamp(),
-
-                        ["ReviewNote"] =
-                            request.Note ?? ""
-                    };
+                var updates = new Dictionary<string, object>
+                {
+                    ["Status"] = validStatus,
+                    ["ReviewedBy"] = HttpContext.GetUserId(),
+                    ["ReviewedAt"] = Timestamp.GetCurrentTimestamp(),
+                    ["ReviewNote"] = request.Note ?? ""
+                };
 
                 await document.UpdateAsync(updates);
 
@@ -647,37 +632,17 @@ namespace APIINSY7315.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex,
-                    "Failed updating application {Id}",
-                    id);
+                _logger.LogError(ex, "Failed updating application {Id}", id);
 
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        error =
-                            "Could not update the application.",
-
-                        detail =
-                            ex.Message,
-
-                        exception =
-                            ex.GetType().FullName,
-
-                        inner =
-                            ex.InnerException?.Message,
-
-                        traceId =
-                            HttpContext.TraceIdentifier
-                    });
+                return StatusCode(500, new
+                {
+                    error = "Could not update the application.",
+                    detail = ex.Message,
+                    traceId = HttpContext.TraceIdentifier
+                });
             }
         }
 
-
-        // ============================================================
-        // FIRESTORE DOCUMENT -> DTO
-        // ============================================================
 
         private static LoanApplicationDto MapDocument(
             DocumentSnapshot document)
@@ -938,9 +903,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // STRING
-        // ============================================================
+        
 
         private static string GetString(
             Dictionary<string, object> data,
@@ -958,9 +921,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // DOUBLE
-        // ============================================================
+     
 
         private static double GetDouble(
             Dictionary<string, object> data,
@@ -985,9 +946,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // INT
-        // ============================================================
 
         private static int GetInt(
             Dictionary<string, object> data,
@@ -1012,10 +970,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // DATETIME
-        // ============================================================
-
+    
         private static DateTime GetDateTime(
             Dictionary<string, object> data,
             string key)
@@ -1049,9 +1004,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // NULLABLE DATETIME
-        // ============================================================
 
         private static DateTime? GetNullableDateTime(
             Dictionary<string, object> data,
@@ -1086,9 +1038,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // NULLABLE TIMESTAMP
-        // ============================================================
 
         private static Timestamp? GetNullableTimestamp(
             Dictionary<string, object> data,
@@ -1111,9 +1060,6 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // STRING LIST
-        // ============================================================
 
         private static List<string> GetStringList(
             Dictionary<string, object> data,
@@ -1149,10 +1095,7 @@ namespace APIINSY7315.Controllers
         }
 
 
-        // ============================================================
-        // CLIENT DETAILS
-        // ============================================================
-
+      
         private static ClientDetailsDto GetClientDetails(
             Dictionary<string, object> data)
         {

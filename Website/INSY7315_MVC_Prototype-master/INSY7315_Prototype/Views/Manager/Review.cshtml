@@ -1,0 +1,340 @@
+﻿@model INSY7315_Prototype.ViewModels.ManagerLoanApplicationViewModel
+
+@{
+    var canVerify = Model.Status.Equals("Submitted", StringComparison.OrdinalIgnoreCase);
+
+    ViewData["Title"] = canVerify ? "Verify Application" : "Application Details";
+}
+
+
+<div class="manager-page">
+
+    <div class="manager-header">
+
+        <div>
+            <span class="manager-label">BRIDGE&ANCHOR</span>
+
+            @if (canVerify)
+            {
+                <h1>Verify Application</h1>
+
+                <p>
+                    Verify the information submitted by the client
+                    before sending the loan for approval.
+                </p>
+            }
+            else
+            {
+                <h1>Application Details</h1>
+
+                <p>
+                    View the submitted loan application and its current status.
+                </p>
+            }
+        </div>
+
+        <a asp-controller="Manager" asp-action="Index" class="btn-primary-custom btn-shadow"> ← Back to Dashboard </a>
+
+    </div>
+
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+
+    <!-- Loan Details -->
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+
+            <div class="manager-panel-title">
+
+                <h2>Loan Details</h2>
+
+                <p>
+                    Requested loan information.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="application-details-grid">
+
+            <div>
+                <span>Amount Requested</span>
+
+                <strong> R @Model.RequestedAmount.ToString("N2") </strong>
+            </div>
+
+
+            <div>
+                <span>Status</span>
+
+                <strong> @Model.Status </strong>
+            </div>
+
+        </div>
+
+
+        <div class="application-reason">
+
+            <span>Reason for Loan</span>
+
+            <p>
+                @(string.IsNullOrWhiteSpace(Model.ReasonForLoan) ? "No reason provided." : Model.ReasonForLoan)
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- More client information -->
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+
+            <div class="manager-panel-title">
+
+                <h2>Client Information</h2>
+
+                <p>
+                    Additional information submitted with the application.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="application-details-grid">
+
+            <div>
+                <span>Home Telephone</span>
+                <strong>@Model.HomeTelNo</strong>
+            </div>
+
+            <div>
+                <span>Marital Status</span>
+                <strong>@Model.MarriedOrUnmarried</strong>
+            </div>
+
+            <div>
+                <span>Physical Address</span>
+                <strong>@Model.CurrentPhysicalAddress</strong>
+            </div>
+
+            <div>
+                <span>Postal Address</span>
+                <strong>@Model.PostalAddress</strong>
+            </div>
+
+            <div>
+                <span>Residence Duration</span>
+                <strong>@Model.ResidenceYears years, @Model.ResidenceMonths months</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Employment -->
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+
+            <div class="manager-panel-title">
+                <h2>Employment Information</h2>
+            </div>
+
+        </div>
+
+
+        <div class="application-details-grid">
+
+            <div>
+                <span>Company</span>
+                <strong>@Model.CompanyName</strong>
+            </div>
+
+            <div>
+                <span>Occupation</span>
+                <strong>@Model.Occupation</strong>
+            </div>
+
+            <div>
+                <span>Work Telephone</span>
+                <strong>@Model.WorkTelephone</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Banking -->
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+
+            <div class="manager-panel-title">
+                <h2>Banking Information</h2>
+            </div>
+
+        </div>
+
+
+        <div class="application-details-grid">
+
+            <div>
+                <span>Bank</span>
+                <strong>@Model.BankName</strong>
+            </div>
+
+            <div>
+                <span>Account Type</span>
+                <strong>@Model.AccountType</strong>
+            </div>
+
+            <div>
+                <span>Account Number</span>
+                <strong>@Model.AccountNumber</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Family / Relative -->
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+
+            <div class="manager-panel-title">
+                <h2>Additional Contact Information</h2>
+            </div>
+
+        </div>
+
+
+        <div class="application-details-grid">
+
+            <div>
+                <span>Spouse</span>
+                <strong>@Model.SpouseNameAndSurname</strong>
+            </div>
+
+            <div>
+                <span>Relative</span>
+                <strong>@Model.Relative1Name</strong>
+            </div>
+
+            <div>
+                <span>Relative Telephone</span>
+                <strong>@Model.Relative1TelNumber</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Application Summary -->
+    @if (canVerify)
+    {
+        <div class="manager-panel">
+
+            <div class="manager-panel-header">
+                <div class="manager-panel-title">
+                    <h2>Verify Application</h2>
+                    <p>
+                        Verify the applicant's information and supporting
+                        documentation before the loan proceeds for approval.
+                    </p>
+                </div>
+            </div>
+
+
+            <form asp-controller="Manager" asp-action="CompleteReview" method="post" class="manager-review">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="ApplicationId" value="@Model.ApplicationId" />
+
+                <div class="review-field">
+                    <label for="reviewNote">Review Notes</label>
+
+                    <textarea id="reviewNote" name="Note" rows="5" maxlength="500" placeholder="Add any notes about the application or documents..."></textarea>
+
+                    <small>
+                        Record anything relevant that was identified during the review.
+                    </small>
+                </div>
+
+                <div class="review-actions">
+
+                    <a asp-controller="Manager" asp-action="Applications" class="btn-secondary-custom"> Back </a>
+
+                    <button type="submit" name="VerificationResult" value="unsuccessful" class="btn-decline"> Verification Unsuccessful </button>
+
+                    <button type="submit" name="VerificationResult" value="successful" class="btn-approve"> Verification Successful </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    }
+
+    @if (!canVerify)
+    {
+        <div class="manager-panel">
+
+            <div class="manager-panel-header">
+
+                <div class="manager-panel-title">
+
+                    <h2>Application Status</h2>
+
+                    <p>
+                        This application has already progressed beyond verification.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="application-details-grid">
+
+                <div>
+                    <span>Current Status</span>
+
+                    <strong class="application-status @Model.Status.ToLower()">
+                        @Model.Status
+                    </strong>
+                </div>
+
+            </div>
+
+
+            @if (Model.Status.Equals("UnderReview", StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="read-only-actions">
+
+                    <a asp-controller="Manager" asp-action="Approval" asp-route-id="@Model.ApplicationId" class="btn-primary-custom"> Go to Loan Approval </a>
+
+                </div>
+            }
+
+        </div>
+    }
+
+
+</div>

@@ -90,10 +90,14 @@ class Register_Page : AppCompatActivity() {
                     Toast.makeText(this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
+                if  (!email.contains("@")) {
+                    Toast.makeText(this, "Please enter a valid email address", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
 
 
 
-                btnSubmitRegistration.isEnabled = false
+
 
                 lifecycleScope.launch {
                     try {
@@ -103,7 +107,7 @@ class Register_Page : AppCompatActivity() {
                             password = password,
                             idNumber = edtIdNumber.text?.toString()?.trim().orEmpty(),
                             cellNo = edtPhone.text?.toString()?.trim().orEmpty(),
-                            role = "Client"
+
                         )
 
                         val response = withContext(Dispatchers.IO) {

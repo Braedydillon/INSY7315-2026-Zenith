@@ -400,7 +400,7 @@ legend + * {
 
 ::-webkit-file-upload-button {
   font: inherit;
-  -webkit-appearance: button;
+  -webkit-appearance:   ;
 }
 
 output {

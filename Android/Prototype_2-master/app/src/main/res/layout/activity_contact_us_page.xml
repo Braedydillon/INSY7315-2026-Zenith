@@ -366,7 +366,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:contentDescription="Return to Home Page"
-        android:src="@drawable/home"
+        android:src="@drawable/homebutton"
         app:backgroundTint="#1769E0"
         app:elevation="6dp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -8,19 +8,21 @@ namespace APIINSY7315
     {
         public const string Client = "client";
         public const string Admin = "admin";
-        public const string Management = "management";
+    
+
+        public const string Staff = "staff";
 
         public static readonly string[] All =
         {
             Client,
             Admin,
-            Management
+            Staff
         };
 
-        public static readonly string[] Staff =
+        public static readonly string[] StaffType =
         {
             Admin,
-            Management
+            Staff
         };
 
         public static bool IsValid(string? role)
@@ -49,7 +51,7 @@ namespace APIINSY7315
         {
             var normalized = Normalize(role);
 
-            return Staff.Contains(normalized);
+            return StaffType.Contains(normalized);
         }
     }
 
@@ -223,10 +225,6 @@ namespace APIINSY7315
             role =
                 Roles.Normalize(role);
 
-
-            // IMPORTANT:
-            // Never automatically turn a missing/invalid
-            // role into "client".
             if (string.IsNullOrWhiteSpace(role))
             {
                 context.Result =
@@ -263,8 +261,7 @@ namespace APIINSY7315
                 email;
 
 
-            // No role requirement.
-            // [FirebaseAuthorize]
+          
             if (_allowedRoles.Length == 0)
             {
                 return;

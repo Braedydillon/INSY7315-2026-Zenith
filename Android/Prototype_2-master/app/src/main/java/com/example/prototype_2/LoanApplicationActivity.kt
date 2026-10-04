@@ -175,7 +175,7 @@ class LoanApplicationActivity : AppCompatActivity() {
         btnSubmitApplication = findViewById(R.id.btnSubmitApplication)
     }
 
-
+    // date for loan application
     private fun getCurrentDateTime(): String {
         val formatter = java.text.SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss",
@@ -220,7 +220,7 @@ class LoanApplicationActivity : AppCompatActivity() {
             idNumber = etIdNumber.text.toString().trim(),
             cellNo = etCellNumber.text.toString().trim(),
             homeTelNo = etHomeTelephone.text.toString().trim(),
-            marriedOrUnmarried = "",
+            marriedOrUnmarried = getMaritalStatus(),
             marriageCommunity = etMaritalCommunity.text.toString().trim(),
             previouslyDivorced = if (divorced) "Yes" else "No",
             divorceYear = divorceYear?.toString() ?: "",
@@ -265,6 +265,22 @@ class LoanApplicationActivity : AppCompatActivity() {
             otherReason = etOtherPurpose.text.toString().trim(),
 
             clientDetails = clientDetails,
+
+            homeTelNo = etHomeTelephone.text.toString().trim(),
+            marriedOrUnmarried = getMaritalStatus(),
+            marriageCommunity = etMaritalCommunity.text.toString().trim(),
+            previouslyDivorced = if (divorced) "Yes" else "No",
+            divorceYear = divorceYear?.toString() ?: "",
+            divorceCommunity = etDivorceCommunity.text.toString().trim(),
+            currentPhysicalAddress = etPhysicalAddress.text.toString().trim(),
+            postalAddress = etPostalAddress.text.toString().trim(),
+            parentsAddress = etParentsAddress.text.toString().trim(),
+            residenceYears = residenceYears,
+            residenceMonths = residenceMonths,
+            companyName = etCompanyName.text.toString().trim(),
+            occupation = etOccupation.text.toString().trim(),
+            workTelephone = etWorkTelephone.text.toString().trim(),
+            workAddress = etWorkAddress.text.toString().trim(),
 
             bankName = etBankName.text.toString().trim(),
             accountType = etAccountType.text.toString().trim(),

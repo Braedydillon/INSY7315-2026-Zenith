@@ -14,7 +14,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.prototype_2.API.LoginRequest
 import com.example.prototype_2.API.RetrofitClient
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,18 +39,6 @@ class Login_Page : AppCompatActivity() {
 
         findViewById<TextView>(R.id.txtCreateAccount).setOnClickListener {
             val intent = Intent(this, Register_Page::class.java)
-            startActivity(intent)
-        }
-
-        findViewById<Button>(R.id.btnStaffProto).setOnClickListener {
-            val intent = Intent(this, Staff_Page::class.java)
-            startActivity(intent)
-        }
-
-        val btnHome = findViewById<FloatingActionButton>(R.id.btnHome)
-
-        btnHome.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 
@@ -95,7 +82,6 @@ class Login_Page : AppCompatActivity() {
 
             try {
 
-                // Login
                 val response = withContext(Dispatchers.IO) {
                     RetrofitClient.apiService.login(
                         LoginRequest(
@@ -105,45 +91,9 @@ class Login_Page : AppCompatActivity() {
                     )
                 }
 
-<<<<<<< HEAD
-                if (response.isSuccessful && response.body() != null) {
-                    val authResponse = response.body()
-                    
-                    // Note: Your backend returns 'idToken' in JSON instead of 'token' in the Login endpoint
-                    // so we make sure we grab the token properly. If the backend actually maps to 'idToken',
-                    // we'll rely on the manual API models.
-                    
-                    val role = authResponse?.role?.lowercase() ?: authResponse?.user?.role?.lowercase()
-                    
-                    if(role == "admin") {
-                        val intent = Intent(this@Login_Page, Staff_Page::class.java)
-                        startActivity(intent)
-                        finish()
-                        return@launch
-                    } else {
-                        // Treat everything else as a client for now
-                        val token = authResponse?.token ?: authResponse?.accessToken ?: authResponse?.idToken
-
-                        if (token != null) {
-                            RetrofitClient.authToken = token
-                            val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-                            prefs.edit().putString("AUTH_TOKEN", token).apply()
-                        }
-
-                        Toast.makeText(this@Login_Page, "Login successful!", Toast.LENGTH_SHORT).show()
-
-                        val intent = Intent(this@Login_Page, MainActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    }
-                } else {
-                    val code = response.code()
-                    val errorMsg = withContext(Dispatchers.IO) {
-=======
                 if (!response.isSuccessful || response.body() == null) {
 
                     val error = withContext(Dispatchers.IO) {
->>>>>>> fea7102 (Fixed the application page)
                         response.errorBody()?.string()
                     }
 
@@ -161,60 +111,65 @@ class Login_Page : AppCompatActivity() {
                     return@launch
                 }
 
-                val authResponse = response.body()
+                val authResponse = response.body()!!
 
                 Log.d(
                     "LOGIN_API",
                     "Login response: $authResponse"
                 )
 
-                // Get Firebase ID token
-                val idToken = authResponse?.idToken
+                val token = authResponse.idToken
+                    ?: authResponse.token
+                    ?: authResponse.accessToken
 
-                if (idToken.isNullOrEmpty()) {
+                if (token.isNullOrEmpty()) {
 
                     Toast.makeText(
                         this@Login_Page,
-                        "Login successful but no ID token was returned.",
+                        "Login successful but no authentication token was returned.",
                         Toast.LENGTH_LONG
                     ).show()
 
                     return@launch
                 }
 
-                // Store token in RetrofitClient
-                RetrofitClient.authToken = idToken
+                RetrofitClient.authToken = token
 
-                // Save login information
+                val role = (
+                        authResponse.role
+                            ?: authResponse.user?.role
+                            ?: ""
+                        ).lowercase()
+
+                Log.d(
+                    "LOGIN_ROLE",
+                    "User role: $role"
+                )
+
                 val prefs = getSharedPreferences(
                     "AppPrefs",
                     MODE_PRIVATE
                 )
 
                 prefs.edit()
-                    .putString("AUTH_TOKEN", idToken)
+                    .putString("AUTH_TOKEN", token)
                     .putString(
                         "REFRESH_TOKEN",
-                        authResponse.refreshToken
+                        authResponse.refreshToken ?: ""
                     )
                     .putString(
                         "UID",
-                        authResponse.uid
+                        authResponse.user?.id ?: ""
                     )
                     .putString(
                         "EMAIL",
-                        authResponse.email
+                        authResponse.user?.email ?: email
                     )
                     .putString(
                         "ROLE",
-                        authResponse.role
+                        role
                     )
                     .apply()
-
-                Log.d(
-                    "LOGIN_AUTH",
-                    "ID token saved: ${idToken.take(20)}..."
-                )
 
                 Toast.makeText(
                     this@Login_Page,
@@ -222,13 +177,42 @@ class Login_Page : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
 
-                // Open MainActivity
-                val intent = Intent(
-                    this@Login_Page,
-                    MainActivity::class.java
-                )
+                /*
+                 * Redirect user based on role:
+                 *
+                 * admin -> Manager Page
+                 * staff -> Staff Page
+                 * client -> Main Page
+                 */
 
-                startActivity(intent)
+                if (role == "admin") {
+
+                    val intent = Intent(
+                        this@Login_Page,
+                        Manager_Page::class.java
+                    )
+
+                    startActivity(intent)
+
+                } else if (role == "staff") {
+
+                    val intent = Intent(
+                        this@Login_Page,
+                        Staff_Page::class.java
+                    )
+
+                    startActivity(intent)
+
+                } else {
+
+                    val intent = Intent(
+                        this@Login_Page,
+                        MainActivity::class.java
+                    )
+
+                    startActivity(intent)
+                }
+
                 finish()
 
             } catch (e: Exception) {

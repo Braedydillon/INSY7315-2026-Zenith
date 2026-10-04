@@ -1,285 +1,213 @@
-﻿@{
+﻿@model INSY7315_Prototype.ViewModels.StaffDashboardViewModel
+@using INSY7315_Prototype.Models
+
+@{
     ViewData["Title"] = "Staff Dashboard";
 }
 
-<div class="staff-dashboard">
+<div class="manager-page">
 
-    <!-- Dashboard Header -->
-    <div class="staff-header">
-
+    <!-- Header -->
+    <div class="manager-header">
         <div>
-            <span class="staff-label">STAFF PORTAL</span>
+            <span class="manager-label">BRIDGE&ANCHOR</span>
 
-            <h1>Good morning, Staff Member</h1>
+            <h1>Staff Dashboard</h1>
 
             <p>
-                Here's an overview of the current loan activity.
+                Verify and approve loans up to R@(LoanRules.StaffLimit.ToString("N0")).
+                Larger loans are sent to the manager.
             </p>
         </div>
+    </div>
 
-        <div class="staff-date">
-            <span>Today</span>
-            <strong>17 August 2026</strong>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+    }
+
+    <!-- Dashboard Statistics -->
+    <div class="manager-stats">
+
+        <div class="manager-stat-card">
+            <div class="stat-top"><div class="stat-icon">A</div></div>
+            <span>Total Applications</span>
+            <strong>@Model.TotalApplications</strong>
+        </div>
+
+        <div class="manager-stat-card pending">
+            <div class="stat-top"><div class="stat-icon">!</div></div>
+            <span>Pending Action</span>
+            <strong>@Model.PendingApplications</strong>
+        </div>
+
+        <div class="manager-stat-card">
+            <div class="stat-top"><div class="stat-icon">✓</div></div>
+            <span>Approved</span>
+            <strong>@Model.ApprovedApplications</strong>
+        </div>
+
+        <div class="manager-stat-card">
+            <div class="stat-top"><div class="stat-icon">R</div></div>
+            <span>Rejected</span>
+            <strong>@Model.RejectedApplications</strong>
         </div>
 
     </div>
 
-
-    <!-- Statistics -->
-    <div class="row g-4 mb-5">
-
-        <div class="col-md-6 col-xl-3">
-            <div class="staff-stat-card">
-
-                <div class="stat-icon">
-                    📋
-                </div>
-
-                <div>
-                    <span>Total Applications</span>
-                    <strong>12</strong>
-                </div>
-
-            </div>
-        </div>
-
-
-        <div class="col-md-6 col-xl-3">
-            <div class="staff-stat-card">
-
-                <div class="stat-icon pending">
-                    ⏳
-                </div>
-
-                <div>
-                    <span>Pending Review</span>
-                    <strong>5</strong>
-                </div>
-
-            </div>
-        </div>
-
-
-        <div class="col-md-6 col-xl-3">
-            <div class="staff-stat-card">
-
-                <div class="stat-icon approved">
-                    ✓
-                </div>
-
-                <div>
-                    <span>Approved</span>
-                    <strong>3</strong>
-                </div>
-
-            </div>
-        </div>
-
-
-        <div class="col-md-6 col-xl-3">
-            <div class="staff-stat-card">
-
-                <div class="stat-icon clients">
-                    👥
-                </div>
-
-                <div>
-                    <span>Active Clients</span>
-                    <strong>24</strong>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-
-
-    <!-- Main Dashboard Content -->
-    <div class="row g-4">
+    <!-- Dashboard Content -->
+    <div class="manager-dashboard-grid">
 
         <!-- Recent Applications -->
-        <div class="col-lg-8">
+        <div class="manager-panel">
 
-            <div class="staff-panel">
+            <div class="manager-panel-header">
 
-                <div class="panel-header">
-
-                    <div>
-                        <span class="panel-label">APPLICATIONS</span>
-                        <h2>Recent Applications</h2>
-                    </div>
-
-                    <a asp-controller="Staff"
-                       asp-action="Applications"
-                       class="panel-link">
-                        View All →
-                    </a>
-
+                <div class="manager-panel-title">
+                    <h2>Recent Applications</h2>
+                    <p> Applications requiring your attention </p>
                 </div>
 
+                <a asp-controller="Staff" asp-action="AllApplications" class="btn-primary-custom btn-shadow"> View All Applications </a>
 
-                <div class="table-responsive">
-
-                    <table class="table staff-table">
-
-                        <thead>
-                            <tr>
-                                <th>Applicant</th>
-                                <th>Amount</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            <tr>
-                                <td>
-                                    <strong>John Smith</strong>
-                                </td>
-
-                                <td>R5,000</td>
-
-                                <td>17 Aug 2026</td>
-
-                                <td>
-                                    <span class="status-badge status-pending">
-                                        Pending
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <a href="#" class="view-link">
-                                        View
-                                    </a>
-                                </td>
-                            </tr>
-
-
-                            <tr>
-                                <td>
-                                    <strong>Sarah Jones</strong>
-                                </td>
-
-                                <td>R3,000</td>
-
-                                <td>17 Aug 2026</td>
-
-                                <td>
-                                    <span class="status-badge status-approved">
-                                        Approved
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <a href="#" class="view-link">
-                                        View
-                                    </a>
-                                </td>
-                            </tr>
-
-
-                            <tr>
-                                <td>
-                                    <strong>Michael Brown</strong>
-                                </td>
-
-                                <td>R7,000</td>
-
-                                <td>16 Aug 2026</td>
-
-                                <td>
-                                    <span class="status-badge status-review">
-                                        Review
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <a href="#" class="view-link">
-                                        View
-                                    </a>
-                                </td>
-                            </tr>
-
-
-                            <tr>
-                                <td>
-                                    <strong>Lisa Williams</strong>
-                                </td>
-
-                                <td>R2,500</td>
-
-                                <td>16 Aug 2026</td>
-
-                                <td>
-                                    <span class="status-badge status-approved">
-                                        Approved
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <a href="#" class="view-link">
-                                        View
-                                    </a>
-                                </td>
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-                </div>
             </div>
+
+            <div class="application-list">
+
+                @if (Model.RecentApplications != null && Model.RecentApplications.Any())
+                {
+                    foreach (var application in Model.RecentApplications)
+                    {
+                        <div class="application-row">
+
+                            <div class="applicant-icon">
+                                @if (!string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname))
+                                {
+                                    @application.ClientDetails.FullNameAndSurname.Substring(0, 1).ToUpper()
+                                }
+                                else
+                                {
+                                    <span>?</span>
+                                }
+                            </div>
+
+                            <div class="applicant-details">
+                                <strong>
+                                    @(string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname) ? "Unknown Applicant" : application.ClientDetails.FullNameAndSurname)
+                                </strong>
+
+                                <span> Application #@application.ApplicationId </span>
+                            </div>
+
+                            <div class="application-amount">
+                                R @application.RequestedAmount.ToString("N2")
+                            </div>
+
+                            <span class="application-status @((application.Status ?? "").ToLower())"> @application.Status </span>
+
+                            <div class="application-actions">
+
+                                @if (LoanRules.Is(application.Status, LoanStatus.Submitted))
+                                {
+                                    <a asp-controller="Staff" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> Verify </a>
+                                }
+                                else if (LoanRules.Is(application.Status, LoanStatus.UnderReview))
+                                {
+                                    <a asp-controller="Staff" asp-action="Approval" asp-route-id="@application.ApplicationId" class="action-view"> Approve Loan </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Staff" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> View Details </a>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-applications">
+                        <p> No loan applications found.</p>
+                    </div>
+                }
+
+            </div>
+
         </div>
 
+        <!-- Side panel -->
+        <div class="attention-panel">
 
-        <!-- Quick Actions -->
-        <div class="col-lg-4">
-            <div class="staff-panel">
-                <div class="panel-header">
-                    <div>
-                        <span class="panel-label">QUICK ACTIONS</span>
-                        <h2>Staff Tools</h2>
-                    </div>
-                </div>
-                <div class="quick-actions">
+            <span class="attention-label">STAFF ACTION</span>
 
-                    <a asp-controller="Staff" asp-action="Applications" class="quick-action">
-                        <div class="quick-action-icon">
-                            📋
-                        </div>
-                        <div>
-                            <strong>Review Applications</strong>
-                            <span>View pending applications</span>
-                        </div>
+            <h2>Applications Need Verification</h2>
 
-                        <b>→</b>
-                    </a>
+            <p>
+                Verify applicant information and supporting documentation
+                before applications proceed for loan approval.
+            </p>
 
-                    <a asp-controller="Staff" asp-action="Clients"class="quick-action">
-                        <div class="quick-action-icon">
-                            👥
-                        </div>
-                        <div>
-                            <strong>Manage Clients</strong>
-                            <span>View client information</span>
-                        </div>
-
-                        <b>→</b>
-                    </a>
-                    <a asp-controller="Staff" asp-action="Loans" class="quick-action">
-
-                        <div class="quick-action-icon">💰</div>
-
-                        <div>
-                            <strong>View Loans</strong>
-                            <span>Manage active loans</span>
-                        </div>
-
-                        <b>→</b>
-                    </a>
-                </div>
+            <div class="pending-number">
+                <strong>@Model.AwaitingVerification</strong>
+                <span>applications awaiting verification</span>
             </div>
+
+            <a asp-controller="Staff" asp-action="Applications" class="review-button btn-shadow"> Verify Applications </a>
+
+            <h2>Loans That Need Approval</h2>
+
+            <p>
+                Review verified loan applications and make
+                the final lending decision.
+            </p>
+
+            <div class="pending-number">
+                <strong>@Model.AwaitingApproval</strong>
+                <span>applications awaiting approval</span>
+            </div>
+
+            <a asp-controller="Staff" asp-action="Approvals" class="review-button btn-shadow"> Approve Loans </a>
+
+            <h2>Sent to Manager</h2>
+
+            <p>
+                Loans above R@(LoanRules.StaffLimit.ToString("N0")) are handled by the manager.
+            </p>
+
+            <div class="pending-number">
+                <strong>@Model.SentToManager</strong>
+                <span>applications with the manager</span>
+            </div>
+
         </div>
+
+        <div class="manager-actions">
+
+            <a asp-controller="Staff" asp-action="Applications" class="manager-action-card">
+                <div class="manager-action-icon">V</div>
+                <strong>Verify Applications</strong>
+                <span>Check client details and submitted documentation.</span>
+            </a>
+
+            <a asp-controller="Staff" asp-action="Approvals" class="manager-action-card">
+                <div class="manager-action-icon">A</div>
+                <strong>Approve Loans</strong>
+                <span>Make decisions on verified loan applications.</span>
+            </a>
+
+        </div>
+
     </div>
+
 </div>

@@ -3,6 +3,7 @@ using FirebaseAdmin.Auth;
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -30,10 +31,7 @@ namespace APIINSY7315.Controllers
             _logger = logger;
         }
 
-        // ============================================================
-        // REGISTER
-        // POST: /api/Auth/register
-        // ============================================================
+     
 
         [HttpPost("register")]
         [AllowAnonymous]
@@ -77,6 +75,24 @@ namespace APIINSY7315.Controllers
                 });
             }
 
+            if (string.IsNullOrWhiteSpace(request.IdNumber) || request.IdNumber.Length != 13)
+            {
+                return BadRequest(new
+                {
+                    error = "INVALID_ID_NUMBER",
+                    message = "A valid 13-digit ID number is required."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(request.CellNo))
+            {
+                return BadRequest(new
+                {
+                    error = "INVALID_CELL_NO",
+                    message = "Cell number is required."
+                });
+            }
+
             var email = request.Email.Trim().ToLowerInvariant();
             var fullName = request.FullName.Trim();
 
@@ -84,9 +100,7 @@ namespace APIINSY7315.Controllers
             {
                 FirebaseAuth auth = FirebaseAuth.DefaultInstance;
 
-                // ----------------------------------------------------
-                // Check whether the Firebase account already exists
-                // ----------------------------------------------------
+            
 
                 try
                 {
@@ -108,9 +122,7 @@ namespace APIINSY7315.Controllers
                     }
                 }
 
-                // ----------------------------------------------------
-                // Create Firebase Authentication account
-                // ----------------------------------------------------
+              
 
                 var firebaseUser =
                     await auth.CreateUserAsync(
@@ -122,15 +134,11 @@ namespace APIINSY7315.Controllers
                             EmailVerified = false
                         });
 
-                // ----------------------------------------------------
-                // Default role
-                // ----------------------------------------------------
+          
 
                 const string role = "client";
 
-                // ----------------------------------------------------
-                // Store role in Firebase custom claims
-                // ----------------------------------------------------
+              
 
                 await auth.SetCustomUserClaimsAsync(
                     firebaseUser.Uid,
@@ -139,9 +147,7 @@ namespace APIINSY7315.Controllers
                         ["role"] = role
                     });
 
-                // ----------------------------------------------------
-                // Store user in Firestore
-                // ----------------------------------------------------
+               
 
                 var userData =
                     new Dictionary<string, object>
@@ -149,6 +155,8 @@ namespace APIINSY7315.Controllers
                         ["uid"] = firebaseUser.Uid,
                         ["email"] = email,
                         ["fullName"] = fullName,
+                        ["idNumber"] = request.IdNumber.Trim(),
+                        ["cellNo"] = request.CellNo.Trim(),
                         ["role"] = role,
                         ["createdAt"] =
                             Timestamp.GetCurrentTimestamp()
@@ -161,9 +169,7 @@ namespace APIINSY7315.Controllers
                         userData,
                         SetOptions.MergeAll);
 
-                // ----------------------------------------------------
-                // Generate Firebase ID token
-                // ----------------------------------------------------
+              
 
                 var idToken =
                     await FirebaseAuth.DefaultInstance
@@ -221,10 +227,7 @@ namespace APIINSY7315.Controllers
             }
         }
 
-        // ============================================================
-        // LOGIN
-        // POST: /api/Auth/login
-        // ============================================================
+    
 
         [HttpPost("login")]
         [AllowAnonymous]
@@ -367,12 +370,6 @@ namespace APIINSY7315.Controllers
                     });
             }
         }
-
-        // ============================================================
-        // REFRESH
-        // POST: /api/Auth/refresh
-        // ============================================================
-
         [HttpPost("refresh")]
         [AllowAnonymous]
         public async Task<IActionResult> Refresh(
@@ -513,9 +510,7 @@ namespace APIINSY7315.Controllers
             }
         }
 
-        // ============================================================
-        // FIREBASE API KEY
-        // ============================================================
+      
 
         private string? GetFirebaseApiKey()
         {
@@ -526,9 +521,7 @@ namespace APIINSY7315.Controllers
                     "FIREBASE_API_KEY");
         }
 
-        // ============================================================
-        // CUSTOM TOKEN -> ID TOKEN
-        // ============================================================
+        
 
         private async Task<TokenExchangeResult>
             ExchangeCustomTokenForIdTokenAsync(
@@ -596,9 +589,7 @@ namespace APIINSY7315.Controllers
             };
         }
 
-        // ============================================================
-        // FIREBASE ERROR PARSER
-        // ============================================================
+      
 
         private static string ExtractFirebaseError(
             string json)
@@ -624,15 +615,13 @@ namespace APIINSY7315.Controllers
             }
             catch
             {
-                // Ignore JSON parsing failure.
+                
             }
 
             return "Firebase authentication failed.";
         }
 
-        // ============================================================
-        // TOKEN RESULT
-        // ============================================================
+      
 
         private sealed class TokenExchangeResult
         {
@@ -642,39 +631,44 @@ namespace APIINSY7315.Controllers
         }
     }
 
-    // ================================================================
-    // REQUEST CLASSES
-    // ================================================================
 
     public class RegisterRequest
     {
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.EmailAddress]
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = "";
 
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.MinLength(6)]
-        [System.ComponentModel.DataAnnotations.MaxLength(100)]
+        [Required]
+        [MinLength(6)]
+        [MaxLength(100)]
         public string Password { get; set; } = "";
 
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(150)]
+        [Required]
+        [StringLength(150)]
         public string FullName { get; set; } = "";
+
+        [Required]
+        [RegularExpression(@"^\d{13}$", ErrorMessage = "ID number must be 13 digits.")]
+        public string IdNumber { get; set; } = "";
+
+        [Required]
+        [RegularExpression(@"^\+?\d{9,15}$", ErrorMessage = "Invalid cell number.")]
+        public string CellNo { get; set; } = "";
     }
 
     public class LoginRequest
     {
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.EmailAddress]
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = "";
 
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string Password { get; set; } = "";
     }
 
     public class RefreshRequest
     {
-        [System.ComponentModel.DataAnnotations.Required]
+        [Required]
         public string RefreshToken { get; set; } = "";
     }
 }

@@ -21,9 +21,9 @@
                 </p>
 
                 <div class="hero-buttons">
-                    <a href="#services" class="btn btn-primary-custom"> Explore Our Services </a>
+                    <a href="#services" class="btn btn-primary-custom btn-shadow"> Explore Our Services </a>
 
-                    <a href="#contact" class="btn btn-outline-custom"> Contact Us </a>
+                    <a href="#contact" class="btn btn-outline-custom btn-shadow"> Contact Us </a>
                 </div>
             </div>
 
@@ -197,7 +197,7 @@
                     6 months.
                 </p>
 
-                <a href="#services" class="btn btn-primary-custom">
+                <a href="#services" class="btn btn-primary-custom btn-shadow">
                     Learn About Our Services
                 </a>
             </div>
@@ -558,9 +558,18 @@
                     </p>
                 </div>
                 <div class="col-lg-5 text-lg-end">
-                    <a href="mailto:Bridgeanchor@gmail.com"class="btn btn-light-custom"> Email Us </a>
+                    <a href="mailto:Bridgeanchor@gmail.com"class="btn btn-light-custom btn-shadow"> Email Us </a>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div>
+        <p>Logged in as: @ViewBag.UserEmail</p>
+        <p>Role: @ViewBag.UserRole</p>
+    </div>
+}

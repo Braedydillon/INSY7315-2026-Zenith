@@ -1,0 +1,254 @@
+﻿@model List<INSY7315_Prototype.ViewModels.ManagerLoanApplicationViewModel>
+
+@{
+    ViewData["Title"] = "All Applications";
+}
+
+<div class="manager-page">
+
+    <!-- Header -->
+    <div class="manager-header">
+
+        <div>
+            <span class="manager-label">BRIDGE&ANCHOR</span>
+
+            <h1>All Applications</h1>
+
+            <p>
+                View all submitted, verified, approved and rejected
+                loan applications.
+            </p>
+        </div>
+
+        <a asp-controller="Manager" asp-action="Index" class="btn-primary-custom btn-shadow"> ← Back to Dashboard </a>
+
+    </div>
+
+
+    <!-- Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+
+    <!-- Application Statistics -->
+    <div class="applications-summary">
+
+        <div>
+            <span>Total Applications</span>
+            <strong>@Model.Count</strong>
+        </div>
+
+        <div>
+            <span>Awaiting Verification</span>
+            <strong>
+                @Model.Count(x =>
+                    x.Status.Equals("Submitted",StringComparison.OrdinalIgnoreCase))
+            </strong>
+        </div>
+
+        <div>
+            <span>Awaiting Approval</span>
+            <strong>
+                @Model.Count(x =>
+                    x.Status.Equals("UnderReview",StringComparison.OrdinalIgnoreCase))
+            </strong>
+        </div>
+
+        <div>
+            <span>Approved</span>
+            <strong>
+                @Model.Count(x =>
+                    x.Status.Equals("Approved",StringComparison.OrdinalIgnoreCase))
+            </strong>
+        </div>
+
+        <div>
+            <span>Rejected</span>
+            <strong>
+                @Model.Count(x =>
+                    x.Status.Equals("Rejected",StringComparison.OrdinalIgnoreCase))
+            </strong>
+        </div>
+
+    </div>
+
+
+    <!-- Applications -->
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+
+            <div class="manager-panel-title">
+                <h2>Loan Applications</h2>
+
+                <p>
+                    View and manage all loan applications.
+                </p>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div class="all-applications-actions">
+
+                <a asp-controller="Manager" asp-action="Applications" class="btn-primary-custom btn-shadow"> Verify Applications </a>
+
+                <a asp-controller="Manager" asp-action="Approvals" class="btn-primary-custom"> Approve Loans</a>
+
+            </div>
+
+        </div>
+
+
+        @if (Model.Any())
+        {
+            <div class="applications-table-wrapper">
+
+                <table class="applications-table">
+
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Application</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var application in Model)
+                        {
+                            <tr>
+
+                                <!-- Applicant -->
+                                <td>
+
+                                    <div class="applicant-cell">
+
+                                        <div class="application-avatar">
+
+                                            @(string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname)? "?": application.ClientDetails.FullNameAndSurname.Substring(0, 1).ToUpper())
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <strong>
+                                                @(string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname)? "Unknown Applicant": application.ClientDetails.FullNameAndSurname)
+                                            </strong>
+
+                                            <small>
+                                                @application.UserEmail
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Application ID -->
+                                <td>
+
+                                    <span class="application-number">
+                                        #@application.ApplicationId
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Amount -->
+                                <td>
+
+                                    <strong>
+                                        R @application.RequestedAmount.ToString("N2")
+                                    </strong>
+
+                                </td>
+
+
+                                <!-- Date -->
+                                <td>
+
+                                    @(application.DateApplied == default ? "—":  application.DateApplied.ToString("dd MMM yyyy"))
+
+                                </td>
+
+
+                                <!-- Status -->
+                                <td>
+
+                                    <span class="application-status @application.Status.ToLower()">
+                                        @application.Status
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Action -->
+                                <td class="application-action">
+
+                                    @if (application.Status.Equals("Submitted", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <a asp-controller="Manager" asp-action="Review" asp-route-id="@application.ApplicationId" class="view-application-btn"> Verify </a>
+                                    }
+
+                                    else if (application.Status.Equals("UnderReview", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <a asp-controller="Manager" asp-action="Approval" asp-route-id="@application.ApplicationId" class="view-application-btn"> Approve Loan </a>
+                                    }
+
+                                    else
+                                    {
+                                        <a asp-controller="Manager" asp-action="Review" asp-route-id="@application.ApplicationId" class="view-application-btn"> View </a>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+
+                <h3>No Applications Found</h3>
+
+                <p>
+                    Loan applications will appear here once clients
+                    begin submitting applications.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+</div>
