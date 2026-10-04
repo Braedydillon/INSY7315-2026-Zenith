@@ -1,7 +1,6 @@
 ﻿using INSY7315_Prototype.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Net.Http.Headers;
 
 namespace INSY7315_Prototype.Controllers
@@ -25,9 +24,7 @@ namespace INSY7315_Prototype.Controllers
                 return RedirectToAction("login", "Account");
             }
 
-            var client = _httpClientFactory.CreateClient();
-
-            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+            var client = _httpClientFactory.CreateClient("LoanApi");
 
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
@@ -46,6 +43,12 @@ namespace INSY7315_Prototype.Controllers
             {
                 TotalApplications = applications.Count,
 
+                AwaitingVerification = applications.Count(a => 
+                    a.Status.Equals("Submitted", StringComparison.OrdinalIgnoreCase)),
+
+                AwaitingApproval = applications.Count(a =>
+                    a.Status.Equals("UnderReview", StringComparison.OrdinalIgnoreCase)),
+
                 PendingApplications = applications.Count(a => 
                     a.Status.Equals("Submitted",StringComparison.OrdinalIgnoreCase) ||
                     a.Status.Equals("UnderReview",StringComparison.OrdinalIgnoreCase)),
@@ -56,7 +59,7 @@ namespace INSY7315_Prototype.Controllers
                 RejectedApplications = applications.Count(a => 
                     a.Status.Equals("Rejected",StringComparison.OrdinalIgnoreCase)),
 
-                RecentApplications = applications.Take(4).ToList()
+                RecentApplications = applications.Take(6).ToList()
             };
 
             return View(model);
@@ -76,9 +79,7 @@ namespace INSY7315_Prototype.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var client = _httpClientFactory.CreateClient();
-
-            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+            var client = _httpClientFactory.CreateClient("LoanApi");
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -103,66 +104,6 @@ namespace INSY7315_Prototype.Controllers
             return View(application);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Review(ManagerDecisionViewModel model)
-        {
-            if (string.IsNullOrWhiteSpace(model.ApplicationId))
-            {
-                return BadRequest();
-            }
-
-            var token = User.FindFirst("IdToken")?.Value;
-
-            if (string.IsNullOrEmpty(token))
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            string status;
-
-            if (model.Decision == "approve")
-            {
-                status = "Approved";
-            }
-            else if (model.Decision == "decline")
-            {
-                status = "Rejected";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Invalid application decision.";
-
-                return RedirectToAction("Review", new { id = model.ApplicationId });
-            }
-
-            var client = _httpClientFactory.CreateClient();
-
-            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var request = new
-            {
-                status = status,
-                note = model.Note
-            };
-
-            var response = await client.PutAsJsonAsync($"api/LoansApi/{model.ApplicationId}/status", request);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadAsStringAsync();
-
-                TempData["ErrorMessage"] = $"Unable to update application: {error}";
-
-                return RedirectToAction("Review", new { id = model.ApplicationId });
-            }
-
-            TempData["SuccessMessage"] = status == "Approved" ? "Application approved successfully." : "Application declined successfully.";
-
-            return RedirectToAction("Index");
-        }
 
         public async Task<IActionResult> Applications()
         {
@@ -173,9 +114,7 @@ namespace INSY7315_Prototype.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var client = _httpClientFactory.CreateClient();
-
-            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+            var client = _httpClientFactory.CreateClient("LoanApi");
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -195,7 +134,7 @@ namespace INSY7315_Prototype.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CompleteReview(string ApplicationId,string? Note)
+        public async Task<IActionResult> CompleteReview(string ApplicationId,string VerificationResult,string? Note)
         {
             if (string.IsNullOrWhiteSpace(ApplicationId))
             {
@@ -209,15 +148,30 @@ namespace INSY7315_Prototype.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            string status;
 
-            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+            if (VerificationResult == "successful")
+            {
+                status = "UnderReview";
+            }
+            else if (VerificationResult == "unsuccessful")
+            {
+                status = "Rejected";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Please select a valid verification result.";
+
+                return RedirectToAction("Review", new { id = ApplicationId });
+            }
+
+            var client = _httpClientFactory.CreateClient("LoanApi");
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var request = new
             {
-                status = "UnderReview",
+                status = status,
                 note = Note ?? string.Empty
             };
 
@@ -227,15 +181,23 @@ namespace INSY7315_Prototype.Controllers
             {
                 var error = await response.Content.ReadAsStringAsync();
 
-                TempData["ErrorMessage"] = $"Unable to verify application: {error}";
+                TempData["ErrorMessage"] = $"Unable to update application: {error}";
 
-                return RedirectToAction("Review",new { id = ApplicationId });
+                return RedirectToAction("Review", new { id = ApplicationId });
             }
 
-            TempData["SuccessMessage"] = "Application verified successfully and sent for loan approval.";
+            if (status == "UnderReview")
+            {
+                TempData["SuccessMessage"] = "Application verified successfully and sent for loan approval.";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Application verification was unsuccessful and the application was rejected.";
+            }
 
             return RedirectToAction("Applications");
         }
+
 
         public async Task<IActionResult> Approvals()
         {
@@ -246,9 +208,7 @@ namespace INSY7315_Prototype.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var client = _httpClientFactory.CreateClient();
-
-            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+            var client = _httpClientFactory.CreateClient("LoanApi");
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -282,9 +242,7 @@ namespace INSY7315_Prototype.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var client = _httpClientFactory.CreateClient();
-
-            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+            var client = _httpClientFactory.CreateClient("LoanApi");
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -340,9 +298,7 @@ namespace INSY7315_Prototype.Controllers
                 return RedirectToAction("Approval", new { id = ApplicationId });
             }
 
-            var client = _httpClientFactory.CreateClient();
-
-            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+            var client = _httpClientFactory.CreateClient("LoanApi");
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -377,13 +333,9 @@ namespace INSY7315_Prototype.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("LoanApi");
 
-            client.BaseAddress = new Uri(
-                "https://apiinsy7315-latest.onrender.com/");
-
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var response = await client.GetAsync("api/LoansApi");
 
@@ -391,14 +343,10 @@ namespace INSY7315_Prototype.Controllers
             {
                 ViewBag.ErrorMessage = "Unable to load loan applications.";
 
-                return View(
-                    new List<ManagerLoanApplicationViewModel>());
+                return View(new List<ManagerLoanApplicationViewModel>());
             }
 
-            var applications =
-                await response.Content
-                    .ReadFromJsonAsync<List<ManagerLoanApplicationViewModel>>()
-                ?? new List<ManagerLoanApplicationViewModel>();
+            var applications = await response.Content.ReadFromJsonAsync<List<ManagerLoanApplicationViewModel>>()?? new List<ManagerLoanApplicationViewModel>();
 
             return View(applications);
         }

@@ -25,31 +25,27 @@
 
     <div class="dashboard-actions">
 
-        <a asp-controller="Loan"
-           asp-action="Index"
-           class="dashboard-card">
+        <a asp-controller="Loan" asp-action="Index" class="dashboard-card">
 
             <div class="dashboard-card-icon">
                 <i class="bi bi-cash-coin"></i>
             </div>
 
             <div>
-                <h3>View Loans</h3>
-                <p>Browse available loan options.</p>
+                <h3>My Applications</h3>
+                <p>View and track your loan applications.</p>
             </div>
         </a>
 
-        <a asp-controller="LoanApplication"
-           asp-action="Index"
-           class="dashboard-card">
+        <a asp-controller="Loan" asp-action="Apply" class="dashboard-card">
 
             <div class="dashboard-card-icon">
                 <i class="bi bi-file-earmark-text"></i>
             </div>
 
             <div>
-                <h3>My Applications</h3>
-                <p>View and track your loan applications.</p>
+                <h3>Apply for loan</h3>
+                <p>Apply for a new loan.</p>
             </div>
         </a>
 

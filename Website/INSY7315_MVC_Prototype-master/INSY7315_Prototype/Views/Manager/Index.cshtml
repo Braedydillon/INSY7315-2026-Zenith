@@ -60,8 +60,7 @@
                 <div class="stat-icon">!</div>
             </div>
 
-            <span>Needs Review</span>
-
+            <span>Pending Action</span>
             <strong>@Model.PendingApplications</strong>
 
         </div>
@@ -114,7 +113,7 @@
 
                 </div>
 
-                <a asp-controller="Manager" asp-action="Applications" class="action-view"> View All Applications </a>
+                <a asp-controller="Manager" asp-action="AllApplications" class="btn-primary-custom btn-shadow"> View All Applications </a>
 
             </div>
 
@@ -169,7 +168,18 @@
                             @* Actions *@
                             <div class="application-actions">
 
-                                <a asp-controller="Manager" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> View </a>
+                                @if (application.Status.Equals("Submitted",StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <a asp-controller="Manager" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> Verify </a>
+                                }
+                                else if (application.Status.Equals("UnderReview",StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <a asp-controller="Manager" asp-action="Approval" asp-route-id="@application.ApplicationId" class="action-view"> Approve Loan </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Manager" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> View Details </a>
+                                }
 
                             </div>
 
@@ -190,10 +200,12 @@
         </div>
 
 
-        @* Needs Attention *@
+        @* Verification Action *@
         <div class="attention-panel">
 
-            <span class="attention-label">MANAGER ACTION</span>
+            <span class="attention-label">
+                MANAGER ACTION
+            </span>
 
             <h2>Applications Need Verification</h2>
 
@@ -202,20 +214,29 @@
                 before applications proceed for loan approval.
             </p>
 
-
             <div class="pending-number">
-
-                <strong> @Model.PendingApplications </strong>
-
-                <span> applications needing review </span>
-
+                <strong>@Model.AwaitingVerification</strong>
+                <span>applications awaiting verification</span>
             </div>
 
             <a asp-controller="Manager" asp-action="Applications" class="review-button btn-shadow"> Verify Applications </a>
 
+             <h2>Loans That Need Approval</h2>
+
+            <p>
+                Review verified loan applications and make
+                the final lending decision.
+            </p>
+
+            <div class="pending-number">
+                <strong>@Model.AwaitingApproval</strong>
+                <span>applications awaiting approval</span>
+            </div>
+
+            <a asp-controller="Manager" asp-action="Approvals" class="review-button btn-shadow"> Approve Loans </a>
+
         </div>
 
-    </div>
 
     <div class="manager-actions">
 

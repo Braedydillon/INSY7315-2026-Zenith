@@ -27,25 +27,21 @@
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("client"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Loan" asp-action="Index">Loans</a>
+                                <a class="nav-link" asp-controller="Loan" asp-action="Apply"> Apply for Loan </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="LoanApplication" asp-action="Index">My Applications</a>
+                                <a class="nav-link" asp-controller="Loan" asp-action="Index"> My Applications </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Client" asp-action="Index">My Account</a>
+                                <a class="nav-link" asp-controller="Client" asp-action="Index"> My Account </a>
                             </li>
                         }
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("staff"))
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("management"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="LoanApplication" asp-action="Index"> Applications</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Staff" asp-action="Index"> Staff Dashboard</a>
+                                <a class="nav-link" asp-controller="Staff" asp-action="Index"> Staff Dashboard </a>
                             </li>
                         }
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("admin"))
