@@ -21,7 +21,7 @@
 
     <!-- Header Title -->
     <TextView
-        android:id="@+id/txtTrackTitle"
+        android:id="@+id/TrackTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -35,7 +35,7 @@
 
     <!-- Header Subtitle -->
     <TextView
-        android:id="@+id/txtTrackSubtitle"
+        android:id="@+id/TrackSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -46,7 +46,7 @@
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtTrackTitle" />
+        app:layout_constraintTop_toBottomOf="@id/TrackTitle" />
 
     <!-- Empty State Card -->
     <androidx.cardview.widget.CardView
@@ -71,7 +71,7 @@
             android:padding="30dp">
 
             <TextView
-                android:id="@+id/txtEmptyIcon"
+                android:id="@+id/EmptyIcon"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:background="#EAF2FF"
@@ -80,7 +80,7 @@
                 android:textSize="30sp" />
 
             <TextView
-                android:id="@+id/txtEmptyTitle"
+                android:id="@+id/EmptyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
@@ -90,7 +90,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/txtEmptyMessage"
+                android:id="@+id/EmptyMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
