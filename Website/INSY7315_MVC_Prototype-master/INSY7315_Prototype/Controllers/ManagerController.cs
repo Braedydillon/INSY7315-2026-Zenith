@@ -102,5 +102,66 @@ namespace INSY7315_Prototype.Controllers
 
             return View(application);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Review(ManagerDecisionViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.ApplicationId))
+            {
+                return BadRequest();
+            }
+
+            var token = User.FindFirst("IdToken")?.Value;
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            string status;
+
+            if (model.Decision == "approve")
+            {
+                status = "Approved";
+            }
+            else if (model.Decision == "decline")
+            {
+                status = "Rejected";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Invalid application decision.";
+
+                return RedirectToAction("Review", new { id = model.ApplicationId });
+            }
+
+            var client = _httpClientFactory.CreateClient();
+
+            client.BaseAddress = new Uri("https://apiinsy7315-latest.onrender.com/");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var request = new
+            {
+                status = status,
+                note = model.Note
+            };
+
+            var response = await client.PutAsJsonAsync($"api/LoansApi/{model.ApplicationId}/status", request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                TempData["ErrorMessage"] = $"Unable to update application: {error}";
+
+                return RedirectToAction("Review", new { id = model.ApplicationId });
+            }
+
+            TempData["SuccessMessage"] = status == "Approved" ? "Application approved successfully." : "Application declined successfully.";
+
+            return RedirectToAction("Index");
+        }
     }
 }

@@ -18,7 +18,7 @@
             </p>
         </div>
 
-        <a asp-controller="Manager"  asp-action="Index"  class="action-view"> ← Back to Dashboard </a>
+        <a asp-controller="Manager" asp-action="Index" class="btn-primary-custom btn-shadow"> ← Back to Dashboard </a>
 
     </div>
 
@@ -298,6 +298,46 @@
             </div>
 
         </div>
+
+    </div>
+
+    <!-- Manager Review -->
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+            <div class="manager-panel-title">
+                <h2>Manager Review</h2>
+                <p>
+                    Review the application before making a final decision.
+                </p>
+            </div>
+        </div>
+
+        <form asp-controller="Manager" asp-action="Review" method="post" class="manager-review">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="ApplicationId" value="@Model.ApplicationId" />
+
+            <div class="review-field">
+
+                <label for="reviewNote"> Review Note </label>
+
+                <textarea id="reviewNote"  name="Note" rows="5" maxlength="500" placeholder="Enter a note about this application..."></textarea>
+
+                <small> Add any comments or reasons relating to your decision. </small>
+
+            </div>
+
+            <div class="review-actions">
+
+                <button type="submit" name="Decision" value="decline" class="btn-decline"> Decline Application </button>
+
+                <button type="submit" name="Decision" value="approve" class="btn-approve"> Application </button>
+
+            </div>
+
+        </form>
 
     </div>
 

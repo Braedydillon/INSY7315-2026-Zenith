@@ -3268,3 +3268,68 @@ main {
         grid-template-columns: 1fr;
     }
 }
+
+.manager-review {
+    padding: 20px;
+}
+
+.review-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+    .review-field label {
+        font-weight: 600;
+        color: #0f2f4a;
+    }
+
+    .review-field textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d5dce3;
+        border-radius: 6px;
+        resize: vertical;
+        font-family: inherit;
+        font-size: 0.95rem;
+    }
+
+        .review-field textarea:focus {
+            outline: none;
+            border-color: #0f2f4a;
+        }
+
+    .review-field small {
+        color: #6c7a89;
+    }
+
+.review-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-approve,
+.btn-decline {
+    padding: 11px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-approve {
+    background: #198754;
+    color: white;
+}
+
+.btn-decline {
+    background: #dc3545;
+    color: white;
+}
+
+    .btn-approve:hover,
+    .btn-decline:hover {
+        opacity: 0.9;
+    }
