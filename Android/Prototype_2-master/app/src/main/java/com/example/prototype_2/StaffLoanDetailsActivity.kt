@@ -1,6 +1,7 @@
 package com.example.prototype_2
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -64,7 +65,7 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
         verifyButton = findViewById(R.id.btnApproveLoan)
 
-        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+        findViewById<View>(R.id.btnBack).setOnClickListener {
             finish()
         }
 
@@ -186,12 +187,12 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                             ) {
 
                                 verifyButton.isEnabled = false
-                                verifyButton.text = "Details Verified"
+                                verifyButton.text = "Loan Approved"
 
                             } else {
 
                                 verifyButton.isEnabled = true
-                                verifyButton.text = "Verify Details"
+                                verifyButton.text = "Approve Loan"
                             }
 
                             verifyButton.setOnClickListener {
@@ -255,8 +256,8 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
             try {
 
                 val request = UpdateStatusRequest(
-                    status = "Verified",
-                    comments = "Staff verified that all details are correct."
+                    status = "Approved",
+                    comments = "Staff approved the loan application."
                 )
 
                 val response =
@@ -270,21 +271,21 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
 
                         applicationStatus.text =
-                            "Status: Verified"
+                            "Status: Approved"
 
                         verifyButton.text =
-                            "Details Verified"
+                            "Loan Approved"
 
                         Toast.makeText(
                             this@StaffLoanDetailsActivity,
-                            "Loan details verified successfully",
+                            "Loan approved successfully",
                             Toast.LENGTH_SHORT
                         ).show()
 
                     } else {
 
                         verifyButton.isEnabled = true
-                        verifyButton.text = "Verify Details"
+                        verifyButton.text = "Approve Loan"
 
                         val error = response.errorBody()?.string()
 
@@ -312,11 +313,11 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
 
                     verifyButton.isEnabled = true
-                    verifyButton.text = "Verify Details"
+                    verifyButton.text = "Approve Loan"
 
                     Toast.makeText(
                         this@StaffLoanDetailsActivity,
-                        "Error verifying the loan details",
+                        "Error approving the loan",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
