@@ -9,7 +9,8 @@
         <div class="card p-4 h-100">
             <h5 class="mb-3">Loan</h5>
             <dl class="row mb-4">
-                <dt class="col-sm-4 text-muted fw-normal">Amount</dt><dd class="col-sm-8 fw-semibold">R@Model.RequestedAmount.ToString("N0")</dd>
+                <dt class="col-sm-4 text-muted fw-normal">Amount</dt>
+                <dd class="col-sm-8 fw-semibold">R@(Model.RequestedAmount.ToString("N0"))</dd>
                 <dt class="col-sm-4 text-muted fw-normal">Reason</dt><dd class="col-sm-8">@Model.ReasonForLoan</dd>
             </dl>
 
