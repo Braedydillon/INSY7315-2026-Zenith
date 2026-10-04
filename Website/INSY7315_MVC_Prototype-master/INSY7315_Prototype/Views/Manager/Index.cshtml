@@ -1,11 +1,12 @@
-﻿@{
+﻿@model INSY7315_Prototype.ViewModels.ManagerDashboardViewModel
+
+@{
     ViewData["Title"] = "Manager Dashboard";
 }
 
 <div class="manager-page">
 
-   
-
+    <!-- Header -->
     <div class="manager-header">
 
         <div>
@@ -20,112 +21,86 @@
 
     </div>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
 
-    
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
 
+
+    <!-- Dashboard Statistics -->
     <div class="manager-stats">
 
-        <!-- Total Clients -->
-
+        <!-- Total Applications -->
         <div class="manager-stat-card">
 
             <div class="stat-top">
-
-                <div class="stat-icon">
-                    C
-                </div>
-
-                <span class="stat-change">
-                    +8%
-                </span>
-
-            </div>
-
-            <span>Total Clients</span>
-
-            <strong>124</strong>
-
-        </div>
-
-
-        <!-- Applications -->
-
-        <div class="manager-stat-card">
-
-            <div class="stat-top">
-
-                <div class="stat-icon">
-                    A
-                </div>
-
-                <span class="stat-change">
-                    +5%
-                </span>
-
+                <div class="stat-icon">A</div>
             </div>
 
             <span>Total Applications</span>
 
-            <strong>48</strong>
+            <strong>@Model.TotalApplications</strong>
 
         </div>
 
 
-        <!-- Pending -->
-
+        <!-- Needs Review -->
         <div class="manager-stat-card pending">
 
             <div class="stat-top">
-
-                <div class="stat-icon">
-                    !
-                </div>
-
-                <span class="stat-change">
-                    12
-                </span>
-
+                <div class="stat-icon">!</div>
             </div>
 
-            <span>Needs Review</span>
-
-            <strong>12</strong>
+            <span>Pending Action</span>
+            <strong>@Model.PendingApplications</strong>
 
         </div>
 
 
-        <!-- Active Loans -->
-
+        <!-- Approved -->
         <div class="manager-stat-card">
 
             <div class="stat-top">
-
-                <div class="stat-icon">
-                    L
-                </div>
-
-                <span class="stat-change">
-                    +3%
-                </span>
-
+                <div class="stat-icon">✓</div>
             </div>
 
-            <span>Active Loans</span>
+            <span>Approved</span>
 
-            <strong>36</strong>
+            <strong>@Model.ApprovedApplications</strong>
+
+        </div>
+
+
+        <!-- Rejected -->
+        <div class="manager-stat-card">
+
+            <div class="stat-top">
+                <div class="stat-icon">R</div>
+            </div>
+
+            <span>Rejected</span>
+
+            <strong>@Model.RejectedApplications</strong>
 
         </div>
 
     </div>
 
 
-   
-
+    <!-- Dashboard Content -->
     <div class="manager-dashboard-grid">
 
 
         <!-- Recent Applications -->
-
         <div class="manager-panel">
 
             <div class="manager-panel-header">
@@ -134,320 +109,174 @@
 
                     <h2>Recent Applications</h2>
 
-                    <p>
-                        Applications requiring your attention
-                    </p>
+                    <p> Applications requiring your attention </p>
 
                 </div>
 
-                <a href="#" class="view-all-link">
-                    View All →
-                </a>
+                <a asp-controller="Manager" asp-action="AllApplications" class="btn-primary-custom btn-shadow"> View All Applications </a>
 
             </div>
 
 
             <div class="application-list">
 
+                @if (Model.RecentApplications != null && Model.RecentApplications.Any())
+                {
+                    foreach (var application in Model.RecentApplications)
+                    {
+                        <div class="application-row">
 
-                <!-- Application 1 -->
+                            @* Applicant Initial *@
+                            <div class="applicant-icon">
 
-                <div class="application-row">
+                                @if (!string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname))
+                                {
+                                    @application.ClientDetails.FullNameAndSurname.Substring(0, 1).ToUpper()
+                                }
+                                else
+                                {
+                                    <span>?</span>
+                                }
 
-                    <div class="applicant-icon">
-                        JS
-                    </div>
-
-                    <div class="applicant-details">
-
-                        <strong>
-                            John Smith
-                        </strong>
-
-                        <span>
-                            Application #APP001
-                        </span>
-
-                    </div>
-
-                    <div class="application-amount">
-                        R50,000
-                    </div>
-
-                    <span class="application-status pending">
-                        Pending
-                    </span>
-
-                    <div class="application-actions">
-
-                        <a href="#" class="action-view">
-                            View
-                        </a>
-
-                        <a href="#" class="action-approve">
-                            Approve
-                        </a>
-
-                        <a href="#" class="action-decline">
-                            Decline
-                        </a>
-
-                    </div>
-
-                </div>
+                            </div>
 
 
-                <!-- Application 2 -->
+                            @* Applicant Information *@
+                            <div class="applicant-details">
 
-                <div class="application-row">
+                                <strong>
+                                    @(string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname)? "Unknown Applicant" : application.ClientDetails.FullNameAndSurname)
+                                </strong>
 
-                    <div class="applicant-icon">
-                        SN
-                    </div>
+                                <span> Application #@application.ApplicationId </span>
 
-                    <div class="applicant-details">
+                            </div>
 
-                        <strong>
-                            Sarah Naidoo
-                        </strong>
 
-                        <span>
-                            Application #APP002
-                        </span>
+                            <!-- Requested Amount -->
+                            <div class="application-amount">
 
-                    </div>
+                                R @application.RequestedAmount.ToString("N2")
 
-                    <div class="application-amount">
-                        R25,000
-                    </div>
+                            </div>
 
-                    <span class="application-status pending">
-                        Pending
-                    </span>
 
-                    <div class="application-actions">
+                            @* Status *@
+                            <span class="application-status @application.Status.ToLower()"> @application.Status </span>
 
-                        <a href="#" class="action-view">
-                            View
-                        </a>
 
-                        <a href="#" class="action-approve">
-                            Approve
-                        </a>
+                            @* Actions *@
+                            <div class="application-actions">
 
-                        <a href="#" class="action-decline">
-                            Decline
-                        </a>
+                                @if (application.Status.Equals("Submitted",StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <a asp-controller="Manager" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> Verify </a>
+                                }
+                                else if (application.Status.Equals("UnderReview",StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <a asp-controller="Manager" asp-action="Approval" asp-route-id="@application.ApplicationId" class="action-view"> Approve Loan </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Manager" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> View Details </a>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-applications">
+
+                        <p> No loan applications found.</p>
 
                     </div>
-
-                </div>
-
-
-                <!-- Application 3 -->
-
-                <div class="application-row">
-
-                    <div class="applicant-icon">
-                        DJ
-                    </div>
-
-                    <div class="applicant-details">
-
-                        <strong>
-                            David Jones
-                        </strong>
-
-                        <span>
-                            Application #APP003
-                        </span>
-
-                    </div>
-
-                    <div class="application-amount">
-                        R75,000
-                    </div>
-
-                    <span class="application-status approved">
-                        Approved
-                    </span>
-
-                    <div class="application-actions">
-
-                        <a href="#" class="action-view">
-                            View
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Application 4 -->
-
-                <div class="application-row">
-
-                    <div class="applicant-icon">
-                        MD
-                    </div>
-
-                    <div class="applicant-details">
-
-                        <strong>
-                            Michael Dlamini
-                        </strong>
-
-                        <span>
-                            Application #APP004
-                        </span>
-
-                    </div>
-
-                    <div class="application-amount">
-                        R40,000
-                    </div>
-
-                    <span class="application-status pending">
-                        Pending
-                    </span>
-
-                    <div class="application-actions">
-
-                        <a href="#" class="action-view">
-                            View
-                        </a>
-
-                        <a href="#" class="action-approve">
-                            Approve
-                        </a>
-
-                        <a href="#" class="action-decline">
-                            Decline
-                        </a>
-
-                    </div>
-
-                </div>
+                }
 
             </div>
 
         </div>
 
 
-        <!-- Needs Attention -->
-
+        @* Verification Action *@
         <div class="attention-panel">
 
             <span class="attention-label">
                 MANAGER ACTION
             </span>
 
-            <h2>
-                Applications Need Review
-            </h2>
+            <h2>Applications Need Verification</h2>
 
             <p>
-                There are currently applications waiting for
-                your review. Check the applicant information
-                before making a decision.
+                Verify applicant information and supporting documentation
+                before applications proceed for loan approval.
             </p>
 
             <div class="pending-number">
-
-                <strong>12</strong>
-
-                <span>
-                    pending applications
-                </span>
-
+                <strong>@Model.AwaitingVerification</strong>
+                <span>applications awaiting verification</span>
             </div>
 
-            <a href="#" class="review-button">
-                Review Applications
-            </a>
+            <a asp-controller="Manager" asp-action="Applications" class="review-button btn-shadow"> Verify Applications </a>
 
-        </div>
-
-    </div>
-
-
-   
-
-    <div class="manager-section">
-
-        <div class="manager-section-heading">
-
-            <h2>
-                Quick Actions
-            </h2>
+             <h2>Loans That Need Approval</h2>
 
             <p>
-                Access commonly used management functions.
+                Review verified loan applications and make
+                the final lending decision.
             </p>
 
-        </div>
+            <div class="pending-number">
+                <strong>@Model.AwaitingApproval</strong>
+                <span>applications awaiting approval</span>
+            </div>
 
-
-        <div class="manager-actions">
-
-
-            <!-- Applications -->
-
-            <a href="#" class="manager-action-card">
-
-                <div class="manager-action-icon">
-                    A
-                </div>
-
-                <strong>
-                    Loan Applications
-                </strong>
-
-                <span>
-                    Review and manage client applications.
-                </span>
-
-            </a>
-
-
-            <!-- Clients -->
-
-            <a href="#" class="manager-action-card">
-
-                <div class="manager-action-icon">
-                    C
-                </div>
-
-                <strong>
-                    Clients
-                </strong>
-
-                <span>
-                    View client information and activity.
-                </span>
-
-            </a>
-
-
-            <!-- Reports -->
-
-            <a href="#" class="manager-action-card">
-
-                <div class="manager-action-icon">
-                    R
-                </div>
-
-                <strong>
-                    Reports
-                </strong>
-
-                <span>
-                    View loan and business reports.
-                </span>
-
-            </a>
+            <a asp-controller="Manager" asp-action="Approvals" class="review-button btn-shadow"> Approve Loans </a>
 
         </div>
+
+
+    <div class="manager-actions">
+
+        <a asp-controller="Manager" asp-action="Applications" class="manager-action-card">
+
+            <div class="manager-action-icon">V</div>
+
+            <strong>Verify Applications</strong>
+
+            <span>
+                Check client details and submitted documentation.
+            </span>
+
+        </a>
+
+
+        <a asp-controller="Manager" asp-action="Approvals" class="manager-action-card">
+
+            <div class="manager-action-icon">A</div>
+
+            <strong>Approve Loans</strong>
+
+            <span>
+                Make decisions on verified loan applications.
+            </span>
+
+        </a>
+
+
+        <a href="#" class="manager-action-card">
+
+            <div class="manager-action-icon">R</div>
+
+            <strong>Reports</strong>
+
+            <span>
+                View loan and business reports.
+            </span>
+
+        </a>
 
     </div>
 

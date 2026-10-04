@@ -1,0 +1,198 @@
+﻿@model INSY7315_Prototype.Models.ApplicationForm
+@{
+    ViewData["Title"] = "Loan application";
+}
+
+<div class="page-head">
+    <div>
+        <h1>Loan application</h1>
+        <p>Complete the online form below and submit it when you are done.</p>
+    </div>
+</div>
+
+<div class="card">
+    <form asp-controller="ApplicationForm" asp-action="Index" method="post">
+        <div asp-validation-summary="All" class="validation"></div>
+
+        <h2>Client details</h2>
+        <div class="grid two">
+            <div>
+                <label asp-for="FullNameAndSurname"></label>
+                <input asp-for="FullNameAndSurname" />
+                <span asp-validation-for="FullNameAndSurname" class="validation"></span>
+            </div>
+            <div>
+                <label asp-for="IdNumber"></label>
+                <input asp-for="IdNumber" inputmode="numeric" maxlength="13" />
+                <span asp-validation-for="IdNumber" class="validation"></span>
+            </div>
+            <div>
+                <label asp-for="HomeTelNo"></label>
+                <input asp-for="HomeTelNo" />
+            </div>
+            <div>
+                <label asp-for="CellNo"></label>
+                <input asp-for="CellNo" />
+                <span asp-validation-for="CellNo" class="validation"></span>
+            </div>
+            <div>
+                <label asp-for="MarriedOrUnmarried"></label>
+                <select asp-for="MarriedOrUnmarried">
+                    <option value="">Select</option>
+                    <option>Married</option>
+                    <option>Unmarried</option>
+                </select>
+            </div>
+            <div>
+                <label asp-for="MarriageCommunity"></label>
+                <input asp-for="MarriageCommunity" placeholder="In or out of community" />
+            </div>
+            <div>
+                <label asp-for="PreviouslyDivorced"></label>
+                <select asp-for="PreviouslyDivorced">
+                    <option value="">Select</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                </select>
+            </div>
+            <div>
+                <label asp-for="DivorceYear"></label>
+                <input asp-for="DivorceYear" />
+            </div>
+            <div>
+                <label asp-for="DivorceCommunity"></label>
+                <input asp-for="DivorceCommunity" placeholder="In or out of community" />
+            </div>
+        </div>
+
+        <h2>Address details</h2>
+        <div class="grid three">
+            <div>
+                <label asp-for="CurrentPhysicalAddress"></label>
+                <textarea asp-for="CurrentPhysicalAddress" rows="3"></textarea>
+                <span asp-validation-for="CurrentPhysicalAddress" class="validation"></span>
+            </div>
+            <div>
+                <label asp-for="PostalAddress"></label>
+                <textarea asp-for="PostalAddress" rows="3"></textarea>
+            </div>
+            <div>
+                <label asp-for="ParentsAddress"></label>
+                <textarea asp-for="ParentsAddress" rows="3"></textarea>
+            </div>
+        </div>
+        <div class="grid two">
+            <div>
+                <label asp-for="ResidenceYears"></label>
+                <input asp-for="ResidenceYears" type="number" min="0" />
+            </div>
+            <div>
+                <label asp-for="ResidenceMonths"></label>
+                <input asp-for="ResidenceMonths" type="number" min="0" max="11" />
+            </div>
+        </div>
+
+        <h2>Current employment details</h2>
+        <div class="grid two">
+            <div>
+                <label asp-for="CompanyName"></label>
+                <input asp-for="CompanyName" />
+                <span asp-validation-for="CompanyName" class="validation"></span>
+            </div>
+            <div>
+                <label asp-for="WorkTelephone"></label>
+                <input asp-for="WorkTelephone" />
+            </div>
+            <div>
+                <label asp-for="Occupation"></label>
+                <input asp-for="Occupation" />
+                <span asp-validation-for="Occupation" class="validation"></span>
+            </div>
+            <div>
+                <label asp-for="WorkAddress"></label>
+                <textarea asp-for="WorkAddress" rows="2"></textarea>
+            </div>
+        </div>
+
+        <h2>Banking details</h2>
+        <div class="grid two">
+            <div><label asp-for="BankName"></label><input asp-for="BankName" /></div>
+            <div><label asp-for="AccountType"></label><input asp-for="AccountType" /></div>
+            <div><label asp-for="AccountNumber"></label><input asp-for="AccountNumber" /></div>
+            <div><label asp-for="BranchName"></label><input asp-for="BranchName" /></div>
+            <div><label asp-for="AccountName"></label><input asp-for="AccountName" /></div>
+            <div><label asp-for="BranchCode"></label><input asp-for="BranchCode" /></div>
+        </div>
+
+        <h2>Spouse / partner details</h2>
+        <div class="grid two">
+            <div><label asp-for="SpouseNameAndSurname"></label><input asp-for="SpouseNameAndSurname" /></div>
+            <div><label asp-for="SpouseIdNumber"></label><input asp-for="SpouseIdNumber" /></div>
+            <div><label asp-for="SpouseTelNumber"></label><input asp-for="SpouseTelNumber" /></div>
+            <div><label asp-for="SpouseEmployerName"></label><input asp-for="SpouseEmployerName" /></div>
+            <div><label asp-for="SpouseEmployerAddress"></label><textarea asp-for="SpouseEmployerAddress" rows="2"></textarea></div>
+            <div><label asp-for="SpouseEmployerTelNumber"></label><input asp-for="SpouseEmployerTelNumber" /></div>
+        </div>
+
+        <h2>Relatives not living with you</h2>
+        <div class="grid two">
+            <div>
+                <h3>Relative 1</h3>
+                <label asp-for="Relative1Name"></label><input asp-for="Relative1Name" />
+                <label asp-for="Relative1Relationship"></label><input asp-for="Relative1Relationship" />
+                <label asp-for="Relative1TelNumber"></label><input asp-for="Relative1TelNumber" />
+                <label asp-for="Relative1Address"></label><textarea asp-for="Relative1Address" rows="2"></textarea>
+            </div>
+            <div>
+                <h3>Relative 2</h3>
+                <label asp-for="Relative2Name"></label><input asp-for="Relative2Name" />
+                <label asp-for="Relative2Relationship"></label><input asp-for="Relative2Relationship" />
+                <label asp-for="Relative2TelNumber"></label><input asp-for="Relative2TelNumber" />
+                <label asp-for="Relative2Address"></label><textarea asp-for="Relative2Address" rows="2"></textarea>
+            </div>
+        </div>
+
+        <h2>Loan details</h2>
+        <label asp-for="RequestedAmount"></label>
+        <input asp-for="RequestedAmount" type="number" min="1" max="10000000" step="0.01" />
+        <span asp-validation-for="RequestedAmount" class="validation"></span>
+
+        <fieldset class="reason-box">
+            <legend>Reason for loan — choose one or more</legend>
+            @foreach (var reason in new[] { "Business", "Education", "Consumption", "Housing", "Furniture", "Other" })
+            {
+                <label class="check">
+                    <input type="checkbox" name="ReasonsForLoan" value="@reason"
+                           checked="@Model.ReasonsForLoan.Contains(reason)" />
+                    @reason
+                </label>
+            }
+            <label asp-for="OtherReason"></label>
+            <input asp-for="OtherReason" />
+        </fieldset>
+
+        <h2>Declaration</h2>
+        <p class="declaration">
+            By submitting this application, you confirm that the information furnished is true and correct
+            and consent to the collection and use of your personal information for the loan application,
+            including credit checks, and to the applicable credit bureaus on approval, as stated on the supplied paper form.
+        </p>
+
+        <div class="grid two">
+            <div>
+                <label asp-for="ApplicantSignature"></label>
+                <input asp-for="ApplicantSignature" />
+            </div>
+            <div>
+                <label asp-for="ApplicationDate"></label>
+                <input asp-for="ApplicationDate" type="date" />
+            </div>
+        </div>
+
+        <button class="button" type="submit">Submit application</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,113 @@
+﻿@model INSY7315_Prototype.ViewModels.ManagerLoanApplicationViewModel
+
+<!-- Applicant -->
+<div class="manager-panel">
+
+    <div class="manager-panel-header">
+        <div class="manager-panel-title">
+            <h2>Applicant</h2>
+            <p>Details submitted by the client.</p>
+        </div>
+    </div>
+
+    <div class="application-details-grid">
+
+        <div>
+            <span>Full Name</span>
+            <strong>@(string.IsNullOrWhiteSpace(Model.ClientDetails?.FullNameAndSurname) ? "Unknown Applicant" : Model.ClientDetails.FullNameAndSurname)</strong>
+        </div>
+
+        <div>
+            <span>ID Number</span>
+            <strong>@Model.ClientDetails?.IdNumber</strong>
+        </div>
+
+        <div>
+            <span>Cell Number</span>
+            <strong>@Model.ClientDetails?.CellNo</strong>
+        </div>
+
+        <div>
+            <span>Email</span>
+            <strong>@Model.UserEmail</strong>
+        </div>
+
+        <div>
+            <span>Home Telephone</span>
+            <strong>@Model.HomeTelNo</strong>
+        </div>
+
+        <div>
+            <span>Marital Status</span>
+            <strong>@Model.MarriedOrUnmarried</strong>
+        </div>
+
+        <div>
+            <span>Physical Address</span>
+            <strong>@Model.CurrentPhysicalAddress</strong>
+        </div>
+
+        <div>
+            <span>Postal Address</span>
+            <strong>@Model.PostalAddress</strong>
+        </div>
+
+        <div>
+            <span>Residence Duration</span>
+            <strong>@Model.ResidenceYears years, @Model.ResidenceMonths months</strong>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Employment -->
+<div class="manager-panel">
+
+    <div class="manager-panel-header">
+        <div class="manager-panel-title">
+            <h2>Employment Information</h2>
+        </div>
+    </div>
+
+    <div class="application-details-grid">
+        <div><span>Company</span><strong>@Model.CompanyName</strong></div>
+        <div><span>Occupation</span><strong>@Model.Occupation</strong></div>
+        <div><span>Work Telephone</span><strong>@Model.WorkTelephone</strong></div>
+    </div>
+
+</div>
+
+<!-- Banking -->
+<div class="manager-panel">
+
+    <div class="manager-panel-header">
+        <div class="manager-panel-title">
+            <h2>Banking Information</h2>
+        </div>
+    </div>
+
+    <div class="application-details-grid">
+        <div><span>Bank</span><strong>@Model.BankName</strong></div>
+        <div><span>Account Type</span><strong>@Model.AccountType</strong></div>
+        <div><span>Account Number</span><strong>@Model.AccountNumber</strong></div>
+    </div>
+
+</div>
+
+<!-- Contacts -->
+<div class="manager-panel">
+
+    <div class="manager-panel-header">
+        <div class="manager-panel-title">
+            <h2>Additional Contact Information</h2>
+        </div>
+    </div>
+
+    <div class="application-details-grid">
+        <div><span>Spouse</span><strong>@Model.SpouseNameAndSurname</strong></div>
+        <div><span>Relative</span><strong>@Model.Relative1Name</strong></div>
+        <div><span>Relative Telephone</span><strong>@Model.Relative1TelNumber</strong></div>
+    </div>
+
+</div>

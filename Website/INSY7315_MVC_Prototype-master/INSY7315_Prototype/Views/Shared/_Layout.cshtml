@@ -13,7 +13,7 @@
         <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
             <div class="container">
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/logo.png" alt="Bridge & Anchor Loans" class="brand-logo" />
+                    <img src="~/images/logo.jpeg" alt="Bridge & Anchor Loans" class="brand-logo" />
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false"
                         aria-label="Toggle navigation">
@@ -24,30 +24,81 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index"> Home </a>
                         </li>
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("client"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Loan" asp-action="Apply"> Apply for Loan </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Loan" asp-action="Index"> My Applications </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Client" asp-action="Index"> My Account </a>
+                            </li>
+                        }
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("staff"))
+                        {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Loan" asp-action="Index"> Loans </a>
+                        <a class="nav-link" asp-controller="Staff" asp-action="Index"> Staff Dashboard </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="LoanApplication" asp-action="Index"> Applications </a>
+                        <a class="nav-link" asp-controller="Staff" asp-action="Applications"> Verify Applications </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Client" asp-action="Index"> Clients </a>
+                        <a class="nav-link" asp-controller="Staff" asp-action="Approvals"> Approve Loans </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Manager" asp-action="Index"> Manager </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Staff" asp-action="Index"> Staff </a>
-                        </li>
+                        }
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Manager" asp-action="Index"> Manager Dashboard</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Manager" asp-action="Applications"> Verify Applications</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Manager" asp-action="Approvals"> Approve Loans </a>
+                            </li>
+
+                        }
                         <li class="nav-item dropdown ms-lg-3">
-                            <a class="nav-link account-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Account </a>
+
+                            <a class="nav-link account-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Account</a>
+
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Account" asp-action="Login"> Login </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Account" asp-action="Register"> Register </a>
-                                </li>
+
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <li>
+                                        <span class="dropdown-item-text"> @User.Identity.Name </span>
+                                    </li>
+
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
+
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post">
+                                            <button type="submit" class="dropdown-item"> Logout </button>
+                                        </form>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Login"> Login </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Register"> Register </a>
+                                    </li>
+                                }
                             </ul>
                         </li>
                     </ul>

@@ -8,5 +8,10 @@ namespace INSY7315_Prototype.Controllers
         {
             return View();
         }
+
+        public IActionResult Application()
+        {
+            return View();
+        }
     }
 }

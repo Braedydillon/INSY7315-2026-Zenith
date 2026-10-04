@@ -1,39 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace INSY7315_Prototype.Models
 {
     public class Loan
     {
-        [Key]
-        public int LoanID { get; set; }
+        [JsonPropertyName("applicationId")]
+        public string Id { get; set; } = string.Empty;
 
-        public int ApplicationID { get; set; }
+        [JsonPropertyName("status")]
+        public string Status { get; set; } = string.Empty;
 
-        [ForeignKey(nameof(ApplicationID))]
-        public LoanApplication? LoanApplication { get; set; }
+        [JsonPropertyName("requestedAmount")]
+        public decimal RequestedAmount { get; set; }
 
-        [Required]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Amount { get; set; }
+        [JsonPropertyName("reasonForLoan")]
+        public string ReasonForLoan { get; set; } = string.Empty;
 
-        [Required]
-        [Column(TypeName = "decimal(5,2)")]
-        public decimal InterestRate { get; set; }
-
-        public int TermMonths { get; set; }
-
-        public LoanStatus Status { get; set; }
-
-        public DateTime? DisbursementDate { get; set; }
-
+        [JsonPropertyName("applicantFormDate")]
+        public DateTime ApplicantFormDate { get; set; }
     }
 
-    public enum LoanStatus
-    {
-        Active,
-        Disbursed,
-        Closed,
-        Defaulted
-    }
 }
