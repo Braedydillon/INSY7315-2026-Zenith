@@ -1,0 +1,146 @@
+﻿@model List<INSY7315_Prototype.ViewModels.ManagerLoanApplicationViewModel>
+
+@{
+    ViewData["Title"] = "Approve Loans";
+}
+
+<div class="manager-page">
+
+    <div class="manager-header">
+
+        <div>
+            <span class="manager-label">BRIDGE&ANCHOR</span>
+
+            <h1>Approve Loans</h1>
+
+            <p>
+                Review verified loan applications and make
+                the final lending decision.
+            </p>
+        </div>
+
+        <a asp-controller="Staff" asp-action="Index" class="btn-primary-custom btn-shadow"> ← Back to Dashboard </a>
+
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+    }
+
+    <div class="applications-summary">
+        <div>
+            <span>Awaiting Approval</span>
+            <strong>@Model.Count</strong>
+        </div>
+    </div>
+
+    <div class="manager-panel">
+
+        <div class="manager-panel-header">
+            <div class="manager-panel-title">
+                <h2>Verified Applications</h2>
+                <p>
+                    These applications have completed verification
+                    and are ready for a loan decision.
+                </p>
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="applications-table-wrapper">
+
+                <table class="applications-table">
+
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Application</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var application in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    <div class="applicant-cell">
+
+                                        <div class="application-avatar">
+                                            @(string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname) ? "?" : application.ClientDetails.FullNameAndSurname.Substring(0, 1).ToUpper())
+                                        </div>
+
+                                        <div>
+                                            <strong>
+                                                @(string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname) ? "Unknown Applicant" : application.ClientDetails.FullNameAndSurname)
+                                            </strong>
+
+                                            <small>@application.UserEmail</small>
+                                        </div>
+
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="application-number">#@application.ApplicationId</span>
+                                </td>
+
+                                <td>
+                                    <strong>R @application.RequestedAmount.ToString("N2")</strong>
+                                </td>
+
+                                <td>
+                                    @(application.DateApplied == default ? "—" : application.DateApplied.ToString("dd MMM yyyy"))
+                                </td>
+
+                                <td>
+                                    <span class="application-status underreview"> Ready for Approval </span>
+                                </td>
+
+                                <td class="application-action">
+                                    <a asp-controller="Staff" asp-action="Approval" asp-route-id="@application.ApplicationId" class="view-application-btn"> Review Loan → </a>
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+
+                <h3>No loans awaiting approval</h3>
+
+                <p>
+                    Verified applications will appear here
+                    when they are ready for a decision.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+</div>

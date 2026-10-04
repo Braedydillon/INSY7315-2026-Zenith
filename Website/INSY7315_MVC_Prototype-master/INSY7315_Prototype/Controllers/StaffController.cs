@@ -1,188 +1,309 @@
 ﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
 using INSY7315_Prototype.Models;
 using INSY7315_Prototype.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[Authorize(Roles = "staff")]
-public class StaffController : Controller
+namespace INSY7315_Prototype.Controllers
 {
-    private readonly IHttpClientFactory _factory;
-    private readonly ILogger<StaffController> _logger;
-
-    private static readonly JsonSerializerOptions _json = new()
+    [Authorize(Roles = "staff")]
+    public class StaffController : Controller
     {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
+        private readonly IHttpClientFactory _httpClientFactory;
 
-    public StaffController(IHttpClientFactory factory, ILogger<StaffController> logger)
-    {
-        _factory = factory;
-        _logger = logger;
-    }
-
-    private HttpClient Api()
-    {
-        var client = _factory.CreateClient("LoanApi");
-        var token = User.FindFirst("IdToken")?.Value;
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        return client;
-    }
-
-    // ---------- All applications ----------
-    public async Task<IActionResult> Index()
-    {
-        var vm = new StaffDashboardViewModel();
-
-        var res = await Api().GetAsync("api/LoansApi");
-        if (!res.IsSuccessStatusCode)
+        public StaffController(IHttpClientFactory httpClientFactory)
         {
-            TempData["Error"] = $"Could not load applications ({(int)res.StatusCode}).";
-            return View(vm);
+            _httpClientFactory = httpClientFactory;
         }
 
-        var all = JsonSerializer.Deserialize<List<LoanApiResponse>>(
-            await res.Content.ReadAsStringAsync(), _json) ?? new();
+        private static string ManagerOnlyMessage =>
+            $"Loans above R{LoanRules.StaffLimit:N0} are handled by the manager. This application has been sent to the manager.";
 
-        vm.PendingCount = all.Count(l => LoanRules.IsPending(l.Status));
-        vm.SentToManagerCount = all.Count(l => LoanRules.Is(l.Status, "Verified"));
-        vm.ApprovedCount = all.Count(l => LoanRules.Is(l.Status, "Approved"));
-        vm.DeclinedCount = all.Count(l => LoanRules.Is(l.Status, "Declined") || LoanRules.Is(l.Status, "Rejected"));
+        // ---------- helpers ----------
+        private HttpClient? CreateClient()
+        {
+            var token = User.FindFirst("IdToken")?.Value;
+            if (string.IsNullOrEmpty(token)) return null;
 
-        vm.Applications = all
-            .OrderByDescending(l => l.ApplicantFormDate)
-            .Select(l => new StaffLoanApplicationViewModel
+            var client = _httpClientFactory.CreateClient("LoanApi");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            return client;
+        }
+
+        private async Task<List<ManagerLoanApplicationViewModel>?> GetAllLoans(HttpClient client)
+        {
+            var response = await client.GetAsync("api/LoansApi");
+            if (!response.IsSuccessStatusCode) return null;
+
+            return await response.Content.ReadFromJsonAsync<List<ManagerLoanApplicationViewModel>>()
+                   ?? new List<ManagerLoanApplicationViewModel>();
+        }
+
+        private async Task<ManagerLoanApplicationViewModel?> GetLoan(HttpClient client, string id)
+        {
+            var response = await client.GetAsync($"api/LoansApi/{id}");
+            if (!response.IsSuccessStatusCode) return null;
+
+            return await response.Content.ReadFromJsonAsync<ManagerLoanApplicationViewModel>();
+        }
+
+        // returns null on success, or the error text
+        private async Task<string?> UpdateStatus(HttpClient client, string id, string status, string? note)
+        {
+            var response = await client.PutAsJsonAsync(
+                $"api/LoansApi/{id}/status",
+                new { status = status, note = note ?? string.Empty });
+
+            if (response.IsSuccessStatusCode) return null;
+
+            var error = await response.Content.ReadAsStringAsync();
+            return string.IsNullOrWhiteSpace(error) ? ((int)response.StatusCode).ToString() : error;
+        }
+
+        // ---------- dashboard ----------
+        public async Task<IActionResult> Index()
+        {
+            var client = CreateClient();
+            if (client == null) return RedirectToAction("Login", "Account");
+
+            var all = await GetAllLoans(client);
+            if (all == null)
             {
-                ApplicationId = l.Id ?? "",
-                ClientName = l.ClientDetails?.FullNameAndSurname ?? "",
-                RequestedAmount = l.RequestedAmount,
-                DateApplied = l.ApplicantFormDate,
-                Status = string.IsNullOrWhiteSpace(l.Status) ? "Pending" : l.Status,
-                RequiresManager = LoanRules.RequiresManager(l.RequestedAmount),
-                IsPending = LoanRules.IsPending(l.Status)
-            })
-            .ToList();
+                ViewBag.ErrorMessage = "Unable to load loan applications.";
+                return View(new StaffDashboardViewModel());
+            }
 
-        return View(vm);
-    }
+            // Only loans staff are allowed to handle are counted as theirs
+            var mine = all.Where(a => LoanRules.StaffCanHandle(a.RequestedAmount)).ToList();
 
-    // ---------- Review one application ----------
-    [HttpGet]
-    public async Task<IActionResult> Verify(string id)
-    {
-        var vm = await BuildVerifyModel(id);
-        if (vm == null) return NotFound();
+            var model = new StaffDashboardViewModel
+            {
+                TotalApplications = mine.Count,
+                AwaitingVerification = mine.Count(a => LoanRules.Is(a.Status, LoanStatus.Submitted)),
+                AwaitingApproval = mine.Count(a => LoanRules.Is(a.Status, LoanStatus.UnderReview)),
+                ApprovedApplications = mine.Count(a => LoanRules.Is(a.Status, LoanStatus.Approved)),
+                RejectedApplications = mine.Count(a => LoanRules.Is(a.Status, LoanStatus.Rejected)),
+                SentToManager = all.Count(a => LoanRules.RequiresManager(a.RequestedAmount)),
+                RecentApplications = mine.OrderByDescending(a => a.DateApplied).Take(6).ToList()
+            };
+            model.PendingApplications = model.AwaitingVerification + model.AwaitingApproval;
 
-        if (!LoanRules.IsPending(vm.Status))
-        {
-            TempData["Error"] = "This application has already been processed.";
-            return RedirectToAction(nameof(Index));
-        }
-        return View(vm);
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Verify(StaffVerifyLoanViewModel model)
-    {
-        // Re-read the loan from the API: the amount and status are never trusted from the form
-        var current = await BuildVerifyModel(model.ApplicationId);
-        if (current == null) return NotFound();
-
-        if (!LoanRules.IsPending(current.Status))
-        {
-            TempData["Error"] = "This application has already been processed.";
-            return RedirectToAction(nameof(Index));
+            return View(model);
         }
 
-        bool big = current.RequiresManager;
-
-        // Which decisions staff may make depends on the amount
-        string? newStatus = (model.Decision, big) switch
+        // ---------- verify ----------
+        public async Task<IActionResult> Applications()
         {
-            ("Approve", false) => "Approved",
-            ("Decline", false) => "Declined",
-            ("Verify", true) => "Verified",
-            ("Reject", true) => "Rejected",
-            _ => null
-        };
+            var client = CreateClient();
+            if (client == null) return RedirectToAction("Login", "Account");
 
-        if (newStatus == null)
-        {
-            TempData["Error"] = big
-                ? $"Loans of R{LoanRules.ManagerThreshold:N0} and above must be verified and sent to the manager."
-                : $"Loans under R{LoanRules.ManagerThreshold:N0} are approved or declined by staff.";
-            return RedirectToAction(nameof(Index));
+            var all = await GetAllLoans(client);
+            if (all == null)
+            {
+                ViewBag.ErrorMessage = "Unable to load loan applications.";
+                return View(new List<ManagerLoanApplicationViewModel>());
+            }
+
+            var toVerify = all
+                .Where(a => LoanRules.StaffCanHandle(a.RequestedAmount)
+                         && LoanRules.Is(a.Status, LoanStatus.Submitted))
+                .OrderByDescending(a => a.DateApplied)
+                .ToList();
+
+            return View(toVerify);
         }
 
-        bool positive = model.Decision is "Approve" or "Verify";
-        if (positive && !(model.IdVerified && model.AddressVerified &&
-                          model.EmploymentVerified && model.BankVerified))
+        public async Task<IActionResult> Review(string id)
         {
-            return await ReturnWithError(model, "Tick every verification check before continuing.");
+            if (string.IsNullOrWhiteSpace(id)) return BadRequest();
+
+            var client = CreateClient();
+            if (client == null) return RedirectToAction("Login", "Account");
+
+            var application = await GetLoan(client, id);
+            if (application == null)
+            {
+                TempData["ErrorMessage"] = "Unable to load the application.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (LoanRules.RequiresManager(application.RequestedAmount))
+            {
+                TempData["ErrorMessage"] = ManagerOnlyMessage;
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(application);
         }
 
-        var body = new StringContent(
-            JsonSerializer.Serialize(new { status = newStatus }, _json),
-            Encoding.UTF8, "application/json");
-
-        var res = await Api().PutAsync($"api/LoansApi/{model.ApplicationId}/status", body);
-
-        if (!res.IsSuccessStatusCode)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompleteReview(string ApplicationId, string VerificationResult, string? Note)
         {
-            _logger.LogWarning("Status update failed: {Status} {Body}",
-                (int)res.StatusCode, await res.Content.ReadAsStringAsync());
-            return await ReturnWithError(model, "We couldn't update the application. Please try again.");
+            if (string.IsNullOrWhiteSpace(ApplicationId)) return BadRequest();
+
+            var client = CreateClient();
+            if (client == null) return RedirectToAction("Login", "Account");
+
+            // Re-read the loan from the API; the amount and status are never trusted from the form
+            var application = await GetLoan(client, ApplicationId);
+            if (application == null)
+            {
+                TempData["ErrorMessage"] = "Unable to load the application.";
+                return RedirectToAction(nameof(Applications));
+            }
+
+            if (LoanRules.RequiresManager(application.RequestedAmount))
+            {
+                TempData["ErrorMessage"] = ManagerOnlyMessage;
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!LoanRules.Is(application.Status, LoanStatus.Submitted))
+            {
+                TempData["ErrorMessage"] = "This application has already been verified.";
+                return RedirectToAction(nameof(Applications));
+            }
+
+            string status;
+            if (VerificationResult == "successful") status = LoanStatus.UnderReview;
+            else if (VerificationResult == "unsuccessful") status = LoanStatus.Rejected;
+            else
+            {
+                TempData["ErrorMessage"] = "Please select a valid verification result.";
+                return RedirectToAction(nameof(Review), new { id = ApplicationId });
+            }
+
+            var error = await UpdateStatus(client, ApplicationId, status, Note);
+            if (error != null)
+            {
+                TempData["ErrorMessage"] = $"Unable to update application: {error}";
+                return RedirectToAction(nameof(Review), new { id = ApplicationId });
+            }
+
+            TempData["SuccessMessage"] = status == LoanStatus.UnderReview
+                ? "Application verified successfully and is ready for loan approval."
+                : "Application verification was unsuccessful and the application was rejected.";
+
+            return RedirectToAction(nameof(Applications));
         }
 
-        TempData["Success"] = newStatus switch
+        // ---------- approve ----------
+        public async Task<IActionResult> Approvals()
         {
-            "Approved" => "Loan approved.",
-            "Declined" => "Loan declined.",
-            "Verified" => "Application verified and sent to the manager.",
-            _ => "Application rejected."
-        };
+            var client = CreateClient();
+            if (client == null) return RedirectToAction("Login", "Account");
 
-        return RedirectToAction(nameof(Index));
-    }
+            var all = await GetAllLoans(client);
+            if (all == null)
+            {
+                ViewBag.ErrorMessage = "Unable to load loans awaiting approval.";
+                return View(new List<ManagerLoanApplicationViewModel>());
+            }
 
-    // ---------- Helpers ----------
-    private async Task<IActionResult> ReturnWithError(StaffVerifyLoanViewModel posted, string message)
-    {
-        var fresh = await BuildVerifyModel(posted.ApplicationId) ?? posted;
+            var awaiting = all
+                .Where(a => LoanRules.StaffCanHandle(a.RequestedAmount)
+                         && LoanRules.Is(a.Status, LoanStatus.UnderReview))
+                .OrderByDescending(a => a.DateApplied)
+                .ToList();
 
-        fresh.IdVerified = posted.IdVerified;
-        fresh.AddressVerified = posted.AddressVerified;
-        fresh.EmploymentVerified = posted.EmploymentVerified;
-        fresh.BankVerified = posted.BankVerified;
-        fresh.StaffNotes = posted.StaffNotes;
+            return View(awaiting);
+        }
 
-        ModelState.AddModelError("", message);
-        return View(fresh);
-    }
-
-    private async Task<StaffVerifyLoanViewModel?> BuildVerifyModel(string id)
-    {
-        var res = await Api().GetAsync($"api/LoansApi/{id}");
-        if (!res.IsSuccessStatusCode) return null;
-
-        var json = await res.Content.ReadAsStringAsync();
-
-        var all = JsonSerializer.Deserialize<List<LoanApiResponse>>(json, _json) ?? new();
-        var l = all.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
-        if (l == null) return null;
-
-        return new StaffVerifyLoanViewModel
+        public async Task<IActionResult> Approval(string id)
         {
-            ApplicationId = l.Id ?? "",
-            RequestedAmount = l.RequestedAmount,
-            ReasonForLoan = l.ReasonForLoan ?? "",
-            DateApplied = l.ApplicantFormDate,
-            Status = l.Status ?? "",
-            RequiresManager = LoanRules.RequiresManager(l.RequestedAmount),
-            Client = LoanMapper.ToDetails(l)
-        };
+            if (string.IsNullOrWhiteSpace(id)) return BadRequest();
+
+            var client = CreateClient();
+            if (client == null) return RedirectToAction("Login", "Account");
+
+            var application = await GetLoan(client, id);
+            if (application == null)
+            {
+                TempData["ErrorMessage"] = "Unable to load the loan application.";
+                return RedirectToAction(nameof(Approvals));
+            }
+
+            if (LoanRules.RequiresManager(application.RequestedAmount))
+            {
+                TempData["ErrorMessage"] = ManagerOnlyMessage;
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!LoanRules.Is(application.Status, LoanStatus.UnderReview))
+            {
+                TempData["ErrorMessage"] = "This application is not waiting for approval.";
+                return RedirectToAction(nameof(Approvals));
+            }
+
+            return View(application);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoanDecision(string ApplicationId, string Decision, string? Note)
+        {
+            if (string.IsNullOrWhiteSpace(ApplicationId)) return BadRequest();
+
+            var client = CreateClient();
+            if (client == null) return RedirectToAction("Login", "Account");
+
+            var application = await GetLoan(client, ApplicationId);
+            if (application == null)
+            {
+                TempData["ErrorMessage"] = "Unable to load the loan application.";
+                return RedirectToAction(nameof(Approvals));
+            }
+
+            if (LoanRules.RequiresManager(application.RequestedAmount))
+            {
+                TempData["ErrorMessage"] = ManagerOnlyMessage;
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!LoanRules.Is(application.Status, LoanStatus.UnderReview))
+            {
+                TempData["ErrorMessage"] = "This application is not waiting for approval.";
+                return RedirectToAction(nameof(Approvals));
+            }
+
+            string status;
+            if (Decision == "approve") status = LoanStatus.Approved;
+            else if (Decision == "decline") status = LoanStatus.Rejected;
+            else
+            {
+                TempData["ErrorMessage"] = "Invalid loan decision.";
+                return RedirectToAction(nameof(Approval), new { id = ApplicationId });
+            }
+
+            var error = await UpdateStatus(client, ApplicationId, status, Note);
+            if (error != null)
+            {
+                TempData["ErrorMessage"] = $"Unable to update loan: {error}";
+                return RedirectToAction(nameof(Approval), new { id = ApplicationId });
+            }
+
+            TempData["SuccessMessage"] = status == LoanStatus.Approved
+                ? "Loan approved successfully."
+                : "Loan declined successfully.";
+
+            return RedirectToAction(nameof(Approvals));
+        }
+
+        // ---------- everything ----------
+        public async Task<IActionResult> AllApplications()
+        {
+            var client = CreateClient();
+            if (client == null) return RedirectToAction("Login", "Account");
+
+            var all = await GetAllLoans(client);
+            if (all == null)
+            {
+                ViewBag.ErrorMessage = "Unable to load loan applications.";
+                return View(new List<ManagerLoanApplicationViewModel>());
+            }
+
+            return View(all.OrderByDescending(a => a.DateApplied).ToList());
+        }
     }
 }

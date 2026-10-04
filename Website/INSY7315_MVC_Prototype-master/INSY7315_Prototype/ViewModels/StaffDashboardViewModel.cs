@@ -2,10 +2,13 @@
 {
     public class StaffDashboardViewModel
     {
-        public int PendingCount { get; set; }
-        public int SentToManagerCount { get; set; }
-        public int ApprovedCount { get; set; }
-        public int DeclinedCount { get; set; }
-        public List<StaffLoanApplicationViewModel> Applications { get; set; } = new();
+        public int TotalApplications { get; set; }
+        public int PendingApplications { get; set; }
+        public int ApprovedApplications { get; set; }
+        public int RejectedApplications { get; set; }
+        public int AwaitingVerification { get; set; }
+        public int AwaitingApproval { get; set; }
+        public int SentToManager { get; set; }
+        public List<ManagerLoanApplicationViewModel> RecentApplications { get; set; } = new();
     }
 }

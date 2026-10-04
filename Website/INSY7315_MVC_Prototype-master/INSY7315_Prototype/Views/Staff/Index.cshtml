@@ -1,79 +1,213 @@
 ﻿@model INSY7315_Prototype.ViewModels.StaffDashboardViewModel
 @using INSY7315_Prototype.Models
+
 @{
-    ViewData["Title"] = "Staff - Loan Applications";
+    ViewData["Title"] = "Staff Dashboard";
 }
 
-<h1 class="fw-bold">Loan Applications</h1>
-<p class="text-muted mb-4">
-    Loans under R@(LoanRules.ManagerThreshold.ToString("N0")) can be approved or declined by staff.
-    Loans of R@(LoanRules.ManagerThreshold.ToString("N0")) and above are verified and sent to the manager.
-</p>
+<div class="manager-page">
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
+    <!-- Header -->
+    <div class="manager-header">
+        <div>
+            <span class="manager-label">BRIDGE&ANCHOR</span>
 
-<div class="row g-3 mb-4">
-    @foreach (var (label, value) in new[] {
-        ("Pending", Model.PendingCount),
-        ("Sent to manager", Model.SentToManagerCount),
-        ("Approved", Model.ApprovedCount),
-        ("Declined / Rejected", Model.DeclinedCount) })
-    {
-        <div class="col-md-3">
-            <div class="card p-4 h-100">
-                <div class="text-muted">@label</div>
-                <div class="fs-3 fw-bold">@value</div>
-            </div>
+            <h1>Staff Dashboard</h1>
+
+            <p>
+                Verify and approve loans up to R@(LoanRules.StaffLimit.ToString("N0")).
+                Larger loans are sent to the manager.
+            </p>
         </div>
-    }
-</div>
+    </div>
 
-<div class="card">
-    <div class="card-header bg-light fs-5 p-4">All Loan Applications</div>
-
-    @foreach (var a in Model.Applications)
+    @if (TempData["SuccessMessage"] != null)
     {
-        <div class="row align-items-center p-4 border-bottom mx-0">
-            <div class="col-md-3">
-                <div class="fw-semibold">@a.ClientName</div>
-                <small class="text-muted">Application #@a.ApplicationId</small>
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+    }
+
+    <!-- Dashboard Statistics -->
+    <div class="manager-stats">
+
+        <div class="manager-stat-card">
+            <div class="stat-top"><div class="stat-icon">A</div></div>
+            <span>Total Applications</span>
+            <strong>@Model.TotalApplications</strong>
+        </div>
+
+        <div class="manager-stat-card pending">
+            <div class="stat-top"><div class="stat-icon">!</div></div>
+            <span>Pending Action</span>
+            <strong>@Model.PendingApplications</strong>
+        </div>
+
+        <div class="manager-stat-card">
+            <div class="stat-top"><div class="stat-icon">✓</div></div>
+            <span>Approved</span>
+            <strong>@Model.ApprovedApplications</strong>
+        </div>
+
+        <div class="manager-stat-card">
+            <div class="stat-top"><div class="stat-icon">R</div></div>
+            <span>Rejected</span>
+            <strong>@Model.RejectedApplications</strong>
+        </div>
+
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="manager-dashboard-grid">
+
+        <!-- Recent Applications -->
+        <div class="manager-panel">
+
+            <div class="manager-panel-header">
+
+                <div class="manager-panel-title">
+                    <h2>Recent Applications</h2>
+                    <p> Applications requiring your attention </p>
+                </div>
+
+                <a asp-controller="Staff" asp-action="AllApplications" class="btn-primary-custom btn-shadow"> View All Applications </a>
+
             </div>
-            <div class="col-md-2">
-                <small class="text-muted d-block">Amount</small>
-                <strong>R@(a.RequestedAmount.ToString("N0"))</strong>
-            </div>
-            <div class="col-md-3">
-                <small class="text-muted d-block">Date Applied</small>
-                <strong>@(a.DateApplied?.ToString("dd MMM yyyy") ?? "—")</strong>
-            </div>
-            <div class="col-md-2">
-                <small class="text-muted d-block">Status</small>
-                <strong>@a.Status</strong>
-            </div>
-            <div class="col-md-2 text-end">
-                @if (a.IsPending)
+
+            <div class="application-list">
+
+                @if (Model.RecentApplications != null && Model.RecentApplications.Any())
                 {
-                    <a asp-action="Verify" asp-route-id="@a.ApplicationId" class="btn btn-primary btn-sm">
-                        @(a.RequiresManager ? "Verify" : "Review")
-                    </a>
-                    @if (a.RequiresManager)
+                    foreach (var application in Model.RecentApplications)
                     {
-                        <div><small class="text-muted">Needs manager</small></div>
+                        <div class="application-row">
+
+                            <div class="applicant-icon">
+                                @if (!string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname))
+                                {
+                                    @application.ClientDetails.FullNameAndSurname.Substring(0, 1).ToUpper()
+                                }
+                                else
+                                {
+                                    <span>?</span>
+                                }
+                            </div>
+
+                            <div class="applicant-details">
+                                <strong>
+                                    @(string.IsNullOrWhiteSpace(application.ClientDetails?.FullNameAndSurname) ? "Unknown Applicant" : application.ClientDetails.FullNameAndSurname)
+                                </strong>
+
+                                <span> Application #@application.ApplicationId </span>
+                            </div>
+
+                            <div class="application-amount">
+                                R @application.RequestedAmount.ToString("N2")
+                            </div>
+
+                            <span class="application-status @((application.Status ?? "").ToLower())"> @application.Status </span>
+
+                            <div class="application-actions">
+
+                                @if (LoanRules.Is(application.Status, LoanStatus.Submitted))
+                                {
+                                    <a asp-controller="Staff" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> Verify </a>
+                                }
+                                else if (LoanRules.Is(application.Status, LoanStatus.UnderReview))
+                                {
+                                    <a asp-controller="Staff" asp-action="Approval" asp-route-id="@application.ApplicationId" class="action-view"> Approve Loan </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Staff" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> View Details </a>
+                                }
+
+                            </div>
+
+                        </div>
                     }
                 }
-            </div>
-        </div>
-    }
+                else
+                {
+                    <div class="no-applications">
+                        <p> No loan applications found.</p>
+                    </div>
+                }
 
-    @if (!Model.Applications.Any())
-    {
-        <div class="p-4 text-muted">No loan applications found.</div>
-    }
+            </div>
+
+        </div>
+
+        <!-- Side panel -->
+        <div class="attention-panel">
+
+            <span class="attention-label">STAFF ACTION</span>
+
+            <h2>Applications Need Verification</h2>
+
+            <p>
+                Verify applicant information and supporting documentation
+                before applications proceed for loan approval.
+            </p>
+
+            <div class="pending-number">
+                <strong>@Model.AwaitingVerification</strong>
+                <span>applications awaiting verification</span>
+            </div>
+
+            <a asp-controller="Staff" asp-action="Applications" class="review-button btn-shadow"> Verify Applications </a>
+
+            <h2>Loans That Need Approval</h2>
+
+            <p>
+                Review verified loan applications and make
+                the final lending decision.
+            </p>
+
+            <div class="pending-number">
+                <strong>@Model.AwaitingApproval</strong>
+                <span>applications awaiting approval</span>
+            </div>
+
+            <a asp-controller="Staff" asp-action="Approvals" class="review-button btn-shadow"> Approve Loans </a>
+
+            <h2>Sent to Manager</h2>
+
+            <p>
+                Loans above R@(LoanRules.StaffLimit.ToString("N0")) are handled by the manager.
+            </p>
+
+            <div class="pending-number">
+                <strong>@Model.SentToManager</strong>
+                <span>applications with the manager</span>
+            </div>
+
+        </div>
+
+        <div class="manager-actions">
+
+            <a asp-controller="Staff" asp-action="Applications" class="manager-action-card">
+                <div class="manager-action-icon">V</div>
+                <strong>Verify Applications</strong>
+                <span>Check client details and submitted documentation.</span>
+            </a>
+
+            <a asp-controller="Staff" asp-action="Approvals" class="manager-action-card">
+                <div class="manager-action-icon">A</div>
+                <strong>Approve Loans</strong>
+                <span>Make decisions on verified loan applications.</span>
+            </a>
+
+        </div>
+
+    </div>
+
 </div>

@@ -38,11 +38,19 @@
                                 <a class="nav-link" asp-controller="Client" asp-action="Index"> My Account </a>
                             </li>
                         }
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("management"))
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("staff"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Staff" asp-action="Index"> Staff Dashboard </a>
-                            </li>
+                        <li class="nav-item">
+                        <a class="nav-link" asp-controller="Staff" asp-action="Index"> Staff Dashboard </a>
+                        </li>
+
+                        <li class="nav-item">
+                        <a class="nav-link" asp-controller="Staff" asp-action="Applications"> Verify Applications </a>
+                        </li>
+
+                        <li class="nav-item">
+                        <a class="nav-link" asp-controller="Staff" asp-action="Approvals"> Approve Loans </a>
+                        </li>
                         }
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("admin"))
                         {

@@ -1,20 +1,22 @@
 ﻿namespace INSY7315_Prototype.Models
 {
+    public static class LoanStatus
+    {
+        public const string Submitted = "Submitted";
+        public const string UnderReview = "UnderReview";   // verified, waiting for approval
+        public const string Approved = "Approved";
+        public const string Rejected = "Rejected";
+    }
+
     public static class LoanRules
     {
-        public const decimal ManagerThreshold = 7000m;
+        // Staff can handle loans up to and including this amount
+        public const decimal StaffLimit = 7000m;
 
-        // R7,000 and above needs the manager
-        public static bool RequiresManager(decimal amount) => amount >= ManagerThreshold;
+        public static bool StaffCanHandle(decimal amount) => amount <= StaffLimit;
+        public static bool RequiresManager(decimal amount) => amount > StaffLimit;
 
         public static bool Is(string? status, string expected) =>
             string.Equals(status?.Trim(), expected, StringComparison.OrdinalIgnoreCase);
-
-        // blank / unknown statuses count as pending
-        public static bool IsPending(string? status)
-        {
-            var s = (status ?? "").Trim().ToLowerInvariant();
-            return s is "" or "pending" or "submitted" or "under review" or "new";
-        }
     }
 }
