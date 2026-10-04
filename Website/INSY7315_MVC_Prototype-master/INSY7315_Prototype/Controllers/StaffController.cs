@@ -142,7 +142,7 @@ public class StaffController : Controller
                 MaritalStatus = l.MarriedOrUnmarried ?? "",
                 CurrentPhysicalAddress = l.CurrentPhysicalAddress,
                 PostalAddress = l.PostalAddress ?? "",
-                ResidenceDuration = $"{l.ResidenceYears} years {l.ResidenceMonths} months",
+                ResidenceDuration = $"{l.ResidenceYears ?? 0} years {l.ResidenceMonths ?? 0} months",
                 CompanyName = l.CompanyName,
                 Occupation = l.Occupation,
                 WorkTelephone = l.WorkTelephone ?? "",

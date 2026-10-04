@@ -2,21 +2,21 @@
 
 namespace INSY7315_Prototype.ViewModels
 {
-
     public class StaffLoanApplicationViewModel
     {
         public string ApplicationId { get; set; } = string.Empty;
         public string ClientName { get; set; } = string.Empty;
         public decimal RequestedAmount { get; set; }
-        public DateTime DateApplied { get; set; }
+        public DateTime? DateApplied { get; set; }
         public string Status { get; set; } = string.Empty;
     }
+
     public class StaffVerifyLoanViewModel
     {
         public string ApplicationId { get; set; } = string.Empty;
         public decimal RequestedAmount { get; set; }
         public string ReasonForLoan { get; set; } = string.Empty;
-        public DateTime DateApplied { get; set; }
+        public DateTime? DateApplied { get; set; }
         public string Status { get; set; } = string.Empty;
 
         public StaffDetailsViewModel Client { get; set; } = new();
@@ -33,7 +33,7 @@ namespace INSY7315_Prototype.ViewModels
         [StringLength(500), Display(Name = "Staff notes")]
         public string? StaffNotes { get; set; }
 
-        public string Decision { get; set; } = string.Empty;   
+        public string Decision { get; set; } = string.Empty;
     }
 
     public class StaffDetailsViewModel

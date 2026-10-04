@@ -35,8 +35,8 @@ namespace INSY7315_Prototype.Models
         [Required] public string CurrentPhysicalAddress { get; set; } = "";
         public string? PostalAddress { get; set; }
         public string? ParentsAddress { get; set; }
-        public int ResidenceYears { get; set; }
-        public int ResidenceMonths { get; set; }
+        public int? ResidenceYears { get; set; }
+        public int? ResidenceMonths { get; set; }
 
         [Required] public string CompanyName { get; set; } = "";
         public string? WorkTelephone { get; set; }
@@ -73,6 +73,6 @@ namespace INSY7315_Prototype.Models
         [Required, Display(Name = "Type your full name as signature")]
         public string ApplicantSignature { get; set; } = "";
 
-        public DateTime ApplicantFormDate { get; set; } = DateTime.UtcNow;
+        public DateTime? ApplicantFormDate { get; set; } = DateTime.UtcNow;
     }
 }

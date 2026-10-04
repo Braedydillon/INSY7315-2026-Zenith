@@ -32,8 +32,8 @@
                 <small class="text-muted">Application #@a.ApplicationId</small>
             </div>
             <div class="col-md-3"><small class="text-muted d-block">Amount</small><strong>R@a.RequestedAmount.ToString("N0")</strong></div>
-            <div class="col-md-3"><small class="text-muted d-block">Date Applied</small><strong>@a.DateApplied.ToString("dd MMM yyyy")</strong></div>
-            <div class="col-md-3 text-end">
+            <div class="col-md-3">
+                <small class="text-muted d-block">Date Applied</small><strong>@(a.DateApplied?.ToString("dd MMM yyyy") ?? "—")</strong>
                 <a asp-action="Verify" asp-route-id="@a.ApplicationId" class="btn btn-primary btn-sm">Review</a>
             </div>
         </div>
