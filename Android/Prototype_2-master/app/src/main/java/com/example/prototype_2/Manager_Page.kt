@@ -195,7 +195,7 @@ class Manager_Page : AppCompatActivity() {
         newStatus: String
     ) {
 
-        val id = loan.applicationId ?: loan.id
+        val id = loan.applicationId ?: loan.applicationId
 
         if (id.isNullOrEmpty()) {
 

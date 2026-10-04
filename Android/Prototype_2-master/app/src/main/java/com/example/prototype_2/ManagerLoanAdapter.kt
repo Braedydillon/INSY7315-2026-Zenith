@@ -70,13 +70,13 @@ class ManagerLoanAdapter(
         val loan = applications[position]
 
         holder.applicationId.text =
-            "Application: ${loan.applicationId ?: loan.id ?: "--"}"
+            "Application: ${loan.applicationId ?: loan.applicationId ?: "--"}"
 
         holder.applicantName.text =
-            loan.applicantName ?: "Unknown Client"
+            loan.clientDetails?.fullNameAndSurname ?: "Unknown Client"
 
         val amount =
-            loan.requestedAmount ?: loan.amount
+            loan.requestedAmount ?: loan.requestedAmount
 
         holder.loanAmount.text =
             if (amount != null) {
@@ -89,7 +89,7 @@ class ManagerLoanAdapter(
             "Reason: ${loan.reasonForLoan ?: "--"}"
 
         holder.submissionDate.text =
-            "Submitted: ${loan.submissionDate ?: "--"}"
+            "Submitted: ${loan.applicationDate ?: "--"}"
 
         holder.loanStatus.text =
             "Status: ${loan.status ?: "Pending"}"

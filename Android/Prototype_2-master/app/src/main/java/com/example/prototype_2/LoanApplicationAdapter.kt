@@ -30,10 +30,10 @@ class LoanApplicationAdapter(
     override fun onBindViewHolder(holder: LoanViewHolder, position: Int) {
         val application = applications[position]
 
-        holder.txtAppId.text = "Application: ${application.id ?: "--"}"
-        holder.txtDate.text = "Submitted: ${application.submissionDate ?: "--"}"
+        holder.txtAppId.text = "Application: ${application.applicationId?: "--"}"
+        holder.txtDate.text = "Submitted: ${application.applicationDate ?: "--"}"
 
-        val loanAmount = application.requestedAmount ?: application.amount
+        val loanAmount = application.requestedAmount ?: application.requestedAmount
 
         holder.txtAmount.text = if (loanAmount != null) {
             val formatter = NumberFormat.getCurrencyInstance(Locale("en", "ZA"))
