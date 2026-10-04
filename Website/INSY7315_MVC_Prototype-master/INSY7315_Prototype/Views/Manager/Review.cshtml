@@ -1,8 +1,11 @@
 ﻿@model INSY7315_Prototype.ViewModels.ManagerLoanApplicationViewModel
 
 @{
-    ViewData["Title"] = "Verify Application";
+    var canVerify = Model.Status.Equals("Submitted", StringComparison.OrdinalIgnoreCase);
+
+    ViewData["Title"] = canVerify ? "Verify Application" : "Application Details";
 }
+
 
 <div class="manager-page">
 
@@ -11,12 +14,23 @@
         <div>
             <span class="manager-label">BRIDGE&ANCHOR</span>
 
-            <h1>Verify Application</h1>
+            @if (canVerify)
+            {
+                <h1>Verify Application</h1>
 
-            <p>
-                Verify the information submitted by the client
-                before sending the loan for approval.
-            </p>
+                <p>
+                    Verify the information submitted by the client
+                    before sending the loan for approval.
+                </p>
+            }
+            else
+            {
+                <h1>Application Details</h1>
+
+                <p>
+                    View the submitted loan application and its current status.
+                </p>
+            }
         </div>
 
         <a asp-controller="Manager" asp-action="Index" class="btn-primary-custom btn-shadow"> ← Back to Dashboard </a>
@@ -123,7 +137,7 @@
 
             <div>
                 <span>Residence Duration</span>
-                <strong>@Model.ResidenceMonths</strong>
+                <strong>@Model.ResidenceYears years, @Model.ResidenceMonths months</strong>
             </div>
 
         </div>
@@ -233,45 +247,94 @@
     </div>
 
     <!-- Application Summary -->
-    <div class="manager-panel">
+    @if (canVerify)
+    {
+        <div class="manager-panel">
 
-        <div class="manager-panel-header">
-            <div class="manager-panel-title">
-                <h2>Verify Application</h2>
-                <p>
-                    Verify the applicant's information and supporting
-                    documentation before the loan proceeds for approval.
-                </p>
+            <div class="manager-panel-header">
+                <div class="manager-panel-title">
+                    <h2>Verify Application</h2>
+                    <p>
+                        Verify the applicant's information and supporting
+                        documentation before the loan proceeds for approval.
+                    </p>
+                </div>
             </div>
+
+
+            <form asp-controller="Manager" asp-action="CompleteReview" method="post" class="manager-review">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="ApplicationId" value="@Model.ApplicationId" />
+
+                <div class="review-field">
+                    <label for="reviewNote">Review Notes</label>
+
+                    <textarea id="reviewNote" name="Note" rows="5" maxlength="500" placeholder="Add any notes about the application or documents..."></textarea>
+
+                    <small>
+                        Record anything relevant that was identified during the review.
+                    </small>
+                </div>
+
+                <div class="review-actions">
+
+                    <a asp-controller="Manager" asp-action="Applications" class="btn-secondary-custom"> Back </a>
+
+                    <button type="submit" name="VerificationResult" value="unsuccessful" class="btn-decline"> Verification Unsuccessful </button>
+
+                    <button type="submit" name="VerificationResult" value="successful" class="btn-approve"> Verification Successful </button>
+
+                </div>
+
+            </form>
+
         </div>
+    }
 
-        <form asp-controller="Manager" asp-action="CompleteReview" method="post" class="manager-review">
+    @if (!canVerify)
+    {
+        <div class="manager-panel">
 
-            @Html.AntiForgeryToken()
+            <div class="manager-panel-header">
 
-            <input type="hidden" name="ApplicationId" value="@Model.ApplicationId" />
+                <div class="manager-panel-title">
 
-            <div class="review-field">
-                <label for="reviewNote">Review Notes</label>
+                    <h2>Application Status</h2>
 
-                <textarea id="reviewNote" name="Note" rows="5" maxlength="500" placeholder="Add any notes about the application or documents..."></textarea>
+                    <p>
+                        This application has already progressed beyond verification.
+                    </p>
 
-                <small>
-                    Record anything relevant that was identified during the review.
-                </small>
-            </div>
-
-            <div class="review-actions">
-
-                <a asp-controller="Manager" asp-action="Applications" class="btn-decline"> Back </a>
-
-                <button type="submit" class="btn-approve"> Confirm Verification </button>
+                </div>
 
             </div>
 
-        </form>
+            <div class="application-details-grid">
 
-    </div>
+                <div>
+                    <span>Current Status</span>
+
+                    <strong class="application-status @Model.Status.ToLower()">
+                        @Model.Status
+                    </strong>
+                </div>
+
+            </div>
+
+
+            @if (Model.Status.Equals("UnderReview", StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="read-only-actions">
+
+                    <a asp-controller="Manager" asp-action="Approval" asp-route-id="@Model.ApplicationId" class="btn-primary-custom"> Go to Loan Approval </a>
+
+                </div>
+            }
+
+        </div>
+    }
 
 
 </div>

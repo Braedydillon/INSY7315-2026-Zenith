@@ -22,10 +22,10 @@
 
 <div class="row g-3 mb-4">
     @foreach (var (label, value) in new[] {
-        ("Total Applications", Model.Total.ToString()),
-        ("Pending", Model.Pending.ToString()),
-        ("Approved", Model.Approved.ToString()),
-        ("Total Requested", "R" + Model.TotalRequested.ToString("N0")) })
+    ("Total Applications", Model.Total.ToString()),
+    ("Pending", Model.Pending.ToString()),
+    ("Approved", Model.Approved.ToString()),
+    ("Rejected", Model.Rejected.ToString()) })
     {
         <div class="col-md-3">
             <div class="card p-4 h-100">
@@ -41,11 +41,22 @@
 
     @foreach (var l in Model.Loans.OrderByDescending(x => x.ApplicantFormDate))
     {
+        var statusText = l.Status?.ToLower() switch
+        {
+            "submitted" => "Pending",
+            "underreview" => "Under Review",
+            "approved" => "Approved",
+            "rejected" => "Rejected",
+            _ => l.Status ?? "Unknown"
+        };
+
         var badge = l.Status?.ToLower() switch
         {
-            "approved" => "bg-success-subtle text-success",
-            "declined" or "rejected" => "bg-danger-subtle text-danger",
-            _ => "bg-warning-subtle text-warning-emphasis"
+            "submitted" => "bg-warning text-dark",
+            "underreview" => "bg-info text-dark",
+            "approved" => "bg-success text-white",
+            "rejected" => "bg-danger text-white",
+            _ => "bg-secondary text-white"
         };
 
         <div class="row align-items-center p-4 border-bottom mx-0">
@@ -62,7 +73,7 @@
                 <strong>@l.ApplicantFormDate.ToString("dd MMM yyyy")</strong>
             </div>
             <div class="col-md-2 text-end">
-                <span class="badge rounded-pill px-3 py-2 @badge">@l.Status</span>
+                <span class="badge rounded-pill px-3 py-2 @badge"> @statusText </span>
             </div>
         </div>
     }
