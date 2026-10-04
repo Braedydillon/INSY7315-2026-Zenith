@@ -54,7 +54,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogoutManager"
             android:layout_width="95dp"
-            android:layout_height="40dp"
+            android:layout_height="48dp"
             android:text="Logout"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
@@ -62,10 +62,10 @@
             android:textStyle="bold"
             app:backgroundTint="#26344D"
             app:cornerRadius="20dp"
-            app:strokeColor="#FFFFFF"
-            app:strokeWidth="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:strokeColor="#FFFFFF"
+            app:strokeWidth="1dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
