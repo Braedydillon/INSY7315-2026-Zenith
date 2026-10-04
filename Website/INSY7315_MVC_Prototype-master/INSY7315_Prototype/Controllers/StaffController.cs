@@ -6,18 +6,21 @@ using INSY7315_Prototype.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[Authorize(Roles = "staff")]   
+[Authorize(Roles = "staff")]
 public class StaffController : Controller
 {
     private readonly IHttpClientFactory _factory;
     private readonly ILogger<StaffController> _logger;
+
     private static readonly JsonSerializerOptions _json = new()
     {
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public StaffController(IHttpClientFactory factory, ILogger<StaffController> logger)
+    public StaffController(
+        IHttpClientFactory factory,
+        ILogger<StaffController> logger)
     {
         _factory = factory;
         _logger = logger;
@@ -27,7 +30,10 @@ public class StaffController : Controller
     {
         var client = _factory.CreateClient("LoanApi");
         var token = User.FindFirst("IdToken")?.Value;
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
         return client;
     }
 
@@ -36,9 +42,12 @@ public class StaffController : Controller
         var vm = new StaffDashboardViewModel();
 
         var res = await Api().GetAsync("api/LoansApi");
+
         if (!res.IsSuccessStatusCode)
         {
-            TempData["Error"] = $"Could not load applications ({(int)res.StatusCode}).";
+            TempData["Error"] =
+                $"Could not load applications ({(int)res.StatusCode}).";
+
             return View(vm);
         }
 
@@ -46,14 +55,17 @@ public class StaffController : Controller
             await res.Content.ReadAsStringAsync(), _json) ?? new();
 
         bool Is(LoanApiResponse l, string s) =>
-            string.Equals(l.Status, s, StringComparison.OrdinalIgnoreCase);
+            string.Equals(
+                l.Status,
+                s,
+                StringComparison.OrdinalIgnoreCase);
 
         vm.PendingCount = all.Count(l => Is(l, "Pending"));
         vm.VerifiedCount = all.Count(l => Is(l, "Verified"));
         vm.RejectedCount = all.Count(l => Is(l, "Rejected"));
 
+        // Display ALL loan applications on the Staff Dashboard
         vm.Applications = all
-            .Where(l => Is(l, "Pending"))
             .OrderByDescending(l => l.ApplicantFormDate)
             .Select(l => new StaffLoanApplicationViewModel
             {
@@ -62,7 +74,8 @@ public class StaffController : Controller
                 RequestedAmount = l.RequestedAmount,
                 DateApplied = l.ApplicantFormDate,
                 Status = l.Status
-            }).ToList();
+            })
+            .ToList();
 
         return View(vm);
     }
@@ -71,7 +84,10 @@ public class StaffController : Controller
     public async Task<IActionResult> Verify(string id)
     {
         var vm = await BuildVerifyModel(id);
-        if (vm == null) return NotFound();
+
+        if (vm == null)
+            return NotFound();
+
         return View(vm);
     }
 
@@ -80,33 +96,56 @@ public class StaffController : Controller
     {
         bool verify = model.Decision == "Verify";
 
-        if (verify && !(model.IdVerified && model.AddressVerified &&
-                        model.EmploymentVerified && model.BankVerified))
+        if (verify && !(model.IdVerified &&
+                        model.AddressVerified &&
+                        model.EmploymentVerified &&
+                        model.BankVerified))
         {
-            return await ReturnWithError(model, "Tick every verification check before sending to the manager.");
+            return await ReturnWithError(
+                model,
+                "Tick every verification check before sending to the manager.");
         }
 
         var newStatus = verify ? "Verified" : "Rejected";
-        var body = new StringContent(
-            JsonSerializer.Serialize(new { status = newStatus }, _json),
-            Encoding.UTF8, "application/json");
 
-        var res = await Api().PutAsync($"api/LoansApi/{model.ApplicationId}/status", body);
+        var body = new StringContent(
+            JsonSerializer.Serialize(
+                new { status = newStatus },
+                _json),
+            Encoding.UTF8,
+            "application/json");
+
+        var res = await Api().PutAsync(
+            $"api/LoansApi/{model.ApplicationId}/status",
+            body);
 
         if (!res.IsSuccessStatusCode)
         {
-            _logger.LogWarning("Status update failed: {Status} {Body}",
-                (int)res.StatusCode, await res.Content.ReadAsStringAsync());
-            return await ReturnWithError(model, "We couldn't update the application. Please try again.");
+            _logger.LogWarning(
+                "Status update failed: {Status} {Body}",
+                (int)res.StatusCode,
+                await res.Content.ReadAsStringAsync());
+
+            return await ReturnWithError(
+                model,
+                "We couldn't update the application. Please try again.");
         }
 
-        TempData["Success"] = verify ? "Application sent to the manager." : "Application rejected.";
+        TempData["Success"] =
+            verify
+                ? "Application sent to the manager."
+                : "Application rejected.";
+
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task<IActionResult> ReturnWithError(StaffVerifyLoanViewModel posted, string message)
+    private async Task<IActionResult> ReturnWithError(
+        StaffVerifyLoanViewModel posted,
+        string message)
     {
-        var fresh = await BuildVerifyModel(posted.ApplicationId) ?? posted;
+        var fresh =
+            await BuildVerifyModel(posted.ApplicationId) ?? posted;
+
         fresh.IdVerified = posted.IdVerified;
         fresh.AddressVerified = posted.AddressVerified;
         fresh.EmploymentVerified = posted.EmploymentVerified;
@@ -114,25 +153,38 @@ public class StaffController : Controller
         fresh.StaffNotes = posted.StaffNotes;
 
         ModelState.AddModelError("", message);
+
         return View(fresh);
     }
 
     private async Task<StaffVerifyLoanViewModel?> BuildVerifyModel(string id)
     {
         var res = await Api().GetAsync($"api/LoansApi/{id}");
-        if (!res.IsSuccessStatusCode) return null;
 
-        var l = JsonSerializer.Deserialize<LoanApiResponse>(
-            await res.Content.ReadAsStringAsync(), _json);
-        if (l == null) return null;
+        if (!res.IsSuccessStatusCode)
+            return null;
+
+        var json = await res.Content.ReadAsStringAsync();
+
+        _logger.LogInformation("LOAN API RESPONSE: {Json}", json);
+
+        var allLoans = JsonSerializer.Deserialize<List<LoanApiResponse>>(json, _json)
+                       ?? new List<LoanApiResponse>();
+
+        var l = allLoans.FirstOrDefault(x =>
+            string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
+
+        if (l == null)
+            return null;
 
         return new StaffVerifyLoanViewModel
         {
-            ApplicationId = id,
+            ApplicationId = l.Id ?? "",
             RequestedAmount = l.RequestedAmount,
             ReasonForLoan = l.ReasonForLoan,
             DateApplied = l.ApplicantFormDate,
             Status = l.Status,
+
             Client = new StaffDetailsViewModel
             {
                 FullNameAndSurname = l.ClientDetails?.FullNameAndSurname ?? "",
@@ -140,15 +192,15 @@ public class StaffController : Controller
                 CellNo = l.ClientDetails?.CellNo ?? "",
                 HomeTelNo = l.HomeTelNo ?? "",
                 MaritalStatus = l.MarriedOrUnmarried ?? "",
-                CurrentPhysicalAddress = l.CurrentPhysicalAddress,
+                CurrentPhysicalAddress = l.CurrentPhysicalAddress ?? "",
                 PostalAddress = l.PostalAddress ?? "",
                 ResidenceDuration = $"{l.ResidenceYears ?? 0} years {l.ResidenceMonths ?? 0} months",
-                CompanyName = l.CompanyName,
-                Occupation = l.Occupation,
+                CompanyName = l.CompanyName ?? "",
+                Occupation = l.Occupation ?? "",
                 WorkTelephone = l.WorkTelephone ?? "",
-                BankName = l.BankName,
-                AccountType = l.AccountType,
-                AccountNumber = l.AccountNumber,
+                BankName = l.BankName ?? "",
+                AccountType = l.AccountType ?? "",
+                AccountNumber = l.AccountNumber ?? "",
                 SpouseNameAndSurname = l.SpouseNameAndSurname ?? "",
                 Relative1Name = l.Relative1Name ?? "",
                 Relative1TelNumber = l.Relative1TelNumber ?? ""
