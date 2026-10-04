@@ -1,9 +1,9 @@
 package com.example.prototype_2
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class StaffLoanDetailsActivity : AppCompatActivity() {
 
@@ -34,12 +35,18 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
     private var loanId: String? = null
 
+    // Stores the current loan amount
+    private var currentLoanAmount: Double? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContentView(R.layout.activity_staff_loan_details)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+
             val systemBars =
                 insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
@@ -53,24 +60,51 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
             insets
         }
 
-        applicationId = findViewById(R.id.ApplicationId)
-        applicationStatus = findViewById(R.id.ApplicationStatus)
-        submissionDate = findViewById(R.id.SubmissionDate)
+        // -------------------------
+        // FIND VIEWS
+        // -------------------------
 
-        clientName = findViewById(R.id.ClientName)
-        clientDetails = findViewById(R.id.ClientDetails)
+        applicationId =
+            findViewById(R.id.ApplicationId)
 
-        loanAmount = findViewById(R.id.LoanAmount)
-        loanReason = findViewById(R.id.LoanReason)
-        loanNote = findViewById(R.id.LoanNote)
+        applicationStatus =
+            findViewById(R.id.ApplicationStatus)
 
-        verifyButton = findViewById(R.id.btnApproveLoan)
+        submissionDate =
+            findViewById(R.id.SubmissionDate)
+
+        clientName =
+            findViewById(R.id.ClientName)
+
+        clientDetails =
+            findViewById(R.id.ClientDetails)
+
+        loanAmount =
+            findViewById(R.id.LoanAmount)
+
+        loanReason =
+            findViewById(R.id.LoanReason)
+
+        loanNote =
+            findViewById(R.id.LoanNote)
+
+        verifyButton =
+            findViewById(R.id.btnApproveLoan)
+
+        // -------------------------
+        // BACK BUTTON
+        // -------------------------
 
         findViewById<View>(R.id.btnBack).setOnClickListener {
             finish()
         }
 
-        loanId = intent.getStringExtra("LOAN_ID")
+        // -------------------------
+        // GET LOAN ID
+        // -------------------------
+
+        loanId =
+            intent.getStringExtra("LOAN_ID")
 
         android.util.Log.d(
             "STAFF_DETAILS",
@@ -78,6 +112,7 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
         )
 
         if (loanId.isNullOrEmpty()) {
+
             Toast.makeText(
                 this,
                 "Loan application could not be found",
@@ -88,20 +123,27 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
             return
         }
 
+        // -------------------------
+        // LOAD LOAN
+        // -------------------------
+
         loadLoanDetails()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun loadLoanDetails() {
 
         CoroutineScope(Dispatchers.IO).launch {
 
             try {
 
-                val token = RetrofitClient.authToken
+                val token =
+                    RetrofitClient.authToken
 
                 if (token.isNullOrEmpty()) {
 
                     withContext(Dispatchers.Main) {
+
                         Toast.makeText(
                             this@StaffLoanDetailsActivity,
                             "Please log in again",
@@ -121,19 +163,31 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
                     if (response.isSuccessful) {
 
-                        val loan = response.body()
+                        val loan =
+                            response.body()
 
                         if (loan != null) {
+
+                            // -------------------------
+                            // SAVE LOAN AMOUNT
+                            // -------------------------
+
+                            currentLoanAmount =
+                                loan.requestedAmount
 
                             // -------------------------
                             // APPLICATION INFORMATION
                             // -------------------------
 
                             applicationId.text =
-                                "Application ID: ${loan.applicationId ?: "--"}"
+                                "Application ID: ${
+                                    loan.applicationId ?: "--"
+                                }"
 
                             applicationStatus.text =
-                                "Status: ${loan.status ?: "Pending"}"
+                                "Status: ${
+                                    loan.status ?: "Pending"
+                                }"
 
                             submissionDate.text =
                                 "Submission Date: ${
@@ -145,7 +199,8 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                             // -------------------------
 
                             val name =
-                                loan.clientDetails?.fullNameAndSurname
+                                loan.clientDetails
+                                    ?.fullNameAndSurname
                                     ?: "--"
 
                             clientName.text =
@@ -234,20 +289,28 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
                             loanAmount.text =
                                 if (loan.requestedAmount != null) {
+
                                     "Requested Amount: R ${
                                         String.format(
+                                            Locale("en", "ZA"),
                                             "%,.2f",
                                             loan.requestedAmount
                                         )
                                     }"
+
                                 } else {
+
                                     "Requested Amount: R --"
                                 }
+
+                            // -------------------------
+                            // LOAN REASON
+                            // -------------------------
 
                             loanReason.text =
                                 "Reason for Loan: ${
                                     loan.reasonForLoan
-                                        ?: loan.reasonsForLoan
+                                        ?: loan.reasonsForLoan?.joinToString(", ")
                                         ?: "--"
                                 }"
 
@@ -257,34 +320,50 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
                             loanNote.text =
                                 if (!loan.reviewNote.isNullOrEmpty()) {
+
                                     "Review Note: ${loan.reviewNote}"
+
                                 } else {
+
                                     "Review Note: --"
                                 }
 
                             // -------------------------
-                            // APPROVE / VERIFY BUTTON
+                            // APPROVAL RULE
                             // -------------------------
 
                             if (
-                                loan.status.equals(
-                                    "Verified",
-                                    ignoreCase = true
-                                ) ||
                                 loan.status.equals(
                                     "Approved",
                                     ignoreCase = true
                                 )
                             ) {
 
+                                // Already approved
                                 verifyButton.isEnabled = false
                                 verifyButton.text = "Loan Approved"
 
+                            } else if (
+                                loan.requestedAmount != null &&
+                                loan.requestedAmount >= 7000
+                            ) {
+
+                                // R7,000 or more
+                                // Staff cannot approve
+                                verifyButton.isEnabled = false
+                                verifyButton.text = "Cannot Approve"
+
                             } else {
 
+                                // Below R7,000
+                                // Staff can approve
                                 verifyButton.isEnabled = true
                                 verifyButton.text = "Approve Loan"
                             }
+
+                            // -------------------------
+                            // APPROVE BUTTON
+                            // -------------------------
 
                             verifyButton.setOnClickListener {
                                 verifyLoanDetails()
@@ -337,9 +416,32 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
         }
     }
 
+    // -------------------------
+    // APPROVE LOAN
+    // -------------------------
+
     private fun verifyLoanDetails() {
 
-        val id = loanId ?: return
+        val id =
+            loanId ?: return
+
+        val amount =
+            currentLoanAmount ?: 0.0
+
+        // -------------------------
+        // CHECK R7,000 LIMIT
+        // -------------------------
+
+        if (amount >= 7000) {
+
+            Toast.makeText(
+                this,
+                "Staff can only approve loans below R7,000",
+                Toast.LENGTH_LONG
+            ).show()
+
+            return
+        }
 
         verifyButton.isEnabled = false
 
@@ -369,6 +471,9 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                         verifyButton.text =
                             "Loan Approved"
 
+                        verifyButton.isEnabled =
+                            false
+
                         Toast.makeText(
                             this@StaffLoanDetailsActivity,
                             "Loan approved successfully",
@@ -377,8 +482,11 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
                     } else {
 
-                        verifyButton.isEnabled = true
-                        verifyButton.text = "Approve Loan"
+                        verifyButton.isEnabled =
+                            true
+
+                        verifyButton.text =
+                            "Approve Loan"
 
                         val error =
                             response.errorBody()?.string()
@@ -406,8 +514,11 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) {
 
-                    verifyButton.isEnabled = true
-                    verifyButton.text = "Approve Loan"
+                    verifyButton.isEnabled =
+                        true
+
+                    verifyButton.text =
+                        "Approve Loan"
 
                     Toast.makeText(
                         this@StaffLoanDetailsActivity,
