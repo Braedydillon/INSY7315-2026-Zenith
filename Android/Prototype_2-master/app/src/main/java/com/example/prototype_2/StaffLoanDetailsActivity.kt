@@ -40,7 +40,8 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_staff_loan_details)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val systemBars =
+                insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
             v.setPadding(
                 systemBars.left,
@@ -99,6 +100,7 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                 val token = RetrofitClient.authToken
 
                 if (token.isNullOrEmpty()) {
+
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             this@StaffLoanDetailsActivity,
@@ -106,12 +108,14 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+
                     return@launch
                 }
 
-                val response = RetrofitClient.apiService.getLoanById(
-                    id = loanId!!
-                )
+                val response =
+                    RetrofitClient.apiService.getLoanById(
+                        id = loanId!!
+                    )
 
                 withContext(Dispatchers.Main) {
 
@@ -121,46 +125,119 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
                         if (loan != null) {
 
+                            // -------------------------
+                            // APPLICATION INFORMATION
+                            // -------------------------
+
                             applicationId.text =
-                                "Application ID: ${loan.id ?: "--"}"
+                                "Application ID: ${loan.applicationId ?: "--"}"
 
                             applicationStatus.text =
-                                "Status: ${loan.status ?: "Submitted"}"
+                                "Status: ${loan.status ?: "Pending"}"
 
                             submissionDate.text =
-                                "Submission Date: ${loan.submissionDate ?: "--"}"
-
-                            clientName.text =
-                                "Client Name: ${
-                                    loan.clientDetails?.fullNameAndSurname ?: "--"
+                                "Submission Date: ${
+                                    loan.applicationDate ?: "--"
                                 }"
 
-                            clientDetails.text =
-                                if (loan.clientDetails != null) {
-                                    "ID Number: ${
-                                        loan.clientDetails.idNumber ?: "--"
-                                    }\n" +
-                                            "Cell Number: ${
-                                                loan.clientDetails.cellNo ?: "--"
-                                            }\n" +
-                                            "Home Telephone: ${
-                                                loan.clientDetails.homeTelNo ?: "--"
-                                            }\n" +
-                                            "Occupation: ${
-                                                loan.clientDetails.occupation ?: "--"
-                                            }"
-                                } else {
-                                    "Client Details: --"
-                                }
+                            // -------------------------
+                            // CLIENT INFORMATION
+                            // -------------------------
 
-                            val amount = loan.requestedAmount
+                            val name =
+                                loan.clientDetails?.fullNameAndSurname
+                                    ?: "--"
+
+                            clientName.text =
+                                "Client Name: $name"
+
+                            clientDetails.text =
+                                """
+                                ID Number: ${
+                                    loan.clientDetails?.idNumber ?: "--"
+                                }
+                                
+                                Cell Number: ${
+                                    loan.clientDetails?.cellNo ?: "--"
+                                }
+                                
+                                Home Telephone: ${
+                                    loan.homeTelNo ?: "--"
+                                }
+                                
+                                Marital Status: ${
+                                    loan.marriedOrUnmarried ?: "--"
+                                }
+                                
+                                Current Address: ${
+                                    loan.currentPhysicalAddress ?: "--"
+                                }
+                                
+                                Postal Address: ${
+                                    loan.postalAddress ?: "--"
+                                }
+                                
+                                Parents Address: ${
+                                    loan.parentsAddress ?: "--"
+                                }
+                                
+                                Residence: ${
+                                    loan.residenceYears ?: "--"
+                                } years ${
+                                    loan.residenceMonths ?: "--"
+                                } months
+                                
+                                Company: ${
+                                    loan.companyName ?: "--"
+                                }
+                                
+                                Occupation: ${
+                                    loan.occupation ?: "--"
+                                }
+                                
+                                Work Telephone: ${
+                                    loan.workTelephone ?: "--"
+                                }
+                                
+                                Work Address: ${
+                                    loan.workAddress ?: "--"
+                                }
+                                
+                                Bank: ${
+                                    loan.bankName ?: "--"
+                                }
+                                
+                                Account Type: ${
+                                    loan.accountType ?: "--"
+                                }
+                                
+                                Account Number: ${
+                                    loan.accountNumber ?: "--"
+                                }
+                                
+                                Account Name: ${
+                                    loan.accountName ?: "--"
+                                }
+                                
+                                Branch Name: ${
+                                    loan.branchName ?: "--"
+                                }
+                                
+                                Branch Code: ${
+                                    loan.branchCode ?: "--"
+                                }
+                                """.trimIndent()
+
+                            // -------------------------
+                            // LOAN INFORMATION
+                            // -------------------------
 
                             loanAmount.text =
-                                if (amount != null) {
+                                if (loan.requestedAmount != null) {
                                     "Requested Amount: R ${
                                         String.format(
                                             "%,.2f",
-                                            amount
+                                            loan.requestedAmount
                                         )
                                     }"
                                 } else {
@@ -169,11 +246,25 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
                             loanReason.text =
                                 "Reason for Loan: ${
-                                    loan.reasonForLoan ?: "--"
+                                    loan.reasonForLoan
+                                        ?: loan.reasonsForLoan
+                                        ?: "--"
                                 }"
 
+                            // -------------------------
+                            // REVIEW INFORMATION
+                            // -------------------------
+
                             loanNote.text =
-                                "Additional Notes: --"
+                                if (!loan.reviewNote.isNullOrEmpty()) {
+                                    "Review Note: ${loan.reviewNote}"
+                                } else {
+                                    "Review Note: --"
+                                }
+
+                            // -------------------------
+                            // APPROVE / VERIFY BUTTON
+                            // -------------------------
 
                             if (
                                 loan.status.equals(
@@ -210,7 +301,8 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
                     } else {
 
-                        val error = response.errorBody()?.string()
+                        val error =
+                            response.errorBody()?.string()
 
                         android.util.Log.e(
                             "STAFF_DETAILS",
@@ -255,10 +347,11 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
 
             try {
 
-                val request = UpdateStatusRequest(
-                    status = "Approved",
-                    comments = "Staff approved the loan application."
-                )
+                val request =
+                    UpdateStatusRequest(
+                        status = "Approved",
+                        comments = "Staff approved the loan application."
+                    )
 
                 val response =
                     RetrofitClient.apiService.updateLoanStatus(
@@ -287,7 +380,8 @@ class StaffLoanDetailsActivity : AppCompatActivity() {
                         verifyButton.isEnabled = true
                         verifyButton.text = "Approve Loan"
 
-                        val error = response.errorBody()?.string()
+                        val error =
+                            response.errorBody()?.string()
 
                         android.util.Log.e(
                             "STAFF_VERIFY",

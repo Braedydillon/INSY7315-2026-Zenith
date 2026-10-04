@@ -1,4 +1,3 @@
-
 package com.example.prototype_2
 
 import android.content.Intent
@@ -57,14 +56,17 @@ class StaffLoanAdapter(
 
         val application = applications[position]
 
+        // Client name
         holder.applicantName.text =
-            application.applicantName ?: "Unknown Client"
+            application.clientDetails?.fullNameAndSurname
+                ?: "Unknown Client"
 
+        // Application ID
         holder.applicationId.text =
-            "Application: ${application.id ?: "--"}"
+            "Application: ${application.applicationId ?: "--"}"
 
-        val amount =
-            application.requestedAmount ?: application.amount
+        // Loan amount
+        val amount = application.requestedAmount
 
         holder.loanAmount.text =
             if (amount != null) {
@@ -73,12 +75,15 @@ class StaffLoanAdapter(
                 "Amount: R --"
             }
 
+        // Application date
         holder.submissionDate.text =
-            "Submitted: ${application.submissionDate ?: "--"}"
+            "Submitted: ${application.applicationDate ?: "--"}"
 
+        // Status
         holder.loanStatus.text =
             "Status: ${application.status ?: "Pending"}"
 
+        // View details button
         holder.viewDetailsButton.setOnClickListener {
 
             val context = holder.itemView.context
@@ -91,6 +96,7 @@ class StaffLoanAdapter(
                     "Application ID is missing",
                     android.widget.Toast.LENGTH_LONG
                 ).show()
+
                 return@setOnClickListener
             }
 
@@ -109,4 +115,3 @@ class StaffLoanAdapter(
         return applications.size
     }
 }
-
