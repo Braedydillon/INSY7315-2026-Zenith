@@ -29,11 +29,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<FloatingActionButton>(R.id.btnWhatsapp)?.setOnClickListener {
-            val intent = Intent(this, Staff_Page::class.java)
-            startActivity(intent)
-        }
-
         findViewById<FloatingActionButton>(R.id.btnChatbot)?.setOnClickListener {
             val intent = Intent(this, Chatbot_Page::class.java)
             startActivity(intent)

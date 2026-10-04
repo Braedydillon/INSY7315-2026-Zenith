@@ -53,14 +53,13 @@
                 app:strokeWidth="1dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="391dp"
-                    android:layout_height="97dp">
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:id="@+id/headerText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
                         android:text="Bridge &amp; Anchor"
                         android:textAlignment="center"
                         android:textColor="#172033"
@@ -87,19 +86,20 @@
 
                     <Button
                         android:id="@+id/btnLogout"
+                        style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Logout"
-                        style="@style/Widget.Material3.Button.TextButton"
                         android:textColor="#172033"
                         android:textSize="10sp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Hero -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/heroCard"
                 android:layout_width="0dp"
@@ -172,6 +172,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Apply Loan Section -->
             <TextView
                 android:id="@+id/txtServicesTitle"
                 android:layout_width="0dp"
@@ -201,78 +202,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/txtServicesTitle" />
 
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardServices"
-                android:layout_width="0dp"
-                android:layout_height="125dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="9dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:layout_constraintEnd_toStartOf="@+id/cardLoan"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtServicesSubtitle">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/txtServicesIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="◉"
-                        android:textColor="#1769E0"
-                        android:textSize="28sp"
-                        app:layout_constraintBottom_toTopOf="@id/txtServices"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/txtServices"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Services"
-                        android:textColor="#172033"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toTopOf="@id/txtExplore"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/txtServicesIcon" />
-
-                    <TextView
-                        android:id="@+id/txtExplore"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Explore"
-                        android:textColor="#718096"
-                        android:textSize="12sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/txtServices" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardLoan"
                 android:layout_width="0dp"
                 android:layout_height="125dp"
+                android:layout_marginStart="18dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginStart="9dp"
                 android:layout_marginEnd="18dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/cardServices"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/txtServicesSubtitle">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -320,12 +261,13 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Track Application -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardTrack"
                 android:layout_width="0dp"
                 android:layout_height="125dp"
-                android:layout_marginTop="12dp"
                 android:layout_marginStart="18dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginEnd="18dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
@@ -379,6 +321,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Contact -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/contactCard"
                 android:layout_width="0dp"
@@ -436,8 +379,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-
-
+            <!-- Policy -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/policyCard"
                 android:layout_width="0dp"
@@ -453,7 +395,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/contactCard">
-
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -498,12 +439,11 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-
         </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     </ScrollView>
 
+    <!-- Chatbot -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnChatbot"
         android:layout_width="wrap_content"
@@ -512,21 +452,8 @@
         android:contentDescription="Chat with us"
         android:src="@drawable/chatbot"
         app:backgroundTint="#1769E0"
-        app:tint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnWhatsapp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="84dp"
-        android:layout_marginBottom="20dp"
-        android:contentDescription="WhatsApp"
-        android:src="@drawable/whatsapp"
-        app:backgroundTint="#25D366"
-        app:tint="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@null" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
