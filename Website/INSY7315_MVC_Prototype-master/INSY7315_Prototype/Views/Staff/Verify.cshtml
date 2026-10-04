@@ -3,8 +3,7 @@
 
 <a asp-action="Index" class="text-decoration-none">&larr; Back to queue</a>
 <h1 class="fw-bold mt-2">Verify Application</h1>
-<p class="text-muted">Application #@Model.ApplicationId &middot; Applied @Model.DateApplied.ToString("dd MMM yyyy")</p>
-
+<p class="text-muted">Application #@Model.ApplicationId &middot; Applied @(Model.DateApplied?.ToString("dd MMM yyyy") ?? "—")</p>
 <div class="row g-4 mb-4">
     <div class="col-lg-7">
         <div class="card p-4 h-100">
