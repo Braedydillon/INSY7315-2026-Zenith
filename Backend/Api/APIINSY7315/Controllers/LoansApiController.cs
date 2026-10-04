@@ -376,7 +376,7 @@ namespace APIINSY7315.Controllers
         [HttpGet]
         [FirebaseAuthorize(
             Roles.Admin,
-            Roles.Management)]
+            Roles.Staff)]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? status)
         {
@@ -448,7 +448,7 @@ namespace APIINSY7315.Controllers
         [HttpGet("pending")]
         [FirebaseAuthorize(
             Roles.Admin,
-            Roles.Management)]
+            Roles.Staff)]
         public async Task<IActionResult> GetPending()
         {
             try
@@ -556,19 +556,15 @@ namespace APIINSY7315.Controllers
 
         [HttpPut("{id}/status")]
         [FirebaseAuthorize(
-            Roles.Admin,
-            Roles.Management)]
+      Roles.Admin,
+      Roles.Staff)]
         public async Task<IActionResult> UpdateStatus(
-            string id,
-            [FromBody] UpdateStatusRequest request)
+      string id,
+      [FromBody] UpdateStatusRequest request)
         {
             if (request == null)
             {
-                return BadRequest(new
-                {
-                    error =
-                        "Request body is required."
-                });
+                return BadRequest(new { error = "Request body is required." });
             }
 
             if (!ModelState.IsValid)
@@ -584,43 +580,47 @@ namespace APIINSY7315.Controllers
 
             if (validStatus == null)
             {
-                return BadRequest(new
-                {
-                    error =
-                        "Invalid loan status."
-                });
+                return BadRequest(new { error = "Invalid loan status." });
             }
 
             try
             {
-                var document =
-                    _db
-                        .Collection(CollectionName)
-                        .Document(id);
-
-                var snapshot =
-                    await document.GetSnapshotAsync();
+                var document = _db.Collection(CollectionName).Document(id);
+                var snapshot = await document.GetSnapshotAsync();
 
                 if (!snapshot.Exists)
                 {
                     return NotFound();
                 }
 
-                var updates =
-                    new Dictionary<string, object>
+                // 1. Get the loan amount from the Firestore document
+                var requestedAmount = snapshot.ContainsField("RequestedAmount")
+                    ? snapshot.GetValue<double>("RequestedAmount")
+                    : 0;
+
+                var currentUserRole = HttpContext.GetRole();
+
+                // 2. Check if the status is being set to "Approved" and amount exceeds 7000
+                if (validStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase) && requestedAmount > 7000)
+                {
+                    // 3. If it's over 7000, strictly require an Admin role
+                    if (!string.Equals(currentUserRole, Roles.Admin, StringComparison.OrdinalIgnoreCase))
                     {
-                        ["Status"] =
-                            validStatus,
+                        return StatusCode(403, new
+                        {
+                            error = "FORBIDDEN",
+                            message = "Loans exceeding 7,000 require Administrator approval."
+                        });
+                    }
+                }
 
-                        ["ReviewedBy"] =
-                            HttpContext.GetUserId(),
-
-                        ["ReviewedAt"] =
-                            Timestamp.GetCurrentTimestamp(),
-
-                        ["ReviewNote"] =
-                            request.Note ?? ""
-                    };
+                var updates = new Dictionary<string, object>
+                {
+                    ["Status"] = validStatus,
+                    ["ReviewedBy"] = HttpContext.GetUserId(),
+                    ["ReviewedAt"] = Timestamp.GetCurrentTimestamp(),
+                    ["ReviewNote"] = request.Note ?? ""
+                };
 
                 await document.UpdateAsync(updates);
 
@@ -632,33 +632,16 @@ namespace APIINSY7315.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex,
-                    "Failed updating application {Id}",
-                    id);
+                _logger.LogError(ex, "Failed updating application {Id}", id);
 
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        error =
-                            "Could not update the application.",
-
-                        detail =
-                            ex.Message,
-
-                        exception =
-                            ex.GetType().FullName,
-
-                        inner =
-                            ex.InnerException?.Message,
-
-                        traceId =
-                            HttpContext.TraceIdentifier
-                    });
+                return StatusCode(500, new
+                {
+                    error = "Could not update the application.",
+                    detail = ex.Message,
+                    traceId = HttpContext.TraceIdentifier
+                });
             }
         }
-
 
 
         private static LoanApplicationDto MapDocument(

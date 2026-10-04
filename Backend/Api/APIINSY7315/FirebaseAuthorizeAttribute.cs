@@ -8,7 +8,7 @@ namespace APIINSY7315
     {
         public const string Client = "client";
         public const string Admin = "admin";
-        public const string Management = "management";
+    
 
         public const string Staff = "staff";
 
@@ -16,14 +16,12 @@ namespace APIINSY7315
         {
             Client,
             Admin,
-            Management,
             Staff
         };
 
         public static readonly string[] StaffType =
         {
             Admin,
-            Management,
             Staff
         };
 
