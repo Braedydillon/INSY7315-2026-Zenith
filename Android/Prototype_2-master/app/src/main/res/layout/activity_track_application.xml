@@ -105,6 +105,26 @@
     </androidx.cardview.widget.CardView>
 
     <!-- Applications List -->
+
+    <!-- Approved Application Message -->
+    <TextView
+        android:id="@+id/approvedMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:background="#E8F5E9"
+        android:padding="16dp"
+        android:text="Your loan application has been approved. Please visit your nearest branch to collect your money."
+        android:textColor="#1B5E20"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/trackHeaderBg" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvApplications"
         android:layout_width="0dp"
@@ -120,7 +140,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/trackHeaderBg"
+        app:layout_constraintTop_toBottomOf="@id/approvedMessage"
         tools:listitem="@layout/activity_item_loan_application" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
