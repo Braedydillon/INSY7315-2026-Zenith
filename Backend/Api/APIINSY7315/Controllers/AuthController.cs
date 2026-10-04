@@ -615,7 +615,7 @@ namespace APIINSY7315.Controllers
             }
             catch
             {
-                // Ignore JSON parsing failure.
+                
             }
 
             return "Firebase authentication failed.";
