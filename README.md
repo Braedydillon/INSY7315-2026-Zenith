@@ -1,15 +1,6 @@
 # Bridge & Anchor Loans
 
-A short-term loan management platform for **Bridge & Anchor Loans**, built as a university project for **INSY7315**. It has two client applications that share one REST API:
-
-| App | Stack | Audience |
-|---|---|---|
-| **Android app** (`/Android`) | Kotlin, Retrofit, Material Components | Clients, staff and managers on mobile |
-| **Web app** (`/INSY7315_Prototype`) | ASP.NET Core MVC (.NET 8), Razor, Bootstrap | Clients, staff and managers in the browser |
-
-Clients apply for loans of **R300 – R7,000** over **1 – 6 months**. Staff verify applications, and anything at or above **R7,000** is escalated to a manager for the final decision.
-
----
+A loan management platform for **Bridge & Anchor Loans**. It has both applications, Android and MVC that share one REST API:
 
 ## Table of Contents
 
@@ -30,9 +21,8 @@ https://apiinsy7315-latest.onrender.com/index.html
 - Submit a full loan application (personal, employment, marital status, spouse and divorce details, loan purpose)
 - Track the status of submitted applications
 - Read the company policy and NCR compliance information
-- Contact page and WhatsApp shortcut *(Android)*
-- Built-in FAQ chatbot covering loan amounts, required documents, how to apply, branch locations and contact details *(Android)*
-- Downloadable PDF finance application form *(Web)*
+- Contact page and WhatsApp shortcut
+- Built-in FAQ chatbot covering loan amounts, required documents, how to apply, branch locations and contact details in Android
 
 ### Staff
 - Dashboard with counts for pending, sent to manager, approved and declined applications
@@ -46,36 +36,12 @@ https://apiinsy7315-latest.onrender.com/index.html
 - Review verified applications and record a verification result with notes
 - Approve or reject large loans
 - View all applications
-
----
-
-The threshold lives in `LoanRules.ManagerThreshold` in the web project. The web app re-reads the loan from the API on every decision, so the amount and status are never trusted from the submitted form.
-
----
-
-## Tech Stack
-
-**Web (`INSY7315_Prototype`)**
-- ASP.NET Core MVC on .NET 8
-- Cookie authentication with role-based authorisation
-- In-memory session (30 minute idle timeout)
-- `HttpClientFactory` for API calls
-- Bootstrap 5 and custom CSS
-
-**Android (`Android`)**
-- Kotlin, minSdk 24, targetSdk 37
-- Retrofit 2.11.0, Gson and OkHttp logging interceptor
-- Material Components, ConstraintLayout and RecyclerView
-- Bearer token stored in `SharedPreferences` and attached by an OkHttp interceptor
-
+- 
 ---
 
 ## Getting Started
 
-
 ### Android app
-
-**Prerequisites:** Android Studio (recent version with Android Gradle Plugin 9.x support), JDK 11+, and an emulator or device running Android 7.0 (API 24) or higher.
 
 1. Open the `Android` folder in Android Studio.
 2. Let Gradle sync finish.
@@ -83,8 +49,6 @@ The threshold lives in `LoanRules.ManagerThreshold` in the web project. The web 
 4. Click **Run**.
 
 The app needs an internet connection because it calls the hosted API.
-
-> **Note:** The API is hosted on Render. If the service has been idle, the first request (login, for example) may take a little longer while it wakes up.
 
 ## API
 
