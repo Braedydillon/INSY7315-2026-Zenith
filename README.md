@@ -22,9 +22,6 @@ Clients apply for loans of **R300 – R7,000** over **1 – 6 months**. Staff ve
   - [Android app](#android-app)
 - [API](#api)
 - [Roles](#roles)
-- [Known Limitations](#known-limitations)
-- [Team](#team)
-- [License](#license)
 
 ---
 
@@ -54,24 +51,6 @@ Clients apply for loans of **R300 – R7,000** over **1 – 6 months**. Staff ve
 
 ---
 
-## Loan Approval Workflow
-
-```
-Client submits application  (status: Pending / Submitted)
-            │
-            ▼
-   Staff review & verify
-            │
-   ┌────────┴─────────────────────────┐
-   │                                  │
-< R7,000                         ≥ R7,000
-   │                                  │
-Staff: Approve / Decline     Staff: Verify / Reject
-                                      │
-                                      ▼
-                        Manager: Approve / Reject
-```
-
 The threshold lives in `LoanRules.ManagerThreshold` in the web project. The web app re-reads the loan from the API on every decision, so the amount and status are never trusted from the submitted form.
 
 ---
@@ -93,40 +72,6 @@ The threshold lives in `LoanRules.ManagerThreshold` in the web project. The web 
 
 **Backend**
 - Hosted REST API at `https://apiinsy7315-latest.onrender.com/` (not part of this repository)
-
----
-
-## Project Structure
-
-```
-.
-├── Android/
-│   └── app/src/main/
-│       ├── java/com/example/prototype_2/
-│       │   ├── API/                      # Retrofit client, service interface, DTOs
-│       │   ├── Login_Page.kt             # Login and role-based routing
-│       │   ├── Register_Page.kt
-│       │   ├── MainActivity.kt           # Client home
-│       │   ├── LoanApplicationActivity.kt
-│       │   ├── TrackApplicationActivity.kt
-│       │   ├── Staff_Page.kt / StaffLoanDetailsActivity.kt
-│       │   ├── Manager_Page.kt
-│       │   ├── Chatbot_Page.kt
-│       │   ├── Policy_Page.kt / Contact_Us_Page.kt
-│       │   └── *Adapter.kt               # RecyclerView adapters
-│       └── res/                          # Layouts, drawables, themes
-│
-├── INSY7315_Prototype/                   # ASP.NET Core MVC web app
-│   ├── Controllers/                      # Account, Loan, Staff, Manager, Home, Client
-│   ├── Models/                           # Loan, LoanRules, LoanMapper, ApplicationForm, ...
-│   ├── ViewModels/
-│   ├── Views/                            # Razor views per controller
-│   ├── Services/AuthApiService.cs        # Login / register calls to the API
-│   ├── wwwroot/                          # CSS, JS, images, PDF form
-│   └── Program.cs
-│
-└── INSY7315_Prototype.sln
-```
 
 ---
 
