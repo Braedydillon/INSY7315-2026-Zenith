@@ -14,9 +14,6 @@ Clients apply for loans of **R300 – R7,000** over **1 – 6 months**. Staff ve
 ## Table of Contents
 
 - [Features](#features)
-- [Loan Approval Workflow](#loan-approval-workflow)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
   - [Web app](#web-app)
   - [Android app](#android-app)
@@ -77,23 +74,6 @@ The threshold lives in `LoanRules.ManagerThreshold` in the web project. The web 
 
 ## Getting Started
 
-### Web app
-
-**Prerequisites:** [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-
-```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
-dotnet restore
-dotnet run --project INSY7315_Prototype
-```
-
-Then open one of the URLs from `launchSettings.json`:
-
-- `https://localhost:7083`
-- `http://localhost:5075`
-
-You can also open `INSY7315_Prototype.sln` in Visual Studio 2022 and press **F5**.
 
 ### Android app
 
@@ -107,8 +87,6 @@ You can also open `INSY7315_Prototype.sln` in Visual Studio 2022 and press **F5*
 The app needs an internet connection because it calls the hosted API.
 
 > **Note:** The API is hosted on Render. If the service has been idle, the first request (login, for example) may take a little longer while it wakes up.
-
----
 
 ## API
 
