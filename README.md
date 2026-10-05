@@ -13,7 +13,6 @@ Clients apply for loans of **R300 – R7,000** over **1 – 6 months**. Staff ve
 
 ## Table of Contents
 
-- [Features](#features)
 - [Getting Started](#getting-started)
   - [Web app](#web-app)
   - [Android app](#android-app)
@@ -22,7 +21,9 @@ Clients apply for loans of **R300 – R7,000** over **1 – 6 months**. Staff ve
 
 ---
 
-## Features
+## Website Link
+https://bridgeanchor-latest.onrender.com/
+https://apiinsy7315-latest.onrender.com/index.html
 
 ### Clients
 - Register and log in
@@ -66,9 +67,6 @@ The threshold lives in `LoanRules.ManagerThreshold` in the web project. The web 
 - Retrofit 2.11.0, Gson and OkHttp logging interceptor
 - Material Components, ConstraintLayout and RecyclerView
 - Bearer token stored in `SharedPreferences` and attached by an OkHttp interceptor
-
-**Backend**
-- Hosted REST API at `https://apiinsy7315-latest.onrender.com/` (not part of this repository)
 
 ---
 
@@ -127,3 +125,14 @@ Authenticated requests send `Authorization: Bearer <token>`.
 | `admin` (manager) | Manager dashboard | `Manager_Page` |
 
 The role is returned by the API at login and used to route the user and restrict access to controllers and screens.
+
+## Login Details
+Client : Kelz@gmail.com 
+Password : kelly1108@
+
+Staff : pg1@gnail.com
+Password : Password@89 
+
+Admin: pg@gmail.com
+Password : Password@89 
+
