@@ -8,6 +8,9 @@ A loan management platform for Bridge & Anchor Loans. It has both applications, 
 https://bridgeanchor-latest.onrender.com/
 https://apiinsy7315-latest.onrender.com/index.html
 
+## Youtube Link
+https://www.youtube.com/watch?v=kg-alCX-_D0
+
 ### Clients
 - Register and log in
 - Submit a full loan application
