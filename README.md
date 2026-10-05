@@ -2,14 +2,6 @@
 
 A loan management platform for **Bridge & Anchor Loans**. It has both applications, Android and MVC that share one REST API:
 
-## Table of Contents
-
-- [Getting Started](#getting-started)
-  - [Web app](#web-app)
-  - [Android app](#android-app)
-- [API](#api)
-- [Roles](#roles)
-
 ---
 
 ## Website Link
@@ -39,9 +31,7 @@ https://apiinsy7315-latest.onrender.com/index.html
 - 
 ---
 
-## Getting Started
-
-### Android app
+## Android app
 
 1. Open the `Android` folder in Android Studio.
 2. Let Gradle sync finish.
@@ -54,8 +44,6 @@ The app needs an internet connection because it calls the hosted API.
 
 Both clients use the same base URL, set in `RetrofitClient.kt` (Android) and `Program.cs` (Web):
 
-```
-https://apiinsy7315-latest.onrender.com/
 ```
 
 Endpoints used by the apps:
