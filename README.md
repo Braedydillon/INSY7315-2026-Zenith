@@ -28,7 +28,7 @@ https://apiinsy7315-latest.onrender.com/index.html
 - Review verified applications and record a verification result with notes
 - Approve or reject large loans
 - View all applications
-- 
+  
 ---
 
 ## Android app
@@ -79,6 +79,8 @@ Authenticated requests send `Authorization: Bearer <token>`.
 The role is returned by the API at login and used to route the user and restrict access to controllers and screens.
 
 ## Login Details
+
+### Android
 Client : Kelz@gmail.com 
 Password : kelly1108@
 
@@ -88,3 +90,12 @@ Password : Password@89
 Admin: pg@gmail.com
 Password : Password@89 
 
+### MVC
+Client: red@gmail.com
+Password: redblue
+
+Staff: idk@gmail.com
+Password: zxcvbnm
+
+Admin: admin@bridgeandanchor.com
+Password: AdminPassword123!
