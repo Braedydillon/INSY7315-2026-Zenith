@@ -50,21 +50,20 @@ Endpoints used by the apps:
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| `POST` | `/api/Auth/register` | Register a new client |
-| `POST` | `/api/Auth/login` | Log in, returns token and role |
-| `POST` | `/api/Auth/refresh` | Refresh a session token |
-| `GET` | `/api/Me` | Current user profile |
-| `POST` | `/api/LoansApi` | Submit a loan application |
-| `GET` | `/api/LoansApi` | All applications (staff / manager) |
-| `GET` | `/api/LoansApi/mine` | The signed-in client's applications |
-| `GET` | `/api/LoansApi/pending` | Pending applications |
-| `GET` | `/api/LoansApi/{id}` | A single application |
-| `PUT` | `/api/LoansApi/{id}/status` | Update application status |
-| `GET` | `/api/Admin/users` | List users (admin) |
-| `POST` | `/api/Admin/set-role` | Assign a role (admin) |
-| `GET` | `/health`, `/health/firestore` | Health checks |
+| POST | /api/Auth/register | Register a new client |
+| POST | /api/Auth/login | Log in, returns token and role |
+| POST | /api/Auth/refresh | Refresh a session token |
+| GET | /api/Me | Current user profile |
+| POST | /api/LoansApi | Submit a loan application |
+| GET | /api/LoansApi | All applications (staff / manager) |
+| GET | /api/LoansApi/mine | The signed-in client's applications |
+| GET | /api/LoansApi/pending | Pending applications |
+| GET | /api/LoansApi/{id} | A single application |
+| PUT | /api/LoansApi/{id}/status | Update application status |
+| GET | /api/Admin/users | List users (admin) |
+| POST | /api/Admin/set-role | Assign a role (admin) |
 
-Authenticated requests send `Authorization: Bearer <token>`.
+Authenticated requests send Authorization: Bearer <token>.
 
 ---
 
@@ -72,9 +71,9 @@ Authenticated requests send `Authorization: Bearer <token>`.
 
 | Role | Web landing page | Android landing page |
 |---|---|---|
-| `client` | Client dashboard | `MainActivity` |
-| `staff` | Staff dashboard | `Staff_Page` |
-| `admin` (manager) | Manager dashboard | `Manager_Page` |
+| client | Client dashboard | MainActivity |
+| staff | Staff dashboard | Staff_Page |
+| admin (manager) | Manager dashboard | Manager_Page |
 
 The role is returned by the API at login and used to route the user and restrict access to controllers and screens.
 
