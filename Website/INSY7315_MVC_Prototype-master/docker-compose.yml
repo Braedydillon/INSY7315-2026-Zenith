@@ -1,0 +1,6 @@
+services:
+  insy7315_prototype:
+    image: ${DOCKER_REGISTRY-}insy7315prototype
+    build:
+      context: .
+      dockerfile: INSY7315_Prototype/Dockerfile
