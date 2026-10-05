@@ -204,31 +204,3 @@ Authenticated requests send `Authorization: Bearer <token>`.
 | `admin` (manager) | Manager dashboard | `Manager_Page` |
 
 The role is returned by the API at login and used to route the user and restrict access to controllers and screens.
-
----
-
-## Known Limitations
-
-- This is a **prototype** built for coursework, not production-ready software.
-- The API base URL is hard-coded in both apps. Move it to configuration (`appsettings.json` / `BuildConfig`) before deploying.
-- The Android chatbot is rule-based (keyword matching), not AI-driven, and does not make credit or approval decisions.
-- Android release builds have minification disabled.
-
----
-
-## Team
-
-<!-- Replace with your group members -->
-
-| Name | Student Number | Role |
-|---|---|---|
-| _Name Surname_ | _00000000_ | _e.g. Android developer_ |
-| _Name Surname_ | _00000000_ | _e.g. Web developer_ |
-
-**Module:** INSY7315
-
----
-
-## License
-
-This project was created for educational purposes. Add a license here if you plan to share or reuse the code (for example, [MIT](https://choosealicense.com/licenses/mit/)).
