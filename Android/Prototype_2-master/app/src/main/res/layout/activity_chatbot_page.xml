@@ -151,6 +151,17 @@
                 app:chipStrokeWidth="1dp" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/chipMultipleLoans"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚠️ Multiple Loans"
+                android:textColor="#1769E0"
+                app:chipBackgroundColor="#EBF3FF"
+                app:chipStrokeColor="#1769E0"
+                app:chipStrokeWidth="1dp" />
+
+            <com.google.android.material.chip.Chip
                 android:id="@+id/chipBranches"
                 style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="wrap_content"

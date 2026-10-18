@@ -66,13 +66,16 @@ class Chatbot_Page : AppCompatActivity() {
                     "the application process, branch locations and contacting our team.",
             listOf(
                 ChatOption("💰 Loan Information") {
-                    sendUserQuery("How much can I borrow?")
+                    sendUserQuery("Loan Information")
                 },
                 ChatOption("📄 Required Documents") {
                     sendUserQuery("What documents do I need?")
                 },
                 ChatOption("📝 How to Apply") {
                     sendUserQuery("How do I apply?")
+                },
+                ChatOption("⚠️ Multiple Loans") {
+                    sendUserQuery("Can I apply for multiple loans?")
                 }
             )
         )
@@ -117,7 +120,7 @@ class Chatbot_Page : AppCompatActivity() {
         }
 
         findViewById<Chip>(R.id.chipLoanInfo)?.setOnClickListener {
-            sendUserQuery("How much can I borrow?")
+            sendUserQuery("Loan Information")
         }
 
         findViewById<Chip>(R.id.chipDocs)?.setOnClickListener {
@@ -126,6 +129,10 @@ class Chatbot_Page : AppCompatActivity() {
 
         findViewById<Chip>(R.id.chipApply)?.setOnClickListener {
             sendUserQuery("How do I apply?")
+        }
+
+        findViewById<Chip>(R.id.chipMultipleLoans)?.setOnClickListener {
+            sendUserQuery("Can I apply for multiple loans?")
         }
 
         findViewById<Chip>(R.id.chipBranches)?.setOnClickListener {
@@ -213,28 +220,36 @@ class Chatbot_Page : AppCompatActivity() {
                             "required documents, applications or branch locations.",
                     listOf(
                         ChatOption("💰 Loan Information") {
-                            sendUserQuery("How much can I borrow?")
+                            sendUserQuery("Loan Information")
                         },
                         ChatOption("📄 Required Documents") {
                             sendUserQuery("What documents do I need?")
+                        },
+                        ChatOption("⚠️ Multiple Loans") {
+                            sendUserQuery("Can I apply for multiple loans?")
                         }
                     )
                 )
             }
 
-            // LOAN AMOUNTS & REPAYMENT
-            lower.contains("how much can i borrow") ||
+            // LOAN INFORMATION
+            lower.contains("loan info") ||
+                    lower.contains("loan information") ||
+                    lower.contains("loan details") ||
                     lower.contains("loan amount") ||
                     lower.contains("borrow") ||
                     lower.contains("repayment") ||
                     lower.contains("repay") ||
-                    lower.contains("repayment period") ||
-                    lower.contains("how long can i repay") ||
-                    lower.contains("loan terms") -> {
+                    lower.contains("loan terms") ||
+                    lower == "info" ||
+                    lower == "information" -> {
 
                 addBotMessage(
-                    "💰 Loan Amounts & Repayment Terms:\n\n" +
-                            "• Loan amounts range from R300 to R7,000.\n" +
+                    "💰 Loan Information:\n\n" +
+                            "The loan amount you can receive depends on your " +
+                            "application and the assessment process.\n\n" +
+                            "✅ Once your loan has been approved, you will need " +
+                            "to visit a Bridge & Anchor branch to collect your cash.\n\n" +
                             "• Repayment periods range from 1 to 6 months.\n\n" +
                             "ℹ️ Please note: I am an automated support assistant. " +
                             "I cannot make affordability, credit or loan-approval decisions. " +
@@ -245,6 +260,9 @@ class Chatbot_Page : AppCompatActivity() {
                         },
                         ChatOption("📝 How to Apply") {
                             sendUserQuery("How do I apply?")
+                        },
+                        ChatOption("⚠️ Multiple Loans") {
+                            sendUserQuery("Can I apply for multiple loans?")
                         }
                     )
                 )
@@ -301,9 +319,32 @@ class Chatbot_Page : AppCompatActivity() {
                         ChatOption("🏢 View Branches") {
                             sendUserQuery("Where are the branches?")
                         }
+
                     )
                 )
             }
+
+
+
+            // MULTIPLE LOAN APPLICATIONS
+            lower.contains("multiple loans") ||
+                    lower.contains("more than one loan") ||
+                    lower.contains("multiple loan applications") ||
+                    lower.contains("apply for multiple") ||
+                    lower.contains("likelihood of rejection") ||
+                    lower.contains("rejected") -> {
+
+                addBotMessage(
+                    "⚠️ Applying for Multiple Loans:\n\n" +
+                            "Applying for multiple loans may increase " +
+                            "your likelihood of being rejected.\n\n" +
+                            "We recommend carefully considering your " +
+                            "financial needs before applying. Each loan " +
+                            "application is subject to the formal assessment process."
+                )
+            }
+
+
 
             // AFTER APPLICATION / STATUS
             lower.contains("what happens after") ||
@@ -557,7 +598,11 @@ class Chatbot_Page : AppCompatActivity() {
 
                     for (option in message.options) {
 
-                        val chip = Chip(holder.itemView.context).apply {
+                        val chip = Chip(
+                            holder.itemView.context,
+                            null,
+                            com.google.android.material.R.style.Widget_MaterialComponents_Chip_Action
+                        ).apply {
                             text = option.label
                             textSize = 12f
                             setChipBackgroundColorResource(android.R.color.white)
