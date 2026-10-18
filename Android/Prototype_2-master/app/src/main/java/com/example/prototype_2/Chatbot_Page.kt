@@ -248,6 +248,7 @@ class Chatbot_Page : AppCompatActivity() {
                     "💰 Loan Information:\n\n" +
                             "The loan amount you can receive depends on your " +
                             "application and the assessment process.\n\n" +
+                            "The minimum amount of money that can be taken out is R1000.\n\n" +
                             "✅ Once your loan has been approved, you will need " +
                             "to visit a Bridge & Anchor branch to collect your cash.\n\n" +
                             "• Repayment periods range from 1 to 6 months.\n\n" +
