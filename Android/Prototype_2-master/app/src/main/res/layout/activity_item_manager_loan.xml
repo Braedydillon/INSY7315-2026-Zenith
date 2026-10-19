@@ -101,37 +101,17 @@
             android:textSize="14sp"
             android:textColor="#6B7280" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/btnViewDetails"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnReject"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                android:text="Reject"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#DC3545" />
-
-            <Button
-                android:id="@+id/btnApprove"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                android:text="Approve"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#198754" />
-
-        </LinearLayout>
+            android:layout_gravity="end"
+            android:layout_marginTop="12dp"
+            android:text="View Details"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#172033" />
 
     </LinearLayout>
 

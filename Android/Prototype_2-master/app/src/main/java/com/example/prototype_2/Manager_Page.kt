@@ -1,17 +1,18 @@
 package com.example.prototype_2
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.prototype_2.API.LoanDto
 import com.example.prototype_2.API.RetrofitClient
-import com.example.prototype_2.API.UpdateStatusRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,12 +30,18 @@ class Manager_Page : AppCompatActivity() {
 
     private lateinit var adapter: ManagerLoanAdapter
 
-    private var applications = mutableListOf<com.example.prototype_2.API.LoanDto>()
+    private var applications = mutableListOf<LoanDto>()
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_manager_page)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         totalApplicationsText = findViewById(R.id.TotalApplications)
         pendingApplicationsText = findViewById(R.id.PendingApplications)
@@ -44,20 +51,7 @@ class Manager_Page : AppCompatActivity() {
         rvManagerLoans = findViewById(R.id.rvManagerLoans)
         btnLogoutManager = findViewById(R.id.btnLogoutManager)
 
-        adapter = ManagerLoanAdapter(
-            applications,
-            object : ManagerLoanAdapter.ManagerActionListener {
-
-                override fun onApprove(loan: com.example.prototype_2.API.LoanDto) {
-                    updateLoanStatus(loan, "Approved")
-                }
-
-                override fun onReject(loan: com.example.prototype_2.API.LoanDto) {
-                    updateLoanStatus(loan, "Rejected")
-                }
-            }
-        )
-
+        adapter = ManagerLoanAdapter(applications)
         rvManagerLoans.layoutManager = LinearLayoutManager(this)
         rvManagerLoans.adapter = adapter
 
@@ -73,36 +67,32 @@ class Manager_Page : AppCompatActivity() {
         loadApplications()
     }
 
+    private fun getAuthToken(): String? {
+        var token = RetrofitClient.authToken
+
+        if (token.isNullOrEmpty()) {
+            val prefsApp = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+            token = prefsApp.getString("AUTH_TOKEN", null)
+        }
+
+        if (token.isNullOrEmpty()) {
+            val prefsAuth = getSharedPreferences("Auth", MODE_PRIVATE)
+            token = prefsAuth.getString("AUTH_TOKEN", null) ?: prefsAuth.getString("token", null)
+        }
+
+        if (!token.isNullOrEmpty()) {
+            RetrofitClient.authToken = token
+        }
+
+        return token
+    }
+
     private fun loadApplications() {
-
         CoroutineScope(Dispatchers.IO).launch {
-
             try {
+                val rawToken = getAuthToken()
 
-                var token = RetrofitClient.authToken
-
-                if (token.isNullOrEmpty()) {
-
-                    val prefs = getSharedPreferences(
-                        "Auth",
-                        MODE_PRIVATE
-                    )
-
-                    token = prefs.getString(
-                        "AUTH_TOKEN",
-                        null
-                    )
-
-                    if (token.isNullOrEmpty()) {
-                        token = prefs.getString(
-                            "token",
-                            null
-                        )
-                    }
-                }
-
-                if (token.isNullOrEmpty()) {
-
+                if (rawToken.isNullOrEmpty()) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             this@Manager_Page,
@@ -110,40 +100,29 @@ class Manager_Page : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-
                     return@launch
                 }
 
-                RetrofitClient.authToken = token
+                val bearerToken = if (rawToken.startsWith("Bearer ", ignoreCase = true)) {
+                    rawToken
+                } else {
+                    "Bearer $rawToken"
+                }
 
-                val response = RetrofitClient.apiService.getAllLoans()
+                val response = RetrofitClient.apiService.getAllLoans(token = bearerToken)
 
                 withContext(Dispatchers.Main) {
-
                     if (response.isSuccessful) {
+                        val loans = response.body() ?: emptyList()
 
-                        val loans = response.body()
+                        applications.clear()
+                        applications.addAll(loans)
 
-                        if (loans != null) {
+                        adapter = ManagerLoanAdapter(applications)
+                        rvManagerLoans.adapter = adapter
 
-                            applications.clear()
-                            applications.addAll(loans)
-
-                            adapter.notifyDataSetChanged()
-
-                            updateStatistics()
-
-                        } else {
-
-                            Toast.makeText(
-                                this@Manager_Page,
-                                "No applications found",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
+                        updateStatistics()
                     } else {
-
                         Toast.makeText(
                             this@Manager_Page,
                             "Failed to load applications: ${response.code()}",
@@ -151,11 +130,8 @@ class Manager_Page : AppCompatActivity() {
                         ).show()
                     }
                 }
-
             } catch (e: Exception) {
-
                 withContext(Dispatchers.Main) {
-
                     Toast.makeText(
                         this@Manager_Page,
                         "Error loading applications",
@@ -167,11 +143,11 @@ class Manager_Page : AppCompatActivity() {
     }
 
     private fun updateStatistics() {
-
         val total = applications.size
 
         val pending = applications.count {
-            it.status.equals("Submitted", true) ||
+            it.status.isNullOrEmpty() ||
+                    it.status.equals("Submitted", true) ||
                     it.status.equals("Pending", true) ||
                     it.status.equals("Verified", true)
         }
@@ -190,150 +166,18 @@ class Manager_Page : AppCompatActivity() {
         rejectedApplicationsText.text = rejected.toString()
     }
 
-    private fun updateLoanStatus(
-        loan: com.example.prototype_2.API.LoanDto,
-        newStatus: String
-    ) {
-
-        val id = loan.applicationId ?: loan.applicationId
-
-        if (id.isNullOrEmpty()) {
-
-            Toast.makeText(
-                this,
-                "Application ID is missing",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            return
-        }
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            try {
-
-                var token = RetrofitClient.authToken
-
-                if (token.isNullOrEmpty()) {
-
-                    val prefs = getSharedPreferences(
-                        "Auth",
-                        MODE_PRIVATE
-                    )
-
-                    token = prefs.getString(
-                        "AUTH_TOKEN",
-                        null
-                    )
-
-                    if (token.isNullOrEmpty()) {
-                        token = prefs.getString(
-                            "token",
-                            null
-                        )
-                    }
-                }
-
-                if (token.isNullOrEmpty()) {
-
-                    withContext(Dispatchers.Main) {
-
-                        Toast.makeText(
-                            this@Manager_Page,
-                            "Please log in again",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    return@launch
-                }
-
-                RetrofitClient.authToken = token
-
-                val request = UpdateStatusRequest(
-                    status = newStatus,
-                    comments = if (newStatus == "Approved") {
-                        "Application approved by manager."
-                    } else {
-                        "Application rejected by manager."
-                    }
-                )
-
-                val response =
-                    RetrofitClient.apiService.updateLoanStatus(
-                        id = id,
-                        request = request
-                    )
-
-                withContext(Dispatchers.Main) {
-
-                    if (response.isSuccessful) {
-
-                        loan.status = newStatus
-
-                        adapter.notifyDataSetChanged()
-
-                        updateStatistics()
-
-                        Toast.makeText(
-                            this@Manager_Page,
-                            "Application $newStatus",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                    } else {
-
-                        Toast.makeText(
-                            this@Manager_Page,
-                            "Could not update application: ${response.code()}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-
-            } catch (e: Exception) {
-
-                withContext(Dispatchers.Main) {
-
-                    Toast.makeText(
-                        this@Manager_Page,
-                        "Error updating application",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
-    }
-
     private fun logout() {
-
-        val prefs = getSharedPreferences(
-            "Auth",
-            MODE_PRIVATE
-        )
-
+        val prefs = getSharedPreferences("Auth", MODE_PRIVATE)
         prefs.edit().clear().apply()
 
-        val appPrefs = getSharedPreferences(
-            "AppPrefs",
-            MODE_PRIVATE
-        )
-
+        val appPrefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
         appPrefs.edit().clear().apply()
 
         RetrofitClient.authToken = null
 
-        val intent = Intent(
-            this,
-            Login_Page::class.java
-        )
-
-        intent.flags =
-            Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK
-
+        val intent = Intent(this, Login_Page::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-
         finish()
     }
 }

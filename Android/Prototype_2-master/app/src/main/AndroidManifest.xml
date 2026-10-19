@@ -88,6 +88,10 @@
 
         </provider>
 
+        <activity
+            android:name=".ManagerLoanDetailsActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
