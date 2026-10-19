@@ -17,7 +17,7 @@ namespace INSY7315_Prototype.Controllers
         }
 
         private static string ManagerOnlyMessage =>
-            $"Loans above R{LoanRules.StaffLimit:N0} are handled by the manager. This application has been sent to the manager.";
+            $"Loans above R{LoanRules.StaffLimit:N0} must be approved or declined by the manager. Staff may still verify them.";
 
         // ---------- helpers ----------
         private HttpClient? CreateClient()
@@ -74,13 +74,13 @@ namespace INSY7315_Prototype.Controllers
             }
 
             // Only loans staff are allowed to handle are counted as theirs
-            var mine = all.Where(a => LoanRules.StaffCanHandle(a.RequestedAmount)).ToList();
+            var mine = all;
 
             var model = new StaffDashboardViewModel
             {
                 TotalApplications = mine.Count,
                 AwaitingVerification = mine.Count(a => LoanRules.Is(a.Status, LoanStatus.Submitted)),
-                AwaitingApproval = mine.Count(a => LoanRules.Is(a.Status, LoanStatus.UnderReview)),
+                AwaitingApproval = mine.Count(a => LoanRules.StaffCanHandle(a.RequestedAmount) && LoanRules.Is(a.Status, LoanStatus.UnderReview)),
                 ApprovedApplications = mine.Count(a => LoanRules.Is(a.Status, LoanStatus.Approved)),
                 RejectedApplications = mine.Count(a => LoanRules.Is(a.Status, LoanStatus.Rejected)),
                 SentToManager = all.Count(a => LoanRules.RequiresManager(a.RequestedAmount)),
@@ -105,8 +105,7 @@ namespace INSY7315_Prototype.Controllers
             }
 
             var toVerify = all
-                .Where(a => LoanRules.StaffCanHandle(a.RequestedAmount)
-                         && LoanRules.Is(a.Status, LoanStatus.Submitted))
+                .Where(a => LoanRules.Is(a.Status, LoanStatus.Submitted))
                 .OrderByDescending(a => a.DateApplied)
                 .ToList();
 
@@ -124,12 +123,6 @@ namespace INSY7315_Prototype.Controllers
             if (application == null)
             {
                 TempData["ErrorMessage"] = "Unable to load the application.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (LoanRules.RequiresManager(application.RequestedAmount))
-            {
-                TempData["ErrorMessage"] = ManagerOnlyMessage;
                 return RedirectToAction(nameof(Index));
             }
 
@@ -151,12 +144,6 @@ namespace INSY7315_Prototype.Controllers
             {
                 TempData["ErrorMessage"] = "Unable to load the application.";
                 return RedirectToAction(nameof(Applications));
-            }
-
-            if (LoanRules.RequiresManager(application.RequestedAmount))
-            {
-                TempData["ErrorMessage"] = ManagerOnlyMessage;
-                return RedirectToAction(nameof(Index));
             }
 
             if (!LoanRules.Is(application.Status, LoanStatus.Submitted))

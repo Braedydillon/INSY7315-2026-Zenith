@@ -99,6 +99,13 @@
             </div>
         </div>
 
+        <a asp-controller="LoanDocuments"
+           asp-action="Index"
+           asp-route-loanId="@Model.ApplicationId"
+           class="btn btn-outline-primary mb-3">
+            View / Request Documents
+        </a>
+
         <form asp-controller="Staff" asp-action="LoanDecision" method="post" class="manager-review">
 
             @Html.AntiForgeryToken()

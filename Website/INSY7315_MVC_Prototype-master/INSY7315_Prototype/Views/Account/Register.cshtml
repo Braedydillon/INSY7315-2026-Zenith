@@ -1,78 +1,169 @@
-﻿@model INSY7315_Prototype.ViewModels.RegisterViewModel
+
+@model INSY7315_Prototype.ViewModels.RegisterViewModel
 
 @{
     ViewData["Title"] = "Register";
 }
 
 <div class="auth-page">
-
     <div class="auth-card">
 
         <div class="auth-header">
+            <div class="auth-logo">
+                <span>Bridge</span><span>&</span><span>Anchor</span>
+            </div>
+
             <h1>Create an Account</h1>
-            <p>Get started with your loan application</p>
+            <p>Register to start your loan application</p>
         </div>
 
-        <form asp-controller="Account" asp-action="Register" method="post">
+        <form asp-controller="Account"
+              asp-action="Register"
+              asp-route-returnUrl="@ViewData["ReturnUrl"]"
+              method="post">
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.AntiForgeryToken()
 
-            <div class="form-group">
-                <label asp-for="FullName">Full Name</label>
-                <input asp-for="FullName" class="form-control" placeholder="Enter your full name" autocomplete="name" />
-                <span asp-validation-for="FullName" class="text-danger"></span>
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3">
             </div>
 
+            <!-- Full Name -->
             <div class="form-group">
-                <label asp-for="Email">Email Address</label>
-                <input asp-for="Email" class="form-control" placeholder="Enter your email address" autocomplete="email" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+                <label asp-for="FullName">
+                    Full Name
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input asp-for="FullName"
+                       class="form-control"
+                       placeholder="Enter your full name"
+                       autocomplete="name"
+                       required />
+
+                <span asp-validation-for="FullName"
+                      class="text-danger"></span>
             </div>
 
+            <!-- Email -->
             <div class="form-group">
-                <label asp-for="IdNumber">ID Number</label>
-                <input asp-for="IdNumber" class="form-control" placeholder="Enter your 13-digit ID number"/>
-                <span asp-validation-for="IdNumber" class="text-danger"></span>
+                <label asp-for="Email">
+                    Email Address
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input asp-for="Email"
+                       class="form-control"
+                       placeholder="Enter your email address"
+                       autocomplete="email"
+                       required />
+
+                <span asp-validation-for="Email"
+                      class="text-danger"></span>
             </div>
 
+            <!-- ID Number -->
             <div class="form-group">
-                <label asp-for="Phone">Phone Number</label>
-                <input asp-for="Phone" class="form-control" placeholder="Enter your phone number" autocomplete="tel" />
-                <span asp-validation-for="Phone" class="text-danger"></span>
+                <label asp-for="IdNumber">
+                    ID Number
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input asp-for="IdNumber"
+                       class="form-control"
+                       placeholder="Enter your 13-digit ID number"
+                       inputmode="numeric"
+                       maxlength="13"
+                       minlength="13"
+                       pattern="[0-9]{13}"
+                       title="Please enter a valid 13-digit ID number"
+                       required />
+
+                <span asp-validation-for="IdNumber"
+                      class="text-danger"></span>
             </div>
 
+            <!-- Phone -->
             <div class="form-group">
-                <label asp-for="Password">Password</label>
-                <input asp-for="Password" class="form-control" placeholder="Create a password" autocomplete="new-password" />
-                <span asp-validation-for="Password" class="text-danger"></span>
+                <label asp-for="Phone">
+                    Phone Number
+                    <span class="text-danger">*</span>
+                </label>
+
+
+                <input asp-for="Phone"
+                       class="form-control"
+                       placeholder="e.g. 0821234567"
+                       autocomplete="tel"
+                       inputmode="numeric"
+                       minlength="10"
+                       maxlength="10"
+                       pattern="0[0-9]{9}"
+                       title="Enter a valid 10-digit South African phone number starting with 0"
+                       required />
+
+
+                <span asp-validation-for="Phone"
+                      class="text-danger"></span>
             </div>
 
+            <!-- Password -->
             <div class="form-group">
-                <label asp-for="ConfirmPassword">Confirm Password</label>
-                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" autocomplete="new-password" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                <label asp-for="Password">
+                    Password
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input asp-for="Password"
+                       class="form-control"
+                       placeholder="Create a password"
+                       autocomplete="new-password"
+                       required />
+
+                <span asp-validation-for="Password"
+                      class="text-danger"></span>
             </div>
 
-            <button type="submit" class="auth-button btn-shadow">
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">
+                    Confirm Password
+                    <span class="text-danger">*</span>
+                </label>
+
+                <input asp-for="ConfirmPassword"
+                       class="form-control"
+                       placeholder="Confirm your password"
+                       autocomplete="new-password"
+                       required />
+
+                <span asp-validation-for="ConfirmPassword"
+                      class="text-danger"></span>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit"
+                    class="auth-button btn-shadow">
                 Create Account
             </button>
 
         </form>
 
+        <!-- Login -->
         <div class="auth-footer">
             <p>
                 Already have an account?
+
                 <a asp-controller="Account"
-                   asp-action="Login">
-                    Login
+                   asp-action="Login"
+                   asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                    Sign In
                 </a>
             </p>
         </div>
 
     </div>
-
 </div>
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
