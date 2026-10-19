@@ -943,6 +943,51 @@
                     android:inputType="date" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Supporting Documents"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp" />
+
+            <Button
+                android:id="@+id/btnUploadId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Upload ID Copy" />
+
+            <TextView
+                android:id="@+id/tvIdFile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No ID document selected" />
+
+            <Button
+                android:id="@+id/btnUploadProofOfAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Upload Proof of Address" />
+
+            <TextView
+                android:id="@+id/tvAddressFile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No proof of address selected" />
+
+            <Button
+                android:id="@+id/btnUploadPayslip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Upload Payslip" />
+
+            <TextView
+                android:id="@+id/tvPayslipFile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No payslip selected" />
+
             <Button
                 android:id="@+id/btnSubmitApplication"
                 android:layout_width="match_parent"

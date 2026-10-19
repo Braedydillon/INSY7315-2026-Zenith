@@ -546,5 +546,14 @@ data class LoanDto(
     val reviewedBy: String? = null,
 
     @SerializedName("reviewNote")
-    val reviewNote: String? = null
+    val reviewNote: String? = null,
+
+    @SerializedName("idDocumentUrl")
+    val idDocumentUrl: String? = null,
+
+    @SerializedName("proofOfAddressUrl")
+    val proofOfAddressUrl: String? = null,
+
+    @SerializedName("payslipUrl")
+    val payslipUrl: String? = null
 )

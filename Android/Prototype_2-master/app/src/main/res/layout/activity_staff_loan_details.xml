@@ -216,6 +216,47 @@
                         android:textColor="#718096"
                         android:textSize="14sp" />
 
+                    <TextView
+                        android:id="@+id/tvDocumentsTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Supporting Documents"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvIdDocument"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:minHeight="48dp"
+                        android:padding="8dp"
+                        android:text="ID Document: Not available"
+                        android:textColor="#2563EB" />
+
+                    <TextView
+                        android:id="@+id/tvProofOfAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Proof of Address: Not available"
+                        android:textColor="#2563EB"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/tvPayslip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Payslip: Not available"
+                        android:textColor="#2563EB"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
