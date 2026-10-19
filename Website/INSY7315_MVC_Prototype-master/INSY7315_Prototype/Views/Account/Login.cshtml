@@ -1,4 +1,6 @@
-﻿@model INSY7315_Prototype.ViewModels.LoginViewModel
+﻿
+@model INSY7315_Prototype.ViewModels.LoginViewModel
+
 @{
     ViewData["Title"] = "Login";
 }
@@ -15,60 +17,66 @@
             <p>Sign in to securely access your account</p>
         </div>
 
-        <form asp-controller="Account" asp-action="Login" method="post">
+        <form asp-controller="Account"
+              asp-action="Login"
+              asp-route-returnUrl="@ViewData["ReturnUrl"]"
+              method="post">
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.AntiForgeryToken()
 
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3">
+            </div>
+
+            <!-- Email -->
             <div class="form-group">
-                <label for="email">Email Address</label>
+                <label asp-for="Email">
+                    Email Address
+                    <span class="text-danger">*</span>
+                </label>
 
-                
                 <input asp-for="Email"
                        class="form-control"
                        placeholder="Enter your email address"
-                       autocomplete="email" />
+                       autocomplete="email"
+                       required />
 
-                <span asp-validation-for="Email" class="text-danger"></span>
-
+                <span asp-validation-for="Email"
+                      class="text-danger"></span>
             </div>
 
+            <!-- Password -->
             <div class="form-group">
-                <div class="password-label">
-                    <label for="password">Password</label>
-
-                    <a href="#" class="forgot-password">
-                        Forgot password?
-                    </a>
-                </div>
+                <label asp-for="Password">
+                    Password
+                    <span class="text-danger">*</span>
+                </label>
 
                 <input asp-for="Password"
                        class="form-control"
                        placeholder="Enter your password"
-                       autocomplete="current-password" />
+                       autocomplete="current-password"
+                       required />
 
-                <span asp-validation-for="Password" class="text-danger"></span>
-
+                <span asp-validation-for="Password"
+                      class="text-danger"></span>
             </div>
 
-            <div class="login-options">
-                <label class="remember-me">
-                    <input type="checkbox" />
-                    <span>Remember me</span>
-                </label>
-            </div>
-
-            <button type="submit" class="auth-button btn-shadow">
+            <!-- Login Button -->
+            <button type="submit"
+                    class="auth-button btn-shadow">
                 Sign In
             </button>
 
         </form>
 
+        <!-- Registration -->
         <div class="auth-footer">
             <p>Don't have an account?</p>
 
             <a asp-controller="Account"
                asp-action="Register"
-               class="register-link">
+               asp-route-returnUrl="@ViewData["ReturnUrl"]">
                 Create an account
             </a>
         </div>

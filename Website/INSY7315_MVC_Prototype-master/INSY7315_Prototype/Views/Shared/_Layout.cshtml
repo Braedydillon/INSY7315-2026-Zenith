@@ -1,82 +1,183 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - Bridge & Anchor Loans</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/INSY7315_Prototype.styles.css" asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/INSY7315_Prototype.styles.css"
+          asp-append-version="true" />
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
             <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/logo.jpeg" alt="Bridge & Anchor Loans" class="brand-logo" />
+
+                <a class="navbar-brand"
+                   asp-controller="Home"
+                   asp-action="Index">
+                    <img src="~/images/logo.jpeg"
+                         alt="Bridge & Anchor Loans"
+                         class="brand-logo" />
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false"
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar"
+                        aria-expanded="false"
                         aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="mainNavbar">
-                   <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                        <!-- Public Navigation -->
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index"> Home </a>
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index">
+                                Home
+                            </a>
                         </li>
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("client"))
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="LoanApplication"
+                               asp-action="Index">
+                                Loan Requirements
+                            </a>
+                        </li>
+
+                        <!-- Client Navigation -->
+                        @if (User.Identity?.IsAuthenticated == true &&
+                             User.IsInRole("client"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Loan" asp-action="Apply"> Apply for Loan </a>
+                                <a class="nav-link"
+                                   asp-controller="Loan"
+                                   asp-action="Apply">
+                                    Apply for Loan
+                                </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Loan" asp-action="Index"> My Applications </a>
+                                <a class="nav-link"
+                                   asp-controller="Loan"
+                                   asp-action="Index">
+                                    My Applications
+                                </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Client" asp-action="Index"> My Account </a>
+                                <a class="nav-link"
+                                   asp-controller="Client"
+                                   asp-action="Index">
+                                    My Account
+                                </a>
                             </li>
                         }
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("staff"))
-                        {
-                        <li class="nav-item">
-                        <a class="nav-link" asp-controller="Staff" asp-action="Index"> Staff Dashboard </a>
-                        </li>
-
-                        <li class="nav-item">
-                        <a class="nav-link" asp-controller="Staff" asp-action="Applications"> Verify Applications </a>
-                        </li>
-
-                        <li class="nav-item">
-                        <a class="nav-link" asp-controller="Staff" asp-action="Approvals"> Approve Loans </a>
-                        </li>
-                        }
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("admin"))
+                        else if (User.Identity?.IsAuthenticated != true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Manager" asp-action="Index"> Manager Dashboard</a>
+                                <a class="nav-link"
+                                   asp-controller="Loan"
+                                   asp-action="Apply">
+                                    Apply Now
+                                </a>
                             </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Manager" asp-action="Applications"> Verify Applications</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Manager" asp-action="Approvals"> Approve Loans </a>
-                            </li>
-
                         }
+
+                        <!-- Staff Navigation -->
+                        @if (User.Identity?.IsAuthenticated == true &&
+                             User.IsInRole("staff"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Staff"
+                                   asp-action="Index">
+                                    Staff Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Staff"
+                                   asp-action="Applications">
+                                    Verify Applications
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Staff"
+                                   asp-action="Approvals">
+                                    Approve Loans
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Manager Navigation -->
+                        @if (User.Identity?.IsAuthenticated == true &&
+                             User.IsInRole("admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Manager"
+                                   asp-action="Index">
+                                    Manager Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Manager"
+                                   asp-action="Applications">
+                                    Verify Applications
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Manager"
+                                   asp-action="Approvals">
+                                    Approve Loans
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Account Dropdown -->
                         <li class="nav-item dropdown ms-lg-3">
-
-                            <a class="nav-link account-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Account</a>
+                            <a class="nav-link account-link dropdown-toggle"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                Account
+                            </a>
 
                             <ul class="dropdown-menu dropdown-menu-end">
 
                                 @if (User.Identity?.IsAuthenticated == true)
                                 {
                                     <li>
-                                        <span class="dropdown-item-text"> @User.Identity.Name </span>
+                                        <span class="dropdown-item-text">
+                                            @User.Identity.Name
+                                        </span>
                                     </li>
 
                                     <li>
@@ -84,21 +185,37 @@
                                     </li>
 
                                     <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post">
-                                            <button type="submit" class="dropdown-item"> Logout </button>
+                                        <form asp-controller="Account"
+                                              asp-action="Logout"
+                                              method="post">
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="dropdown-item">
+                                                Logout
+                                            </button>
                                         </form>
                                     </li>
                                 }
                                 else
                                 {
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Login"> Login </a>
+                                        <a class="dropdown-item"
+                                           asp-controller="Account"
+                                           asp-action="Login">
+                                            Login
+                                        </a>
                                     </li>
 
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Register"> Register </a>
+                                        <a class="dropdown-item"
+                                           asp-controller="Account"
+                                           asp-action="Register">
+                                            Register
+                                        </a>
                                     </li>
                                 }
+
                             </ul>
                         </li>
                     </ul>
@@ -106,8 +223,11 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
-        <main role="main" class="pb-3"> @RenderBody() </main>
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
     </div>
 
     <footer class="main-footer">
@@ -117,29 +237,43 @@
                     <div class="footer-brand">
                         Bridge & Anchor Loans
                     </div>
-                    <p class="footer-text"> Simple, reliable lending solutions.</p>
+
+                    <p class="footer-text">
+                        Simple, reliable lending solutions.
+                    </p>
                 </div>
+
                 <div class="col-md-6 text-md-end">
-                    <a asp-controller="Home" asp-action="Index"> Home </a>
+                    <a asp-controller="Home"
+                       asp-action="Index">
+                        Home
+                    </a>
+
                     <span class="footer-divider">|</span>
-                    <a asp-controller="Home" asp-action="Privacy"> Privacy </a>
+
+                    <a asp-controller="Home"
+                       asp-action="Privacy">
+                        Privacy
+                    </a>
                 </div>
             </div>
 
             <hr />
 
             <div class="footer-bottom">
-                &copy; 2026 Bridge & Anchor Loans. All rights reserved.
+                &copy; 2026 Bridge & Anchor Loans.
+                All rights reserved.
             </div>
-
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>

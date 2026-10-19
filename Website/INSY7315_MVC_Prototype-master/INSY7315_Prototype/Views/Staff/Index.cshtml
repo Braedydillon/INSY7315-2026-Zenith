@@ -1,4 +1,4 @@
-﻿@model INSY7315_Prototype.ViewModels.StaffDashboardViewModel
+@model INSY7315_Prototype.ViewModels.StaffDashboardViewModel
 @using INSY7315_Prototype.Models
 
 @{
@@ -113,24 +113,68 @@
                                 R @application.RequestedAmount.ToString("N2")
                             </div>
 
-                            <span class="application-status @((application.Status ?? "").ToLower())"> @application.Status </span>
+
+                            @{
+                                var status = application.Status ?? "";
+
+                                var statusText = LoanRules.Is(status, LoanStatus.Submitted)
+                                    ? "Awaiting Verification"
+                                    : LoanRules.Is(status, LoanStatus.UnderReview)
+                                        ? "Awaiting Approval"
+                                        : LoanRules.Is(status, LoanStatus.Approved)
+                                            ? "Approved"
+                                            : LoanRules.Is(status, LoanStatus.Rejected)
+                                                ? "Rejected"
+                                                : status;
+                            }
+
+                            <span class="application-status @status.ToLowerInvariant()">
+                                @statusText
+                            </span>
+
+
 
                             <div class="application-actions">
 
                                 @if (LoanRules.Is(application.Status, LoanStatus.Submitted))
                                 {
-                                    <a asp-controller="Staff" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> Verify </a>
+                                    <a asp-controller="Staff"
+                                       asp-action="Review"
+                                       asp-route-id="@application.ApplicationId"
+                                       class="action-view">
+                                        Verify
+                                    </a>
                                 }
                                 else if (LoanRules.Is(application.Status, LoanStatus.UnderReview))
                                 {
-                                    <a asp-controller="Staff" asp-action="Approval" asp-route-id="@application.ApplicationId" class="action-view"> Approve Loan </a>
+                                    @if (LoanRules.StaffCanHandle(application.RequestedAmount))
+                                    {
+                                        <a asp-controller="Staff"
+                                           asp-action="Approval"
+                                           asp-route-id="@application.ApplicationId"
+                                           class="action-view">
+                                            Approve Loan
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">
+                                            Manager Approval
+                                        </span>
+                                    }
                                 }
                                 else
                                 {
-                                    <a asp-controller="Staff" asp-action="Review" asp-route-id="@application.ApplicationId" class="action-view"> View Details </a>
+                                    <a asp-controller="Staff"
+                                       asp-action="Review"
+                                       asp-route-id="@application.ApplicationId"
+                                       class="action-view">
+                                        View Details
+                                    </a>
                                 }
 
                             </div>
+
 
                         </div>
                     }

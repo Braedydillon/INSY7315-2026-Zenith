@@ -1,164 +1,1012 @@
-﻿@model LoanApplyRequest
+﻿
+@model INSY7315_Prototype.Models.LoanApplyRequest
+
 @{
     ViewData["Title"] = "Apply for a Loan";
+
+    var reasons = new[]
+    {
+        "Medical",
+        "Education",
+        "Home improvement",
+        "Debt consolidation",
+        "Emergency",
+        "Other"
+    };
 }
 
-<h1 class="fw-bold mb-4">Apply for a Loan</h1>
+<div class="container py-4">
 
-<form asp-action="Apply" method="post" class="card p-4 mb-5">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <h5 class="mt-2">Loan details</h5>
-    <div class="row g-3 mb-4">
-        <div class="col-md-6"><label asp-for="RequestedAmount" class="form-label"></label><input asp-for="RequestedAmount" class="form-control" /><span asp-validation-for="RequestedAmount" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="ReasonForLoan" class="form-label"></label><input asp-for="ReasonForLoan" class="form-control" /><span asp-validation-for="ReasonForLoan" class="text-danger"></span></div>
-        <div class="col-12">
-            <label class="form-label">Reasons (tick all that apply)</label><br />
-            @foreach (var r in new[] { "Medical", "Education", "Home improvement", "Debt consolidation", "Emergency", "Other" })
-            {
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" name="ReasonsForLoan" value="@r" id="r_@r" />
-                    <label class="form-check-label" for="r_@r">@r</label>
-                </div>
-            }
-        </div>
-        <div class="col-12"><label asp-for="OtherReason" class="form-label">Other reason</label><input asp-for="OtherReason" class="form-control" /></div>
+    <div class="mb-4">
+        <h1 class="fw-bold mb-2">Apply for a Loan</h1>
+        <p class="text-muted mb-0">
+            Complete the application below. Fields marked with
+            <span class="text-danger">*</span> are required.
+        </p>
     </div>
 
-    <h5>Personal details</h5>
-    <div class="row g-3 mb-4">
-        <div class="col-md-6"><label asp-for="ClientDetails.FullNameAndSurname" class="form-label"></label><input asp-for="ClientDetails.FullNameAndSurname" class="form-control" /><span asp-validation-for="ClientDetails.FullNameAndSurname" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="ClientDetails.IdNumber" class="form-label"></label><input asp-for="ClientDetails.IdNumber" class="form-control" /><span asp-validation-for="ClientDetails.IdNumber" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="ClientDetails.CellNo" class="form-label"></label><input asp-for="ClientDetails.CellNo" class="form-control" /><span asp-validation-for="ClientDetails.CellNo" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="HomeTelNo" class="form-label">Home tel no.</label><input asp-for="HomeTelNo" class="form-control" /></div>
-        <div class="col-md-6">
-            <label asp-for="MarriedOrUnmarried" class="form-label">Marital status</label>
-            <select asp-for="MarriedOrUnmarried" id="maritalStatus" class="form-select">
-                <option value="">Select…</option>
-                <option>Married</option>
-                <option>Unmarried</option>
-            </select>
+    <form asp-controller="Loan"
+          asp-action="Apply"
+          method="post"
+          id="loanApplicationForm"
+          novalidate
+          class="card border-0 shadow-sm mb-5"
+          enctype="multipart/form-data">
+
+        @Html.AntiForgeryToken()
+
+        <div class="card-body p-4">
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3"></div>
+
+            <!-- LOAN DETAILS -->
+
+            <h5 class="fw-semibold mb-3">1. Loan Details</h5>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+                    <label asp-for="RequestedAmount" class="form-label">
+                        Requested Amount (R)
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="RequestedAmount"
+                           type="number"
+                           min="300"
+                           max="500000"
+                           step="0.01"
+                           class="form-control" />
+
+                    <div class="form-text">
+                        Enter an amount between R300 and R500,000.
+                    </div>
+
+                    <span asp-validation-for="RequestedAmount"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ReasonForLoan" class="form-label">
+                        Main Reason for Loan
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="ReasonForLoan"
+                           class="form-control" />
+
+                    <span asp-validation-for="ReasonForLoan"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">
+                        Reasons (tick all that apply)
+                    </label>
+
+                    <div class="d-flex flex-wrap gap-3">
+                        @foreach (var reason in reasons)
+                        {
+                            var selected =
+                                Model.ReasonsForLoan?.Contains(reason) == true;
+
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       name="ReasonsForLoan"
+                                       value="@reason"
+                                       id="reason_@reason.Replace(" ", "_")"
+                                       checked="@selected" />
+
+                                <label class="form-check-label"
+                                       for="reason_@reason.Replace(" ", "_")">
+                                    @reason
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-12" id="otherReasonBox">
+                    <label asp-for="OtherReason" class="form-label">
+                        Please Specify Other Reason
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="OtherReason"
+                           class="form-control" />
+
+                    <span asp-validation-for="OtherReason"
+                          class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- PERSONAL DETAILS -->
+
+            <h5 class="fw-semibold mb-3">2. Personal Details</h5>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+                    <label asp-for="ClientDetails.FullNameAndSurname"
+                           class="form-label">
+                        Full Name and Surname
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="ClientDetails.FullNameAndSurname"
+                           class="form-control" />
+
+                    <span asp-validation-for="ClientDetails.FullNameAndSurname"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ClientDetails.IdNumber"
+                           class="form-label">
+                        ID Number
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="ClientDetails.IdNumber"
+                           class="form-control"
+                           maxlength="13"
+                           inputmode="numeric" />
+
+                    <span asp-validation-for="ClientDetails.IdNumber"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ClientDetails.CellNo"
+                           class="form-label">
+                        Cell Number
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="ClientDetails.CellNo"
+                           type="tel"
+                           class="form-control"
+                           maxlength="10" />
+
+                    <span asp-validation-for="ClientDetails.CellNo"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="HomeTelNo" class="form-label">
+                        Home Telephone
+                    </label>
+
+                    <input asp-for="HomeTelNo"
+                           type="tel"
+                           class="form-control" />
+
+                    <span asp-validation-for="HomeTelNo"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="MarriedOrUnmarried"
+                           class="form-label">
+                        Marital Status
+                    </label>
+
+                    <select asp-for="MarriedOrUnmarried"
+                            id="maritalStatus"
+                            class="form-select">
+                        <option value="">Select...</option>
+                        <option value="Married">Married</option>
+                        <option value="Unmarried">Unmarried</option>
+                    </select>
+
+                    <span asp-validation-for="MarriedOrUnmarried"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6" id="marriageCommunityBox">
+                    <label asp-for="MarriageCommunity"
+                           class="form-label">
+                        Marriage Community
+                    </label>
+
+                    <input asp-for="MarriageCommunity"
+                           class="form-control"
+                           placeholder="In or out of community of property" />
+
+                    <span asp-validation-for="MarriageCommunity"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="PreviouslyDivorced"
+                           class="form-label">
+                        Previously Divorced?
+                    </label>
+
+                    <select asp-for="PreviouslyDivorced"
+                            id="prevDivorced"
+                            class="form-select">
+                        <option value="">Select...</option>
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+
+                    <span asp-validation-for="PreviouslyDivorced"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4" id="divorceYearBox">
+                    <label asp-for="DivorceYear" class="form-label">
+                        Divorce Year
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="DivorceYear"
+                           class="form-control"
+                           maxlength="4"
+                           inputmode="numeric"
+                           placeholder="e.g. 2020" />
+
+                    <span asp-validation-for="DivorceYear"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4" id="divorceCommunityBox">
+                    <label asp-for="DivorceCommunity"
+                           class="form-label">
+                        Divorce Community
+                    </label>
+
+                    <input asp-for="DivorceCommunity"
+                           class="form-control" />
+
+                    <span asp-validation-for="DivorceCommunity"
+                          class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- ADDRESS -->
+
+            <h5 class="fw-semibold mb-3">3. Address Details</h5>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-12">
+                    <label asp-for="CurrentPhysicalAddress"
+                           class="form-label">
+                        Current Physical Address
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="CurrentPhysicalAddress"
+                           class="form-control" />
+
+                    <span asp-validation-for="CurrentPhysicalAddress"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="PostalAddress" class="form-label">
+                        Postal Address
+                    </label>
+
+                    <input asp-for="PostalAddress"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ParentsAddress" class="form-label">
+                        Parents' Address
+                    </label>
+
+                    <input asp-for="ParentsAddress"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="ResidenceYears" class="form-label">
+                        Years at Address
+                    </label>
+
+                    <input asp-for="ResidenceYears"
+                           type="number"
+                           min="0"
+                           max="100"
+                           class="form-control" />
+
+                    <span asp-validation-for="ResidenceYears"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="ResidenceMonths" class="form-label">
+                        Months at Address
+                    </label>
+
+                    <input asp-for="ResidenceMonths"
+                           type="number"
+                           min="0"
+                           max="11"
+                           class="form-control" />
+
+                    <span asp-validation-for="ResidenceMonths"
+                          class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- EMPLOYMENT -->
+
+            <h5 class="fw-semibold mb-3">4. Employment Details</h5>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+                    <label asp-for="CompanyName" class="form-label">
+                        Company Name
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="CompanyName"
+                           class="form-control" />
+
+                    <span asp-validation-for="CompanyName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Occupation" class="form-label">
+                        Occupation
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="Occupation"
+                           class="form-control" />
+
+                    <span asp-validation-for="Occupation"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="WorkTelephone" class="form-label">
+                        Work Telephone
+                    </label>
+
+                    <input asp-for="WorkTelephone"
+                           type="tel"
+                           class="form-control" />
+
+                    <span asp-validation-for="WorkTelephone"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="WorkAddress" class="form-label">
+                        Work Address
+                    </label>
+
+                    <input asp-for="WorkAddress"
+                           class="form-control" />
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- BANK DETAILS -->
+
+            <h5 class="fw-semibold mb-3">5. Banking Details</h5>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+                    <label asp-for="BankName" class="form-label">
+                        Bank Name
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="BankName"
+                           class="form-control" />
+
+                    <span asp-validation-for="BankName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="AccountType" class="form-label">
+                        Account Type
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <select asp-for="AccountType" class="form-select">
+                        <option value="">Select...</option>
+                        <option value="Cheque">Cheque</option>
+                        <option value="Savings">Savings</option>
+                        <option value="Transmission">Transmission</option>
+                    </select>
+
+                    <span asp-validation-for="AccountType"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="AccountName" class="form-label">
+                        Account Holder Name
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="AccountName"
+                           class="form-control" />
+
+                    <span asp-validation-for="AccountName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="AccountNumber" class="form-label">
+                        Account Number
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="AccountNumber"
+                           class="form-control"
+                           inputmode="numeric" />
+
+                    <span asp-validation-for="AccountNumber"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="BranchName" class="form-label">
+                        Branch Name
+                    </label>
+
+                    <input asp-for="BranchName"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="BranchCode" class="form-label">
+                        Branch Code
+                    </label>
+
+                    <input asp-for="BranchCode"
+                           class="form-control"
+                           maxlength="6"
+                           inputmode="numeric" />
+
+                    <span asp-validation-for="BranchCode"
+                          class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- SPOUSE -->
+
+            <div id="spouseSection">
+
+                <h5 class="fw-semibold mb-3">6. Spouse Details</h5>
+
+                <div class="row g-3 mb-4">
+
+                    <div class="col-md-6">
+                        <label asp-for="SpouseNameAndSurname"
+                               class="form-label">
+                            Spouse Full Name
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input asp-for="SpouseNameAndSurname"
+                               class="form-control" />
+
+                        <span asp-validation-for="SpouseNameAndSurname"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SpouseIdNumber"
+                               class="form-label">
+                            Spouse ID Number
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input asp-for="SpouseIdNumber"
+                               class="form-control"
+                               maxlength="13"
+                               inputmode="numeric" />
+
+                        <span asp-validation-for="SpouseIdNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SpouseTelNumber"
+                               class="form-label">
+                            Spouse Telephone
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input asp-for="SpouseTelNumber"
+                               type="tel"
+                               class="form-control" />
+
+                        <span asp-validation-for="SpouseTelNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SpouseEmployerName"
+                               class="form-label">
+                            Spouse Employer Name
+                        </label>
+
+                        <input asp-for="SpouseEmployerName"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SpouseEmployerAddress"
+                               class="form-label">
+                            Spouse Employer Address
+                        </label>
+
+                        <input asp-for="SpouseEmployerAddress"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SpouseEmployerTelNumber"
+                               class="form-label">
+                            Spouse Employer Telephone
+                        </label>
+
+                        <input asp-for="SpouseEmployerTelNumber"
+                               type="tel"
+                               class="form-control" />
+
+                        <span asp-validation-for="SpouseEmployerTelNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <hr class="my-4" />
+
+            </div>
+
+            <!-- RELATIVES -->
+
+            <h5 class="fw-semibold mb-3">7. Relative Contact Details</h5>
+
+            <p class="text-muted small">
+                Relative 1 is required. Relative 2 is optional.
+            </p>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-3">
+                    <label asp-for="Relative1Name" class="form-label">
+                        Relative 1 Name
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="Relative1Name"
+                           class="form-control" />
+
+                    <span asp-validation-for="Relative1Name"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Relative1Relationship"
+                           class="form-label">
+                        Relationship
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="Relative1Relationship"
+                           class="form-control" />
+
+                    <span asp-validation-for="Relative1Relationship"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Relative1TelNumber"
+                           class="form-label">
+                        Telephone
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="Relative1TelNumber"
+                           type="tel"
+                           class="form-control" />
+
+                    <span asp-validation-for="Relative1TelNumber"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Relative1Address"
+                           class="form-label">
+                        Address
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="Relative1Address"
+                           class="form-control" />
+
+                    <span asp-validation-for="Relative1Address"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Relative2Name" class="form-label">
+                        Relative 2 Name
+                    </label>
+
+                    <input asp-for="Relative2Name"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Relative2Relationship"
+                           class="form-label">
+                        Relationship
+                    </label>
+
+                    <input asp-for="Relative2Relationship"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Relative2TelNumber"
+                           class="form-label">
+                        Telephone
+                    </label>
+
+                    <input asp-for="Relative2TelNumber"
+                           type="tel"
+                           class="form-control" />
+
+                    <span asp-validation-for="Relative2TelNumber"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Relative2Address"
+                           class="form-label">
+                        Address
+                    </label>
+
+                    <input asp-for="Relative2Address"
+                           class="form-control" />
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- DECLARATION -->
+
+            <h5 class="fw-semibold mb-3">8. Declaration</h5>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+                    <label asp-for="ApplicantSignature"
+                           class="form-label">
+                        Type Your Full Name as Signature
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input asp-for="ApplicantSignature"
+                           class="form-control" />
+
+                    <span asp-validation-for="ApplicantSignature"
+                          class="text-danger"></span>
+                </div>
+
+            </div>
+
+
+            <hr class="my-4" />
+
+            <h5 class="fw-semibold mb-3">Supporting Documents</h5>
+
+            <p class="text-muted small">
+                Upload your ID document, payslip, bank statement,
+                or proof of address. You can also upload documents later.
+            </p>
+
+            <div class="mb-4">
+                <label for="supportingDocuments" class="form-label">
+                    Upload Documents (Optional)
+                </label>
+
+                <input type="file"
+                       id="supportingDocuments"
+                       name="supportingDocuments"
+                       class="form-control"
+                       accept=".pdf,.jpg,.jpeg,.png"
+                       multiple />
+
+                <div class="form-text">
+                    PDF, JPG or PNG. Maximum 5 MB per file.
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+                <button type="submit"
+                        id="submitApplicationBtn"
+                        class="btn btn-primary px-4">
+                    Submit Application
+                </button>
+
+                <a asp-controller="Loan"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </div>
+
         </div>
-        <div class="col-md-6" id="marriageCommunityBox">
-            <label asp-for="MarriageCommunity" class="form-label">Marriage community (in/out of)</label>
-            <input asp-for="MarriageCommunity" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="PreviouslyDivorced" class="form-label"></label>
-            <select asp-for="PreviouslyDivorced" id="prevDivorced" class="form-select">
-                <option value="">Select…</option>
-                <option>No</option>
-                <option>Yes</option>
-            </select>
-        </div>
-        <div class="col-md-4" id="divorceYearBox">
-            <label asp-for="DivorceYear" class="form-label"></label>
-            <input asp-for="DivorceYear" class="form-control" />
-            <span asp-validation-for="DivorceYear" class="text-danger"></span>
-        </div>
-        <div class="col-md-4" id="divorceCommunityBox">
-            <label asp-for="DivorceCommunity" class="form-label"></label>
-            <input asp-for="DivorceCommunity" class="form-control" />
-        </div>
+    </form>
 </div>
 
-    <h5>Address</h5>
-    <div class="row g-3 mb-4">
-        <div class="col-12"><label asp-for="CurrentPhysicalAddress" class="form-label"></label><input asp-for="CurrentPhysicalAddress" class="form-control" /><span asp-validation-for="CurrentPhysicalAddress" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="PostalAddress" class="form-label"></label><input asp-for="PostalAddress" class="form-control" /></div>
-        <div class="col-md-6"><label asp-for="ParentsAddress" class="form-label"></label><input asp-for="ParentsAddress" class="form-control" /></div>
-        <div class="col-md-3"><label asp-for="ResidenceYears" class="form-label">Years at address</label><input asp-for="ResidenceYears" class="form-control" /></div>
-        <div class="col-md-3"><label asp-for="ResidenceMonths" class="form-label">Months at address</label><input asp-for="ResidenceMonths" class="form-control" /></div>
-    </div>
+@section Scripts {
 
-    <h5>Employment</h5>
-    <div class="row g-3 mb-4">
-        <div class="col-md-6"><label asp-for="CompanyName" class="form-label"></label><input asp-for="CompanyName" class="form-control" /><span asp-validation-for="CompanyName" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="Occupation" class="form-label"></label><input asp-for="Occupation" class="form-control" /><span asp-validation-for="Occupation" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="WorkTelephone" class="form-label"></label><input asp-for="WorkTelephone" class="form-control" /></div>
-        <div class="col-md-6"><label asp-for="WorkAddress" class="form-label"></label><input asp-for="WorkAddress" class="form-control" /></div>
-    </div>
+    <partial name="_ValidationScriptsPartial" />
 
-    <h5>Bank details</h5>
-    <div class="row g-3 mb-4">
-        <div class="col-md-6"><label asp-for="BankName" class="form-label"></label><input asp-for="BankName" class="form-control" /><span asp-validation-for="BankName" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="AccountType" class="form-label"></label><select asp-for="AccountType" class="form-select"><option value="">Select…</option><option>Cheque</option><option>Savings</option><option>Transmission</option></select><span asp-validation-for="AccountType" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="AccountName" class="form-label"></label><input asp-for="AccountName" class="form-control" /><span asp-validation-for="AccountName" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="AccountNumber" class="form-label"></label><input asp-for="AccountNumber" class="form-control" /><span asp-validation-for="AccountNumber" class="text-danger"></span></div>
-        <div class="col-md-6"><label asp-for="BranchName" class="form-label"></label><input asp-for="BranchName" class="form-control" /></div>
-        <div class="col-md-6"><label asp-for="BranchCode" class="form-label"></label><input asp-for="BranchCode" class="form-control" /></div>
-    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-        <div id="spouseSection">
-            <h5>Spouse</h5>
-            <div class="row g-3 mb-4">
-                <!-- the six existing spouse fields stay exactly as they are,
-             and add the validation spans for the first three -->
-                <div class="col-md-6"><label asp-for="SpouseNameAndSurname" class="form-label"></label><input asp-for="SpouseNameAndSurname" class="form-control" /><span asp-validation-for="SpouseNameAndSurname" class="text-danger"></span></div>
-                <div class="col-md-6"><label asp-for="SpouseIdNumber" class="form-label"></label><input asp-for="SpouseIdNumber" class="form-control" /><span asp-validation-for="SpouseIdNumber" class="text-danger"></span></div>
-                <div class="col-md-6"><label asp-for="SpouseTelNumber" class="form-label"></label><input asp-for="SpouseTelNumber" class="form-control" /><span asp-validation-for="SpouseTelNumber" class="text-danger"></span></div>
-                <div class="col-md-6"><label asp-for="SpouseEmployerName" class="form-label"></label><input asp-for="SpouseEmployerName" class="form-control" /></div>
-                <div class="col-md-6"><label asp-for="SpouseEmployerAddress" class="form-label"></label><input asp-for="SpouseEmployerAddress" class="form-control" /></div>
-                <div class="col-md-6"><label asp-for="SpouseEmployerTelNumber" class="form-label"></label><input asp-for="SpouseEmployerTelNumber" class="form-control" /></div>
-            </div>
-        </div>
+            const form = document.getElementById("loanApplicationForm");
 
-        <h5>Relatives <small class="text-muted fs-6">(Relative 1 is required, Relative 2 is optional)</small></h5>
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <label asp-for="Relative1Name" class="form-label"></label>
-                <input asp-for="Relative1Name" class="form-control" />
-                <span asp-validation-for="Relative1Name" class="text-danger"></span>
-            </div>
-            <div class="col-md-3">
-                <label asp-for="Relative1Relationship" class="form-label"></label>
-                <input asp-for="Relative1Relationship" class="form-control" />
-                <span asp-validation-for="Relative1Relationship" class="text-danger"></span>
-            </div>
-            <div class="col-md-3">
-                <label asp-for="Relative1TelNumber" class="form-label"></label>
-                <input asp-for="Relative1TelNumber" class="form-control" />
-                <span asp-validation-for="Relative1TelNumber" class="text-danger"></span>
-            </div>
-            <div class="col-md-3">
-                <label asp-for="Relative1Address" class="form-label"></label>
-                <input asp-for="Relative1Address" class="form-control" />
-                <span asp-validation-for="Relative1Address" class="text-danger"></span>
-            </div>
+            const maritalStatus = document.getElementById("maritalStatus");
+            const prevDivorced = document.getElementById("prevDivorced");
 
-            <div class="col-md-3"><label asp-for="Relative2Name" class="form-label"></label><input asp-for="Relative2Name" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Relative2Relationship" class="form-label"></label><input asp-for="Relative2Relationship" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Relative2TelNumber" class="form-label"></label><input asp-for="Relative2TelNumber" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Relative2Address" class="form-label"></label><input asp-for="Relative2Address" class="form-control" /></div>
-        </div>
+            const spouseSection = document.getElementById("spouseSection");
+            const marriageCommunityBox = document.getElementById("marriageCommunityBox");
+            const divorceYearBox = document.getElementById("divorceYearBox");
+            const divorceCommunityBox = document.getElementById("divorceCommunityBox");
 
-    <h5>Declaration</h5>
-    <div class="row g-3 mb-4">
-        <div class="col-md-6"><label asp-for="ApplicantSignature" class="form-label"></label><input asp-for="ApplicantSignature" class="form-control" /><span asp-validation-for="ApplicantSignature" class="text-danger"></span></div>
-    </div>
+            const otherReasonBox = document.getElementById("otherReasonBox");
+            const otherReason = document.getElementById("OtherReason");
 
-    <div>
-        <button type="submit" class="btn btn-primary">Submit Application</button>
-        <a asp-action="Index" class="btn btn-link">Cancel</a>
-    </div>
-</form>
+            const otherCheckbox = document.querySelector(
+                'input[name="ReasonsForLoan"][value="Other"]'
+            );
 
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-        <script>
-            function show(id, visible) {
-                document.getElementById(id).style.display = visible ? '' : 'none';
+            const conditionalIds = [
+                "SpouseNameAndSurname",
+                "SpouseIdNumber",
+                "SpouseTelNumber",
+                "DivorceYear",
+                "OtherReason"
+            ];
+
+            // Show or hide a conditional section.
+            function showSection(element, visible) {
+                if (!element) return;
+
+                element.style.display = visible ? "" : "none";
+
+                element.querySelectorAll("input, select, textarea")
+                    .forEach(field => {
+                        field.disabled = !visible;
+                    });
             }
+
+            // Display validation below a field.
+            function setError(id, message) {
+                const field = document.getElementById(id);
+                if (!field) return;
+
+                field.classList.add("is-invalid");
+
+                let error = document.getElementById(id + "_customError");
+
+                if (!error) {
+                    error = document.createElement("div");
+                    error.id = id + "_customError";
+                    error.className = "text-danger small mt-1";
+                    field.insertAdjacentElement("afterend", error);
+                }
+
+                error.textContent = message;
+            }
+
+            function clearError(id) {
+                const field = document.getElementById(id);
+                if (!field) return;
+
+                field.classList.remove("is-invalid");
+
+                const error = document.getElementById(id + "_customError");
+
+                if (error) {
+                    error.textContent = "";
+                }
+            }
+
+            // Update all conditional sections.
             function updateForm() {
-                const married = document.getElementById('maritalStatus').value === 'Married';
-                const divorced = document.getElementById('prevDivorced').value === 'Yes';
-                show('spouseSection', married);
-                show('marriageCommunityBox', married);
-                show('divorceYearBox', divorced);
-                show('divorceCommunityBox', divorced);
+                const married = maritalStatus.value === "Married";
+                const divorced = prevDivorced.value === "Yes";
+
+                showSection(spouseSection, married);
+                showSection(marriageCommunityBox, married);
+                showSection(divorceYearBox, divorced);
+                showSection(divorceCommunityBox, divorced);
+
+                if (!married) {
+                    ["SpouseNameAndSurname", "SpouseIdNumber",
+                     "SpouseTelNumber"].forEach(clearError);
+                }
+
+                if (!divorced) {
+                    clearError("DivorceYear");
+                }
             }
-            document.getElementById('maritalStatus').addEventListener('change', updateForm);
-            document.getElementById('prevDivorced').addEventListener('change', updateForm);
+
+            function updateOtherReason() {
+                if (!otherCheckbox || !otherReasonBox) return;
+
+                const selected = otherCheckbox.checked;
+
+                showSection(otherReasonBox, selected);
+
+                if (!selected) {
+                    clearError("OtherReason");
+                }
+            }
+
+            // Validate fields that are conditionally required.
+            function validateConditionalFields() {
+                let valid = true;
+
+                conditionalIds.forEach(clearError);
+
+                const married = maritalStatus.value === "Married";
+                const divorced = prevDivorced.value === "Yes";
+
+                if (married) {
+                    const spouseName =
+                        document.getElementById("SpouseNameAndSurname");
+
+                    const spouseId =
+                        document.getElementById("SpouseIdNumber");
+
+                    const spousePhone =
+                        document.getElementById("SpouseTelNumber");
+
+                    if (!spouseName.value.trim()) {
+                        setError(
+                            "SpouseNameAndSurname",
+                            "Spouse full name is required."
+                        );
+                        valid = false;
+                    }
+
+                    if (!spouseId.value.trim()) {
+                        setError(
+                            "SpouseIdNumber",
+                            "Spouse ID number is required."
+                        );
+                        valid = false;
+                    }
+
+                    if (!spousePhone.value.trim()) {
+                        setError(
+                            "SpouseTelNumber",
+                            "Spouse telephone number is required."
+                        );
+                        valid = false;
+                    }
+                }
+
+                if (divorced) {
+                    const value =
+                        document.getElementById("DivorceYear").value.trim();
+
+                    const year = Number(value);
+                    const currentYear = new Date().getFullYear();
+
+                    if (!/^\d{4}$/.test(value) ||
+                        year < 1900 ||
+                        year > currentYear) {
+
+                        setError(
+                            "DivorceYear",
+                            "Please enter a valid divorce year."
+                        );
+
+                        valid = false;
+                    }
+                }
+
+                if (otherCheckbox?.checked &&
+                    !otherReason.value.trim()) {
+
+                    setError(
+                        "OtherReason",
+                        "Please specify your other reason for the loan."
+                    );
+
+                    valid = false;
+                }
+
+                return valid;
+            }
+
+            // Update sections when selections change.
+            maritalStatus.addEventListener("change", updateForm);
+            prevDivorced.addEventListener("change", updateForm);
+
+            if (otherCheckbox) {
+                otherCheckbox.addEventListener(
+                    "change",
+                    updateOtherReason
+                );
+            }
+
+            // Clear conditional errors while editing.
+            conditionalIds.forEach(id => {
+                const field = document.getElementById(id);
+
+                if (field) {
+                    field.addEventListener("input", function () {
+                        clearError(id);
+                    });
+                }
+            });
+
+            // Validate before submission.
+            form.addEventListener("submit", function (event) {
+
+                const conditionalValid = validateConditionalFields();
+
+                // Use existing ASP.NET/jQuery validation
+                // for ordinary model fields.
+                const modelValid =
+                    typeof jQuery === "undefined" ||
+                    !jQuery.validator ||
+                    jQuery(form).valid();
+
+                if (!conditionalValid || !modelValid) {
+                    event.preventDefault();
+
+                    const firstInvalid =
+                        form.querySelector(".is-invalid, .input-validation-error");
+
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+
+                        firstInvalid.focus({ preventScroll: true });
+                    }
+                }
+            });
+
+            // Initial state when page loads.
             updateForm();
-        </script>
-    }
+            updateOtherReason();
+
+        });
+    </script>
+}
