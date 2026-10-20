@@ -27,7 +27,6 @@ namespace APIINSY7315.Controllers
         
 
         [HttpPost]
-        [EnableRateLimiting("loan-submit")]
         [FirebaseAuthorize(Roles.Client)]
         public async Task<IActionResult> Submit(
             [FromBody] SubmitLoanRequest request)
@@ -50,6 +49,14 @@ namespace APIINSY7315.Controllers
 
             var userId =
                 HttpContext.GetUserId();
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new
+                {
+                    error = "INVALID_USER",
+                    message = "Firebase user ID not found."
+                });
+            }
 
             var userEmail =
                 HttpContext.GetEmail() ?? "";
@@ -398,7 +405,7 @@ namespace APIINSY7315.Controllers
      
 
         [HttpGet("mine")]
-        [EnableRateLimiting("loan-read")]
+       
         [FirebaseAuthorize(Roles.Client)]
         public async Task<IActionResult> GetMine()
         {
@@ -632,7 +639,7 @@ namespace APIINSY7315.Controllers
 
 
         [HttpPut("{id}/status")]
-        [EnableRateLimiting("status-update")]
+       
         [FirebaseAuthorize(
       Roles.Admin,
       Roles.Staff)]
