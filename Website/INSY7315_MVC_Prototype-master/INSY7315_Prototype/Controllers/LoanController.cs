@@ -127,12 +127,12 @@ public class LoanController : Controller
 
         // Validate the temporary loan amount range.
         // The model also enforces this with its Range attribute.
-        if (model.RequestedAmount < 300 ||
-            model.RequestedAmount > 500000)
+        if (model.RequestedAmount < 500 ||
+            model.RequestedAmount > 20000)
         {
             ModelState.AddModelError(
                 nameof(model.RequestedAmount),
-                "Loan amount must be between R300 and R500,000.");
+                "Loan amount must be between R500 and R20,000.");
         }
 
         // Validate conditional spouse fields.

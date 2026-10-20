@@ -54,13 +54,13 @@
 
                     <input asp-for="RequestedAmount"
                            type="number"
-                           min="300"
-                           max="500000"
+                           min="500"
+                           max="20000"
                            step="0.01"
                            class="form-control" />
 
                     <div class="form-text">
-                        Enter an amount between R300 and R500,000.
+                        Enter an amount between R500 and R20,000.
                     </div>
 
                     <span asp-validation-for="RequestedAmount"
