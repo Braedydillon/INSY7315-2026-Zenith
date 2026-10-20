@@ -1,6 +1,7 @@
 using APIINSY7315.Models;
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace APIINSY7315.Controllers
 {
@@ -26,6 +27,7 @@ namespace APIINSY7315.Controllers
         
 
         [HttpPost]
+        [EnableRateLimiting("loan-submit")]
         [FirebaseAuthorize(Roles.Client)]
         public async Task<IActionResult> Submit(
             [FromBody] SubmitLoanRequest request)
@@ -270,7 +272,81 @@ namespace APIINSY7315.Controllers
                         .Document(applicationId);
 
 
-                await document.CreateAsync(application);
+
+                // South African local time (UTC+2)
+                var now = DateTimeOffset.UtcNow.ToOffset(
+                    TimeSpan.FromHours(2));
+
+                var dayKey = now.ToString("yyyy-MM-dd");
+                var monthKey = now.ToString("yyyy-MM");
+
+                // Separate counters for each Firebase user
+                var userLimits = _db
+                    .Collection("LoanSubmissionLimits")
+                    .Document(userId);
+
+                var dayRef = userLimits
+                    .Collection("Days")
+                    .Document(dayKey);
+
+                var monthRef = userLimits
+                    .Collection("Months")
+                    .Document(monthKey);
+
+                // Check and save atomically
+                string? limitError = await _db.RunTransactionAsync(
+                    async transaction =>
+                    {
+                        var daySnapshot =
+                            await transaction.GetSnapshotAsync(dayRef);
+
+                        var monthSnapshot =
+                            await transaction.GetSnapshotAsync(monthRef);
+
+                        long dailyCount = daySnapshot.Exists
+                            ? daySnapshot.GetValue<long>("Count")
+                            : 0;
+
+                        long monthlyCount = monthSnapshot.Exists
+                            ? monthSnapshot.GetValue<long>("Count")
+                            : 0;
+
+                        // Maximum 2 applications daily
+                        if (dailyCount >= 2)
+                            return "DAILY_LIMIT_EXCEEDED";
+
+                        // Maximum 5 applications monthly
+                        if (monthlyCount >= 5)
+                            return "MONTHLY_LIMIT_EXCEEDED";
+
+                        // Increment counters
+                        transaction.Set(dayRef, new
+                        {
+                            Count = dailyCount + 1
+                        });
+
+                        transaction.Set(monthRef, new
+                        {
+                            Count = monthlyCount + 1
+                        });
+
+                        // Save loan in the same transaction
+                        transaction.Create(document, application);
+
+                        return (string?)null;
+                    });
+
+                if (limitError != null)
+                {
+                    return StatusCode(429, new
+                    {
+                        error = limitError,
+                        message = limitError == "DAILY_LIMIT_EXCEEDED"
+                            ? "You can only submit 2 loan applications per day."
+                            : "You can only submit 5 loan applications per month."
+                    });
+                }
+
 
 
                 _logger.LogInformation(
@@ -322,6 +398,7 @@ namespace APIINSY7315.Controllers
      
 
         [HttpGet("mine")]
+        [EnableRateLimiting("loan-read")]
         [FirebaseAuthorize(Roles.Client)]
         public async Task<IActionResult> GetMine()
         {
@@ -555,6 +632,7 @@ namespace APIINSY7315.Controllers
 
 
         [HttpPut("{id}/status")]
+        [EnableRateLimiting("status-update")]
         [FirebaseAuthorize(
       Roles.Admin,
       Roles.Staff)]

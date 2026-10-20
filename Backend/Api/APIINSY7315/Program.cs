@@ -4,6 +4,8 @@ using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 using Microsoft.OpenApi;
 using System.IO;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +62,51 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+//rate limiter
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = 429;
+
+    options.OnRejected = async (context, token) =>
+    {
+        var response = context.HttpContext.Response;
+        response.StatusCode = 429;
+        response.ContentType = "application/json";
+
+        await response.WriteAsync(
+            "{\"error\":\"RATE_LIMIT_EXCEEDED\"," +
+            "\"message\":\"Too many requests. Please try again later.\"}",
+            token);
+    };
+
+    // Default protection for all requests
+    options.GlobalLimiter =
+        PartitionedRateLimiter.Create<HttpContext, string>(
+            ctx => LimitByIp(ctx, 120, TimeSpan.FromMinutes(1)));
+
+    // Authentication
+    options.AddPolicy("login",
+        ctx => LimitByIp(ctx, 5, TimeSpan.FromMinutes(1)));
+
+    options.AddPolicy("register",
+        ctx => LimitByIp(ctx, 3, TimeSpan.FromHours(1)));
+
+    options.AddPolicy("refresh",
+        ctx => LimitByIp(ctx, 10, TimeSpan.FromMinutes(1)));
+
+    // Loan applications
+    options.AddPolicy("loan-submit",
+        ctx => LimitByIp(ctx, 5, TimeSpan.FromHours(1)));
+
+    options.AddPolicy("loan-read",
+        ctx => LimitByIp(ctx, 60, TimeSpan.FromMinutes(1)));
+
+    options.AddPolicy("status-update",
+        ctx => LimitByIp(ctx, 20, TimeSpan.FromMinutes(1)));
+});
+
+
 
 var app = builder.Build();
 
@@ -126,6 +173,29 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+//helper function for rate limiting
+
+static RateLimitPartition<string> LimitByIp(
+    HttpContext context,
+    int limit,
+    TimeSpan window)
+{
+    var ip = context.Connection.RemoteIpAddress?.ToString()
+             ?? "unknown";
+
+    return RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: ip,
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = limit,
+            Window = window,
+            QueueLimit = 0,
+            AutoReplenishment = true
+        });
+}

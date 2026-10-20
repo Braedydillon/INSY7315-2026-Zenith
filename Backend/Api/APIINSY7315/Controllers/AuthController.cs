@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace APIINSY7315.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [AllowAnonymous]
+   
     public class AuthController : ControllerBase
     {
         private readonly FirestoreDb _firestore;
@@ -34,7 +35,7 @@ namespace APIINSY7315.Controllers
      
 
         [HttpPost("register")]
-        [AllowAnonymous]
+       
         public async Task<IActionResult> Register(
             [FromBody] RegisterRequest request)
         {
@@ -230,6 +231,7 @@ namespace APIINSY7315.Controllers
     
 
         [HttpPost("login")]
+        [EnableRateLimiting("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login(
             [FromBody] LoginRequest request)
@@ -371,6 +373,7 @@ namespace APIINSY7315.Controllers
             }
         }
         [HttpPost("refresh")]
+        [EnableRateLimiting("refresh")]
         [AllowAnonymous]
         public async Task<IActionResult> Refresh(
             [FromBody] RefreshRequest request)
