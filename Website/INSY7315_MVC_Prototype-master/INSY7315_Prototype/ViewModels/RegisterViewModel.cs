@@ -17,8 +17,8 @@ namespace INSY7315_Prototype.ViewModels
         public string Email { get; set; } = string.Empty;
 
 
-        [Required(ErrorMessage = "Phone number is required")]
-        [Phone(ErrorMessage = "Please enter valid phone number")]
+        [Required(ErrorMessage = "Phone number is required.")]
+        [RegularExpression(@"^0[0-9]{9}$",ErrorMessage = "Enter a valid 10-digit South African phone number.")]
         public string Phone { get; set; } = string.Empty;
 
 

@@ -1,11 +1,17 @@
-﻿@model INSY7315_Prototype.ViewModels.ManagerLoanApplicationViewModel
+@model INSY7315_Prototype.ViewModels.ManagerLoanApplicationViewModel
 @using INSY7315_Prototype.Models
+
 
 @{
     var canVerify = LoanRules.Is(Model.Status, LoanStatus.Submitted);
 
-    ViewData["Title"] = canVerify ? "Verify Application" : "Application Details";
+    var staffCanApprove = LoanRules.StaffCanHandle(Model.RequestedAmount);
+
+    ViewData["Title"] = canVerify
+        ? "Verify Application"
+        : "Application Details";
 }
+
 
 <div class="manager-page">
 
@@ -90,6 +96,13 @@
                 </div>
             </div>
 
+            <a asp-controller="LoanDocuments"
+               asp-action="Index"
+               asp-route-loanId="@Model.ApplicationId"
+               class="btn btn-outline-primary mb-3">
+                View / Request Documents
+            </a>
+
             <form asp-controller="Staff" asp-action="CompleteReview" method="post" class="manager-review">
 
                 @Html.AntiForgeryToken()
@@ -136,12 +149,20 @@
                 </div>
             </div>
 
-            @if (LoanRules.Is(Model.Status, LoanStatus.UnderReview))
+
+            @if (LoanRules.Is(Model.Status, LoanStatus.UnderReview)
+                && staffCanApprove)
             {
                 <div class="read-only-actions">
-                    <a asp-controller="Staff" asp-action="Approval" asp-route-id="@Model.ApplicationId" class="btn-primary-custom"> Go to Loan Approval </a>
+                    <a asp-controller="Staff"
+                       asp-action="Approval"
+                       asp-route-id="@Model.ApplicationId"
+                       class="btn-primary-custom">
+                        Go to Loan Approval
+                    </a>
                 </div>
             }
+
 
         </div>
     }
